@@ -1,0 +1,3 @@
+# Preview build hosted off the client's own domain. Not for indexing.
+User-agent: *
+Disallow: /

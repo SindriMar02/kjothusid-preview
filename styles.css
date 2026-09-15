@@ -1,0 +1,706 @@
+/* ==========================================================================
+   Heidmork : 1:1 transplant of the CO'COON system (auw.studio)
+   Ported from the mirrored source at _reference/cocoon-teardown/src/.
+   Tokens, type scale, spacing, aspect ratios, easings and component
+   mechanics are the reference's own values, unchanged.
+   ========================================================================== */
+
+/* Display face is the reference's own (Marcellus).
+   Body face: the reference declares "Maison Neue", "Helvetica Neue", Arial.
+   Maison Neue is licensed, so we use its declared Helvetica fallback class. */
+@font-face{font-family:'Marcellus';src:url('assets/fonts/Marcellus-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Maison Neue';src:url('assets/fonts/NimbusSans-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Maison Neue';src:url('assets/fonts/NimbusSans-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+
+:root{
+  --font-sans:"Maison Neue","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Marcellus",Georgia,"Times New Roman",serif;
+
+  --color-black:#141414;
+  --color-white:#f0f0f0;
+  --color-light-gray:#cacaca;
+  --color-dark-gray:#898989;
+  --color-light-black:#292929;
+  --color-overlay:#14141480;
+  --color-glass:#f0f0f033;
+  --color-error:#f0c4b4;
+
+  --spacing-xxxs:.125rem;
+  --spacing-xxs:.25rem;
+  --spacing-xs:.5rem;
+  --spacing-s:.75rem;
+  --spacing-m:1rem;
+  --spacing-l:1.5rem;
+  --spacing-xl:2rem;
+  --spacing-xxl:4rem;
+  --spacing-spacer:8rem;
+
+  --page-width:90rem;
+  --navbar-height:3.75rem;
+
+  --blur-overlay:.5rem;
+  --blur-card:3.125rem;
+  --footer-shadow-blur:.0625rem;
+  --footer-shadow-color:#f0f0f080;
+  --footer-shadow-glow-blur:.625rem;
+  --footer-shadow-glow-color:#f0f0f01a;
+
+  --root-font-size:100%;
+  --top-chrome:var(--navbar-height);
+  --dvh:1dvh;--svh:1svh;--lvh:1lvh;
+}
+
+/* reference: >=144rem the whole rem-built page scales with the viewport */
+@media (min-width:144rem){:root{--root-font-size:calc(100vw / 144)}}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border:0 solid}
+html{background:var(--color-white);font-size:var(--root-font-size);-webkit-text-size-adjust:100%}
+body{
+  background:var(--color-white);color:var(--color-black);
+  font-family:var(--font-sans);-webkit-font-smoothing:antialiased;
+  min-height:calc(var(--svh) * 100);
+}
+img,svg,video{display:block;vertical-align:middle}
+img,video{max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+/* reference reset: controls inherit type and carry no chrome background */
+button,input,select,optgroup,textarea{font:inherit;letter-spacing:inherit;color:inherit;background-color:transparent;border-radius:0;appearance:none}
+button{cursor:pointer}
+ol,ul{list-style:none}
+::selection{background:var(--color-black);color:var(--color-white)}
+#page{min-height:calc(var(--svh) * 100);display:flex;flex-direction:column;will-change:transform}
+main{flex:1 0 auto}
+:focus-visible{outline:1px solid var(--color-black);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ---------------- type scale (reference values) ---------------- */
+.type-display{font-family:var(--font-display);letter-spacing:-.03em;font-size:clamp(2.5rem,1.5rem + 5vw,5rem);line-height:.95}
+.type-header{font-family:var(--font-display);letter-spacing:-.03em;font-size:clamp(2rem,1.25rem + 3.75vw,4rem);line-height:.94}
+.type-large{font-family:var(--font-sans);letter-spacing:.02em;font-size:1.5rem;line-height:1.75rem}
+.type-medium{font-family:var(--font-sans);letter-spacing:.02em;font-size:1.25rem;line-height:1.5rem}
+.type-small{font-family:var(--font-sans);letter-spacing:.02em;font-size:.875rem;line-height:1.0625rem}
+.type-xsmall{font-family:var(--font-sans);letter-spacing:.02em;font-size:.75rem;line-height:.9375rem}
+.uppercase{text-transform:uppercase}
+.font-bold{font-weight:700}
+.text-white{color:var(--color-white)}
+.text-black{color:var(--color-black)}
+.text-dark-gray{color:var(--color-dark-gray)}
+.text-light-gray{color:var(--color-light-gray)}
+
+.wrapper{width:100%;max-width:var(--page-width);padding-inline:var(--spacing-l);margin-inline:auto}
+
+/* section rhythm: mobile value, desktop value at 48rem (reference pattern) */
+.section-spacing{padding-top:var(--section-pt-mobile,0);padding-bottom:var(--section-pb-mobile,0)}
+[data-pt="s"]{--section-pt-mobile:var(--spacing-s);--section-pt-desktop:var(--spacing-m)}
+[data-pt="m"]{--section-pt-mobile:var(--spacing-m);--section-pt-desktop:var(--spacing-l)}
+[data-pt="l"]{--section-pt-mobile:var(--spacing-l);--section-pt-desktop:var(--spacing-xl)}
+[data-pt="xl"]{--section-pt-mobile:var(--spacing-xl);--section-pt-desktop:var(--spacing-xxl)}
+[data-pt="xxl"]{--section-pt-mobile:var(--spacing-xl);--section-pt-desktop:var(--spacing-spacer)}
+[data-pb="s"]{--section-pb-mobile:var(--spacing-s);--section-pb-desktop:var(--spacing-m)}
+[data-pb="m"]{--section-pb-mobile:var(--spacing-m);--section-pb-desktop:var(--spacing-l)}
+[data-pb="l"]{--section-pb-mobile:var(--spacing-l);--section-pb-desktop:var(--spacing-xl)}
+[data-pb="xl"]{--section-pb-mobile:var(--spacing-xl);--section-pb-desktop:var(--spacing-xxl)}
+[data-pb="xxl"]{--section-pb-mobile:var(--spacing-xl);--section-pb-desktop:var(--spacing-spacer)}
+@media (min-width:48rem){.section-spacing{padding-top:var(--section-pt-desktop,0);padding-bottom:var(--section-pb-desktop,0)}}
+
+/* ---------------- buttons (reference mechanics) ---------------- */
+.btn{
+  isolation:isolate;width:fit-content;
+  padding:var(--spacing-s) var(--spacing-xl);
+  font-family:var(--font-sans);letter-spacing:.02em;white-space:nowrap;cursor:pointer;
+  --btn-ease:cubic-bezier(.65,0,.35,1);--btn-duration:.25s;
+  /* The fill wipe keeps the reference's morph curve and 250ms, which is inside
+     budget. The transform channel carries press feedback, so it gets its own
+     fast ease-out instead. */
+  transition:color var(--btn-duration) var(--btn-ease),transform .16s cubic-bezier(.23,1,.32,1);
+  justify-content:center;align-items:center;font-size:.875rem;display:inline-flex;position:relative;overflow:hidden;
+}
+.btn-fill{background:var(--color-black);color:var(--color-white)}
+.btn-outline{--btn-fill:var(--color-black);--btn-on-fill:var(--color-white);background:0 0;border:1px solid}
+.btn-outline.text-white{--btn-fill:var(--color-white);--btn-on-fill:var(--color-black)}
+.btn-outline::before{content:"";z-index:-1;position:absolute;inset:0;background:var(--btn-fill);transform-origin:bottom;transform:scaleY(0);transition:transform var(--btn-duration) var(--btn-ease)}
+/* Hover motion is gated: a tap on a touch screen fires a false hover, which
+   left the fill wiped in and stuck there after the finger lifted. */
+@media (hover:hover) and (pointer:fine){
+  .btn-fill:hover:not(:disabled){transform:scale(.99)}
+  .btn-outline:hover:not(:disabled)::before{transform:scaleY(1)}
+  .btn-outline:hover:not(:disabled){color:var(--btn-on-fill)}
+}
+/* Press feedback. Nothing here was pressable-feeling on touch, where hover
+   never fires. Subtle, and it scales the label with the box. */
+.btn-fill:active:not(:disabled),
+.btn-outline:active:not(:disabled){transform:scale(.97)}
+
+/* ---------------- cocoon-link underline ---------------- */
+.link{display:inline-block}
+.link__anchor{padding-bottom:var(--spacing-xxxs);cursor:pointer;display:inline-block;position:relative}
+.link__underline{pointer-events:none;width:100%;height:1px;position:absolute;bottom:0;left:0;overflow:hidden}
+.link__line{background:currentColor;position:absolute;inset:0;transform:translate(-101%)}
+
+
+/* ---------------- navbar ---------------- */
+.navbar{
+  position:fixed;inset-inline:0;top:0;z-index:40;padding-inline:var(--spacing-m);
+  color:var(--color-white);transition:color .3s ease;
+}
+.navbar[data-nav-theme="light"]{color:var(--color-black)}
+.navbar__inner{position:relative;display:flex;align-items:center;justify-content:space-between;padding-block:var(--spacing-m)}
+.navbar__left,.navbar__right{display:flex;align-items:center;gap:var(--spacing-l)}
+.navbar__logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:1.125rem;letter-spacing:.08em}
+.navbar__links{display:none;align-items:center;gap:var(--spacing-l)}
+.navbar__burger{position:relative;display:block;width:var(--spacing-l);height:var(--spacing-l);background:none;color:inherit;cursor:pointer}
+.navbar__burger-line{position:absolute;left:0;top:50%;width:100%;height:1px;background:currentColor}
+@media (min-width:64rem){.navbar__links{display:flex}.navbar__toggle{display:none}}
+
+/* ---------------- hero ---------------- */
+.hero{
+  position:relative;display:flex;overflow:hidden;isolation:isolate;
+  min-height:var(--hero-height,calc(var(--svh) * 100));
+}
+@media (max-width:47.99rem){.hero[data-section-height="full"]{min-height:calc(var(--svh) * 90)}}
+.hero__media{position:absolute;left:0;right:0;z-index:0;top:calc(var(--hero-parallax-travel,0%) * -1);height:calc(100% + var(--hero-parallax-travel,0%) * 2);will-change:transform}
+.hero__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Focal point for the narrow crop: the patties sit right of centre in this
+   photograph, and the slate at the left is the darkest part of the frame,
+   which is where the navbar needs its ground. */
+@media (max-aspect-ratio:1/1),(max-width:89.99rem){.hero__image{object-position:62% center}}
+.hero__overlay{position:absolute;inset:0;z-index:20;pointer-events:none;background:linear-gradient(to top,var(--color-black),transparent 60%);opacity:var(--hero-overlay-opacity,.4)}
+/* Top scrim. The reference's white navbar assumes a dark frame-top and this
+   photograph is backlit across the top, differently at every crop: at 1440 the
+   wordmark measured 87% luminance, at 1280 the left slot measured 93%, both
+   white on near-white. Chasing it with object-position alone just moves the
+   bright band from one nav slot to another, so the navbar gets a guaranteed
+   ground instead. Same device as the reference's own bottom gradient, mirrored,
+   held solid for exactly the navbar's height and faded out well before the
+   headline. Its own layer, so --hero-overlay-opacity keeps its meaning; above
+   the overlay (z 20) and below the content (z 30). */
+/* The scrim that used to live here has moved onto the navbar itself
+   (see "Navbar ground" at the end of this file). Anchored to the hero it
+   scrolled out from under the fixed navbar: correct at scroll 0, and by 600px
+   into the hero the navbar was sitting on unscrimmed photograph again, which
+   is exactly what the scroll probe measured. A scrim for a fixed element
+   belongs on that element. */
+.hero__content{
+  position:relative;z-index:30;display:flex;flex-direction:column;justify-content:flex-end;
+  gap:var(--spacing-s);width:100%;padding:var(--spacing-m);color:var(--color-white);
+}
+.hero__text{max-width:26.5rem}
+@media (min-width:48rem){
+  .hero__content{flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;align-content:flex-end;column-gap:var(--spacing-xl);row-gap:var(--spacing-m);padding-block:var(--spacing-l);padding-inline:var(--spacing-m)}
+  .hero__heading{flex-basis:100%}
+  .hero__text{order:2;align-self:flex-end}
+  .hero__actions{order:1;max-width:21.25rem}
+}
+.hero__actions{display:flex;gap:var(--spacing-s);margin-top:var(--spacing-s)}
+@media (min-width:48rem){.hero__actions{gap:var(--spacing-m);margin-top:0}}
+.hero__actions .btn{flex:1}
+
+/* split-line reveal wrapper (SplitText lines + mask) */
+.line{display:block;overflow:hidden}
+.line>span{display:block;will-change:transform}
+
+/* ---------------- featured products ---------------- */
+.featured-products{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.featured-products__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--spacing-m);align-items:start}
+.featured-products__marketing{
+  position:relative;isolation:isolate;overflow:hidden;grid-column:1/-1;aspect-ratio:370/537;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:var(--spacing-l);
+}
+.featured-products__media{position:absolute;inset:0;z-index:0}
+.featured-products__parallax{position:absolute;left:0;width:100%;top:calc(var(--fp-parallax-travel,0%) * -1);height:calc(100% + var(--fp-parallax-travel,0%) * 2);will-change:transform}
+.featured-products__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.featured-products__overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 0%,var(--color-black) 100%);opacity:var(--fp-overlay-opacity,.5)}
+.featured-products__content{position:relative;z-index:1;display:flex;flex-direction:column;gap:var(--spacing-xs)}
+.featured-products__detail{display:flex;flex-direction:column;gap:var(--spacing-l)}
+@media (min-width:48rem){
+  .featured-products__grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .featured-products--reverse .featured-products__grid{grid-auto-flow:dense}
+  .featured-products__marketing{grid-column:span 2;aspect-ratio:696/704}
+  .featured-products--reverse .featured-products__marketing{grid-column:3/span 2}
+  .featured-products__content{align-items:flex-end}
+  .featured-products__heading{align-self:flex-start}
+  .featured-products__detail{width:18rem}
+}
+
+/* ---------------- product card ---------------- */
+.product-card{display:flex;flex-direction:column;gap:var(--spacing-xxs)}
+.product-card__media{aspect-ratio:4/5;position:relative;overflow:hidden}
+.product-card__image{object-fit:cover;width:100%;height:100%}
+.product-card__image--secondary{opacity:0;transition:opacity .3s;position:absolute;inset:0}
+@media (hover:hover) and (pointer:fine){.product-card:hover .product-card__image--secondary{opacity:1}}
+.product-card__info{display:flex;justify-content:space-between;gap:var(--spacing-m)}
+.product-card__meta{display:flex;flex-direction:column}
+.product-card__note{white-space:nowrap;text-align:right;color:var(--color-dark-gray)}
+@media (min-width:48rem){.product-card{gap:var(--spacing-xs)}}
+
+/* ---------------- full bleed media ---------------- */
+.media-fullbleed{display:block;width:100%}
+.media-fullbleed__media{position:relative;width:100%;overflow:hidden;aspect-ratio:402/506}
+.media-fullbleed__parallax{position:absolute;left:0;width:100%;top:calc(var(--media-fullbleed-parallax-travel,0%) * -1);height:calc(100% + var(--media-fullbleed-parallax-travel,0%) * 2);will-change:transform}
+.media-fullbleed__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media (min-width:48rem){.media-fullbleed__media{aspect-ratio:1440/760}}
+
+/* ---------------- featured collection ---------------- */
+.featured-collection{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.featured-collection__header{display:flex;align-items:center;justify-content:space-between;gap:var(--spacing-m)}
+.featured-collection__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--spacing-m);align-items:start;margin-top:var(--spacing-xs)}
+@media (min-width:48rem){.featured-collection__grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* ---------------- reviews rail ---------------- */
+.reviews{display:flex;flex-direction:column;gap:var(--spacing-xl);background:var(--color-white)}
+.reviews__header{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--spacing-m);padding-inline:var(--spacing-m)}
+.reviews__nav{display:flex;gap:var(--spacing-s)}
+.reviews__arrow{display:grid;place-items:center;color:var(--color-black);cursor:pointer;background:none}
+.reviews__arrow[disabled]{opacity:.3;cursor:default}
+.reviews__arrow--prev{transform:scaleX(-1)}
+.reviews__arrow-icon{display:block;width:var(--spacing-l);height:var(--spacing-l)}
+.reviews__track{
+  display:flex;gap:var(--spacing-m);overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding-inline:var(--spacing-m);scroll-padding-inline:var(--spacing-m);cursor:grab;
+}
+.reviews__track::-webkit-scrollbar{display:none}
+.reviews__track.is-dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.reviews__track.is-dragging .reviews__item{pointer-events:none}
+.reviews__item{flex:0 0 auto;scroll-snap-align:start;aspect-ratio:340/421;height:clamp(21.25rem,19.47rem + 7.6vw,26.3125rem)}
+.reviews__item--media{position:relative;overflow:hidden}
+.reviews__media-img{display:block;width:100%;height:100%;object-fit:cover}
+.reviews__card{display:flex;flex-direction:column;justify-content:space-between;padding:var(--spacing-l);border:1px solid var(--color-dark-gray)}
+.reviews__quote{position:relative}
+.reviews__qmark--open{position:absolute;top:0;inset-inline-end:100%;margin-inline-end:-.05em}
+@media (min-width:48rem){.reviews__track{padding-inline-end:0;scroll-padding-inline-end:0}}
+
+/* ---------------- media overlay (glass card + collage) ---------------- */
+.media-overlay{position:relative;isolation:isolate;overflow:hidden;display:flex;justify-content:center;padding-inline:var(--spacing-m)}
+.media-overlay__media{position:absolute;left:0;width:100%;z-index:0;top:calc(var(--media-overlay-parallax-travel,0%) * -1);height:calc(100% + var(--media-overlay-parallax-travel,0%) * 2);will-change:transform}
+.media-overlay__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.media-overlay__vignette{position:absolute;inset:0;z-index:10;pointer-events:none;background:radial-gradient(ellipse at center,transparent,var(--color-black));opacity:var(--media-overlay-vignette-opacity,.5)}
+.media-overlay__card{
+  position:relative;z-index:20;display:flex;flex-direction:column;gap:var(--spacing-xl);
+  width:100%;max-width:23.125rem;padding:var(--spacing-m);
+  background:var(--color-glass);-webkit-backdrop-filter:blur(var(--blur-card));backdrop-filter:blur(var(--blur-card));
+  border:1px solid var(--color-light-gray);overflow:hidden;
+}
+.media-overlay__content{display:flex;flex-direction:column}
+.media-overlay__collage{position:relative;width:100%;height:28rem}
+.media-overlay__tile{position:absolute;overflow:hidden;will-change:transform}
+.media-overlay__tile--1{left:53.63%;top:6.46rem;width:46.37%;aspect-ratio:2732/4096}
+.media-overlay__tile--2{left:20.59%;top:0;width:37.65%;height:11.9375rem}
+.media-overlay__tile--3{left:0;top:9.51rem;width:35.78%;aspect-ratio:3277/4096}
+.media-overlay__tile--4{left:17.89%;top:16.04rem;width:36%;aspect-ratio:2732/4096}
+.media-overlay__tile-image{width:100%;height:100%;object-fit:cover}
+@media (min-width:48rem){
+  .media-overlay__card{flex-direction:row;align-items:center;justify-content:center;gap:var(--spacing-xl);max-width:73.125rem;padding:var(--spacing-xxl)}
+  .media-overlay__content{max-width:29.6875rem}
+  .media-overlay__body{max-width:24.5rem}
+  .media-overlay__collage{width:33.0625rem;height:30.75rem}
+  .media-overlay__tile--1{left:17.8125rem;top:5.3125rem;width:15.25rem;height:22.8125rem;aspect-ratio:auto}
+  .media-overlay__tile--2{left:5.875rem;top:0;width:12.4375rem;height:18.5625rem;aspect-ratio:auto}
+  .media-overlay__tile--3{left:0;top:14.8125rem;width:11.75rem;height:14.6875rem;aspect-ratio:auto}
+  .media-overlay__tile--4{left:10.0625rem;top:13rem;width:11.8125rem;height:17.75rem;aspect-ratio:auto}
+}
+
+/* ---------------- split media ---------------- */
+.split-media{display:block;width:100%}
+.split-media__grid{display:grid;grid-template-columns:1fr}
+.split-media__panel{position:relative;overflow:hidden;aspect-ratio:402/437}
+.split-media__parallax{position:absolute;left:0;width:100%;top:calc(var(--split-media-parallax-travel,0%) * -1);height:calc(100% + var(--split-media-parallax-travel,0%) * 2);will-change:transform}
+.split-media__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.split-media__overlay{position:absolute;inset:0;pointer-events:none;background:var(--color-black);opacity:var(--split-media-overlay-opacity,.2)}
+.split-media__content{position:relative;z-index:10;display:flex;flex-direction:column;gap:var(--spacing-s);padding:var(--spacing-xl) var(--spacing-m);color:var(--color-white)}
+.split-media__body{max-width:19.125rem}
+@media (min-width:48rem){
+  .split-media__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .split-media__panel{aspect-ratio:720/760}
+}
+
+/* ---------------- footer ---------------- */
+.footer{
+  display:flex;flex-direction:column;min-height:calc(var(--svh) * 100);will-change:transform;
+  width:100%;padding:var(--spacing-xxl) var(--spacing-l) var(--spacing-l);
+  background:var(--color-black);color:var(--color-white);
+}
+/* Reference source order is wordmark, body, legal; below 48rem the reference
+   flips it to body, wordmark, legal (order-1/2/3) and drops the wordmark's
+   bottom margin. Without the flip the wordmark's line-height:.8 ink lands on
+   the newsletter heading, which the diacritics in HEIÐMÖRK make worse. */
+.footer__wordmark{order:2;width:100%;margin-bottom:0}
+.footer__mark{
+  display:block;width:100%;--footer-shadow-x:0;--footer-shadow-y:3;
+  filter:drop-shadow(calc(var(--footer-shadow-x) * 1px) calc(var(--footer-shadow-y) * 1px) var(--footer-shadow-blur) var(--footer-shadow-color))
+         drop-shadow(0 0 var(--footer-shadow-glow-blur) var(--footer-shadow-glow-color));
+  will-change:filter;
+}
+.footer__mark-word{
+  display:block;width:100%;font-family:var(--font-display);color:var(--color-black);text-transform:uppercase;
+  font-size:clamp(2.75rem,16.5vw,15rem);line-height:.8;letter-spacing:-.02em;text-align:center;
+}
+.footer__legal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--spacing-m);margin-top:var(--spacing-xxl);color:var(--color-light-gray)}
+/* Footer composition.
+   The reference's footer is a shop's: a newsletter signup beside several link
+   columns, sized for a catalogue's worth of links. Heidmork has six, so the
+   transplanted skeleton left half-empty columns and a void in the middle, and
+   the signup + columns pairing is the single most template-looking thing on a
+   page. Replaced with what a farm stand's footer should actually lead with:
+   when it is open. The free space now sits above the wordmark rather than in
+   the middle, so it reads as breathing room before the closing mark. */
+.footer__lead{order:1;display:grid;gap:var(--spacing-l)}
+.footer__hours{margin-top:var(--spacing-xs)}
+.footer__meta{display:grid;gap:var(--spacing-xxs);color:var(--color-light-gray)}
+.footer__nav{order:2;margin-top:auto;padding-top:var(--spacing-xxl);display:flex;flex-wrap:wrap;gap:var(--spacing-s) var(--spacing-l)}
+/* The mark's line-height is .8, so its ink and the umlaut on the O overflow
+   the box upward. Clear the nav row above it. */
+.footer__wordmark{order:3;margin-top:var(--spacing-xxl)}
+.footer__legal{order:4}
+@media (min-width:48rem){
+  .footer__lead{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--spacing-xl);align-items:end}
+  .footer__lead-head{grid-column:1/span 8}
+  .footer__meta{grid-column:10/span 3;text-align:right}
+}
+
+/* SNDR Studio credit: the wordmark, linking to the SNDR page. Set in this
+   build's own two faces so it reads as part of the footer rather than bolted
+   on, and it sits a step quieter than the legal line until hovered. The 44px
+   min-height is the tap target, not the visual size. */
+.sndr{display:inline-flex;align-items:center;gap:var(--spacing-xs);min-height:44px;color:var(--color-dark-gray);transition:color .3s ease}
+.sndr__mark{font-family:var(--font-display);font-size:.9375rem;letter-spacing:.06em;line-height:1}
+.sndr__mark i{font-style:normal}
+.sndr__studio{font-family:var(--font-sans);font-size:.625rem;letter-spacing:.18em;line-height:1}
+@media (hover:hover) and (pointer:fine){.sndr:hover{color:var(--color-white)}}
+@media (min-width:48rem){
+}
+@media (min-width:48rem){
+  .footer__legal{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--spacing-xl);align-items:center}
+  .footer__legal-copy{grid-column:span 6}
+  .footer__legal-social{grid-column:7/span 4}
+  .footer__legal-credit{grid-column:11/span 2;text-align:right}
+  .footer__wordmark{margin-bottom:var(--spacing-xxl)}
+}
+.footer .link__line{background:currentColor}
+
+/* ---------------- panels + overlay (shift modal) ---------------- */
+[data-overlay]{background:var(--color-overlay);opacity:0;--overlay-blur-progress:0;pointer-events:none;z-index:40;position:fixed;inset:0}
+/* The blur is set once rather than tweened. Animating backdrop-filter
+   recomposites everything behind a full-viewport fixed layer every frame.
+   The element's own opacity fade still ramps the blur in, because opacity
+   groups the filtered result, so this looks the same and costs far less. */
+[data-overlay].is-active{pointer-events:auto;-webkit-backdrop-filter:blur(var(--blur-overlay));backdrop-filter:blur(var(--blur-overlay))}
+[data-panel]{z-index:50;background:var(--color-black);color:var(--color-white);position:fixed}
+[data-panel][data-axis="y"]{width:100%;top:0;left:0;transform:translateY(-100%)}
+[data-panel][data-axis="x"]{height:calc(var(--dvh) * 100);width:min(28rem,100vw);top:0;right:0;transform:translate(100%)}
+body.is-modal-open{overflow:hidden}
+.mega{height:auto;max-height:calc(var(--dvh) * 100);display:flex;flex-direction:column}
+.mega__bar{position:relative;display:flex;align-items:center;justify-content:space-between;padding:var(--spacing-m) var(--spacing-l);border-bottom:1px solid var(--color-dark-gray)}
+.mega__grid{display:grid;grid-template-columns:1fr;gap:var(--spacing-xl);flex:0 1 auto;align-content:start;min-height:0;overflow-y:auto;padding:var(--spacing-xl) var(--spacing-l) var(--spacing-xxl)}
+.mega__cols{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--spacing-xl);row-gap:var(--spacing-l);align-items:start}
+.mega__section-title{color:var(--color-dark-gray);margin-bottom:var(--spacing-s)}
+.mega__list{display:flex;flex-direction:column;gap:var(--spacing-xxxs)}
+.mega__media{position:relative;min-height:18rem;overflow:clip;display:none}
+.mega__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mega__line{display:none}
+@media (min-width:64rem){
+  .mega{height:auto;display:block}
+  .mega__grid{grid-template-columns:minmax(0,2fr) minmax(14rem,1fr) minmax(16rem,1.2fr);flex:none;overflow:visible;padding-block:0}
+  .mega__media{display:block}
+  .mega__line{display:block;position:absolute;top:0;bottom:0;left:0;width:1px;background:var(--color-dark-gray);transform:scaleY(0);transform-origin:top}
+  .mega__col{position:relative;padding-top:var(--spacing-xl);padding-bottom:var(--spacing-xxl);padding-left:var(--spacing-l)}
+  .mega__col:first-child{padding-left:0}
+}
+.mega__promo{display:flex;flex-direction:column}
+.mega__promo-inner{flex-grow:1;display:flex;flex-direction:column;gap:var(--spacing-s);padding:var(--spacing-l);border:1px solid var(--color-dark-gray);background:var(--color-light-black)}
+/* Below the three-column breakpoint the panel hugs its content, so the promo
+   card must not stretch into the leftover height. */
+@media (max-width:63.99rem){.mega__promo-inner{flex-grow:0}}
+
+/* reveal defaults, overwritten by GSAP */
+[data-reveal]{opacity:0}
+
+@media (prefers-reduced-motion:reduce){
+  /* Gentler, not zero. Colour and opacity transitions aid comprehension and are
+     kept; only transform-driven movement is removed. The old rule collapsed
+     every transition to .01ms, which also killed the navbar's colour crossfade
+     and the card crossfade, neither of which causes vestibular load. */
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  *,*::before,*::after{transition-property:opacity,color,background-color,border-color,fill,stroke!important}
+  [data-reveal]{opacity:1!important;transform:none!important}
+  .line>span{transform:none!important}
+}
+
+/* ---------------- helpers used by the markup ---------------- */
+.btn--full{width:100%}
+.mega__mark{font-family:var(--font-display);letter-spacing:.08em}
+.media-overlay__body{margin-top:var(--spacing-l)}
+.heat{margin-top:var(--spacing-xl);border-top:1px solid var(--color-light-gray)}
+.heat__row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--spacing-m);padding-block:var(--spacing-s);border-bottom:1px solid var(--color-light-gray)}
+.reviews__meta{display:flex;flex-direction:column;gap:var(--spacing-xxs)}
+.footer__eyebrow{margin-bottom:var(--spacing-xs)}
+
+
+/* footer legal: reference behaviour. On mobile the row is two halves and the
+   middle line is hidden. Scoped to max-width so it cannot override the
+   12-col desktop spans declared earlier in this file. */
+@media (max-width:47.99rem){
+  .footer__legal-copy{grid-column:span 2}
+  .footer__legal-social{display:none}
+  .footer__legal-credit{grid-column:span 2;text-align:right}
+}
+
+/* Parallax wells collapse where parallax does not run.
+   Each well is oversized purely to give the scrubbed transform somewhere to
+   travel. app.js gates parallax to (min-width:48rem) + no-preference, so below
+   that breakpoint the oversizing only zooms the photograph for nothing. These
+   declarations sit on the well itself, which beats the travel value inherited
+   from the section's inline style. */
+@media (max-width:47.99rem){
+  .hero__media{--hero-parallax-travel:0%}
+  .featured-products__parallax{--fp-parallax-travel:0%}
+  .media-fullbleed__parallax{--media-fullbleed-parallax-travel:0%}
+  .media-overlay__media{--media-overlay-parallax-travel:0%}
+  .split-media__parallax{--split-media-parallax-travel:0%}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero__media{--hero-parallax-travel:0%}
+  .featured-products__parallax{--fp-parallax-travel:0%}
+  .media-fullbleed__parallax{--media-fullbleed-parallax-travel:0%}
+  .media-overlay__media{--media-overlay-parallax-travel:0%}
+  .split-media__parallax{--split-media-parallax-travel:0%}
+}
+
+/* ==========================================================================
+   Accessibility and platform hardening.
+   None of this changes the reference's visual design; it covers the things a
+   1:1 transplant does not excuse.
+   ========================================================================== */
+
+/* The skip link was permanently clipped, so a sighted keyboard user could
+   never see it. Reveal it on focus. */
+.sr-only:focus-visible{
+  position:fixed;top:var(--spacing-xs);left:var(--spacing-xs);z-index:60;
+  width:auto;height:auto;margin:0;overflow:visible;clip-path:none;white-space:normal;
+  padding:var(--spacing-xs) var(--spacing-m);
+  background:var(--color-black);color:var(--color-white);
+  font-family:var(--font-sans);font-size:.875rem;
+  outline:1px solid var(--color-white);outline-offset:2px;
+}
+
+/* The focus ring is black, which is invisible on the black surfaces. */
+.footer :focus-visible,
+.mega :focus-visible,
+
+/* The newsletter field cleared its outline and never replaced it. */
+.footer__input:focus-visible{outline:1px solid var(--color-white);outline-offset:2px}
+
+/* Fixed chrome would otherwise cover the top of any in-page anchor target. */
+:target,[id]{scroll-margin-top:calc(var(--top-chrome) + var(--spacing-l))}
+
+/* The close control is a 1rem icon; grow the hit area to 2rem and pull the
+   offset in by the same amount so the icon stays exactly where it was. */
+
+/* Kill the 300ms tap delay and the default grey flash on touch. */
+a,button,input,label,summary{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+/* The panel scrolls its own content; don't chain that scroll to the page. */
+.mega__grid{overscroll-behavior:contain}
+
+/* The full-bleed footer must clear the home bar. */
+.footer{padding-bottom:calc(var(--spacing-l) + env(safe-area-inset-bottom))}
+
+/* The page is a fixed light theme; stop the UA painting form controls dark. */
+html{color-scheme:light}
+
+/* Text that must survive a very long word or an unbroken address. */
+.footer__meta,.mega__list,.product-card__info{overflow-wrap:break-word}
+
+/* ==========================================================================
+   Eimverk additions. Product panel (the reference's x-axis shift panel, the
+   drawer Cocoon uses for its cart, carrying a product instead) and the
+   range's grouped collection headers.
+   ========================================================================== */
+.featured-collection__header--later{margin-top:var(--spacing-xxl)}
+.product-card[data-modal-open]{cursor:pointer}
+.product-card[data-modal-open]:focus-visible{outline:1px solid var(--color-black);outline-offset:4px}
+@media (hover:hover) and (pointer:fine){
+  .product-card:hover .product-card__image--secondary{opacity:1}
+}
+.product-card:active .product-card__media{transform:scale(.985)}
+.product-card__media{transition:transform .16s cubic-bezier(.23,1,.32,1)}
+/* cutouts on paper: the same ground as the page, so the bottles float */
+.product-card__image{background:var(--color-white)}
+
+.product{display:flex;flex-direction:column;background:var(--color-black);color:var(--color-white)}
+.product__bar{display:flex;align-items:center;justify-content:space-between;padding:var(--spacing-m) var(--spacing-l);border-bottom:1px solid var(--color-dark-gray);flex:none}
+.product__scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.product__media{aspect-ratio:4/5;background:var(--color-white);overflow:hidden}
+.product__image{display:block;width:100%;height:100%;object-fit:cover}
+.product__body{display:flex;flex-direction:column;gap:var(--spacing-l);padding:var(--spacing-xl) var(--spacing-l) calc(var(--spacing-xxl) + env(safe-area-inset-bottom))}
+.product__name{font-size:clamp(1.75rem,1.25rem + 2vw,2.5rem)}
+.product__copy{display:grid;gap:var(--spacing-s);color:var(--color-light-gray)}
+.product__specs{display:grid;margin:0;border-top:1px solid var(--color-dark-gray)}
+.product__spec{display:flex;justify-content:space-between;gap:var(--spacing-m);padding-block:var(--spacing-s);border-bottom:1px solid var(--color-dark-gray);font-size:.875rem;line-height:1.0625rem;letter-spacing:.02em}
+.product__spec dt{color:var(--color-white)}
+.product__spec dd{margin:0;color:var(--color-light-gray);text-align:right}
+.product__buy{display:grid;gap:var(--spacing-s);margin-top:var(--spacing-s)}
+.product__stockists{display:grid;gap:var(--spacing-xxs);list-style:none;margin:0;padding:0}
+.product :focus-visible{outline:1px solid var(--color-white);outline-offset:2px}
+@media (min-width:48rem){
+  [data-panel="product"][data-axis="x"]{width:min(30rem,100vw)}
+  .product__media{aspect-ratio:1/1}
+  .product__media .product__image{object-fit:contain}
+}
+.split-media__btn{margin-top:var(--spacing-m)}
+.heat{list-style:none;margin-inline:0;padding:0}
+/* Long expression names ("Flóki Young Malt Sheep Dung Smoked") beside a nowrap
+   note squeezed the name to 54px on phones. The note may wrap; the name keeps
+   the larger share of the row. */
+.product-card__info{align-items:flex-start}
+.product-card__meta{flex:1 1 58%;min-width:0}
+.product-card__note{flex:0 1 42%;white-space:normal}
+/* Measured, not guessed: the card is 171px at 390, 172 at 768 and 236 at 1024.
+   In a row at 768 that leaves the name 90px and the note 66px, both cramped
+   against names as long as "Flóki Young Malt Sheep Dung Smoked". Stack them
+   until the card is wide enough to hold both on one line. */
+@media (max-width:63.99rem){
+  .product-card__info{flex-direction:column;gap:var(--spacing-xxxs)}
+  .product-card__note{flex:none;text-align:left}
+}
+
+/* ==========================================================================
+   Navbar ground (Eimverk-specific adaptation of the reference).
+
+   MEASURED, not assumed. `_qa-navscroll.mjs` walks the page and reads the
+   median luminance actually rendered behind each nav slot at every scroll
+   position. The transparent navbar failed 27 slots at 390 and 13 at 1440,
+   worst case 1.03:1 (ink on a near-black photograph, invisible).
+
+   The reference can keep a transparent navbar because its page is mostly paper
+   with dark photographs under a black announcement bar. This page is
+   photograph-heavy at mid luminance, where BOTH themes fail: white ink over a
+   ground of 80 is 2.7:1 and black ink over the same ground is 2.8:1. Flipping
+   the theme cannot fix it, so the navbar is given a real ground.
+
+   It stays transparent over the hero, so the opening moment is unchanged, and
+   from there carries the section's own tone from the two-tone palette. Nothing
+   new is introduced: the bar is paper over paper sections and ink over
+   photographic ones, which is the system's own pair. */
+.navbar::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:var(--color-white);opacity:0;
+  transition:opacity .3s ease,background-color .3s ease;
+}
+.navbar[data-nav-theme="dark"]::before{background:var(--color-black)}
+.navbar[data-nav-solid="on"]::before{opacity:1}
+
+/* Over the hero the bar has no ground, so it carries the scrim instead, on its
+   own fixed layer where it cannot scroll away. Same vignetting the hero used to
+   paint, held for the navbar's height and faded out well above the headline. */
+.navbar::after{
+  content:"";position:absolute;inset-inline:0;top:0;z-index:-1;pointer-events:none;
+  height:calc(var(--navbar-height) * 2.6);
+  background:linear-gradient(to bottom,var(--color-black),var(--color-black) 42%,transparent);
+  opacity:.72;transition:opacity .3s ease;
+}
+.navbar[data-nav-solid="on"]::after{opacity:0}
+
+/* The reference's tile overlay is a radial that is WEAKEST at the centre,
+   which suits a tile whose content is centred. Ours is bottom-anchored, and at
+   768 the FLÓKI heading landed on the palest barrel staves at 51% luminance.
+   Raising the radial's opacity flattens the whole photograph to fix one corner,
+   so a bottom-up scrim is stacked under it instead: the heading, the copy and
+   the button get a guaranteed ground and the top of the image keeps its light. */
+.featured-products__overlay{
+  background:
+    linear-gradient(to top,var(--color-black) 0%,rgba(20,20,20,0) 74%),
+    radial-gradient(ellipse at center,transparent 0%,var(--color-black) 100%);
+}
+
+
+/* ==========================================================================
+   Kjöthúsið additions.
+
+   1. The cut map. Kjöthúsið's own bull drawing, made hoverable: the one module
+      here that is not part of the reference system. The drawing is red, which
+      is the client's own colour and the page's single accent, exactly the role
+      the reference gives its one non-monochrome tone.
+   2. The price list. The reference's collection grid is image-led, one
+      photograph per product. Kjöthúsið has eight photographs and 62 products
+      on a monthly offer list, so the range is set as typeset rows instead,
+      built from the same hairline row the process card already uses.
+   ========================================================================== */
+/* The reference's secondary tone (#898989 on #f0f0f0) measures 3.07:1. That is
+   acceptable for a hint beside a heading and not for text that carries the
+   information, which on this page is the price of every product and the cut
+   names people click. Those get a darker grey from the same family (4.9:1).
+   Deliberate divergence from the reference, recorded in DESIGN.md. */
+:root{--color-brand:#c91b24;--color-mid-gray:#6b6b6b}
+
+.cuts{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.cuts__header{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--spacing-m);flex-wrap:wrap}
+.cuts__hint{max-width:20rem;color:var(--color-mid-gray)}
+.cuts__grid{display:grid;grid-template-columns:1fr;gap:var(--spacing-xl);margin-top:var(--spacing-xl);align-items:start}
+.cuts__map{position:relative;width:100%}
+.cuts__svg svg{display:block;width:100%;height:auto}
+.cuts__svg path{fill:var(--color-brand);cursor:pointer;transition:opacity .2s cubic-bezier(.23,1,.32,1),fill .2s cubic-bezier(.23,1,.32,1)}
+.cuts__map.is-active .cuts__svg path{opacity:.3}
+.cuts__svg path.is-on{opacity:1;fill:var(--color-black)}
+.cuts__tag{
+  position:absolute;left:0;top:0;translate:-50% -50%;z-index:2;pointer-events:none;
+  padding:var(--spacing-xxs) var(--spacing-s);
+  background:var(--color-white);color:var(--color-black);border:1px solid var(--color-black);
+  white-space:nowrap;opacity:0;transition:transform .26s cubic-bezier(.23,1,.32,1),opacity .16s ease-out;
+}
+.cuts__tag.is-on{opacity:1}
+.cuts__detail{display:flex;flex-direction:column;gap:var(--spacing-s)}
+.cuts__list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--spacing-xxs) var(--spacing-m);margin-top:var(--spacing-m);border-top:1px solid var(--color-light-gray);padding-top:var(--spacing-m)}
+.cuts__list-btn{display:block;width:100%;text-align:left;padding-block:var(--spacing-xxs);color:var(--color-mid-gray);transition:color .2s ease}
+.cuts__list-btn.is-on{color:var(--color-black)}
+@media (hover:hover) and (pointer:fine){.cuts__list-btn:hover{color:var(--color-black)}}
+@media (min-width:48rem){
+  .cuts__grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:var(--spacing-xxl)}
+  .cuts__detail{padding-top:var(--spacing-xl)}
+}
+
+.prices__note{margin-top:var(--spacing-s);max-width:32rem}
+.prices__group{margin-top:var(--spacing-xxl)}
+.prices__head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--spacing-m);padding-bottom:var(--spacing-s);border-bottom:1px solid var(--color-black)}
+.prices__more{color:var(--color-mid-gray);transition:color .2s ease}
+@media (hover:hover) and (pointer:fine){.prices__more:hover{color:var(--color-black)}}
+.prices__list{display:grid}
+.prices__row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--spacing-m);padding-block:var(--spacing-s);border-bottom:1px solid var(--color-light-gray)}
+.prices__row .text-dark-gray{color:var(--color-mid-gray)}
+@media (min-width:48rem){
+  .prices__list{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--spacing-xxl)}
+}
+
+/* ==========================================================================
+   The two visit panels.
+
+   They were the reference's row: a heading pushed left and a trailing block
+   pushed right, which works in a full-width band and not in a half-width panel.
+   With a real paragraph and an action in each, a two-word heading sat alone at
+   one edge while the copy jammed against the other, and the shop panel was
+   right-aligned on top of that, so the pair read as two different components
+   with a stray word under one of them.
+
+   Both panels are now the same object: heading, copy, one action, stacked and
+   anchored to the bottom of the frame, which is where the hero already puts its
+   own stack. The eye gets one shape twice instead of two shapes once. */
+.split-media__panel{display:flex;flex-direction:column;justify-content:flex-end}
+.split-media__content{gap:var(--spacing-m);padding:var(--spacing-xl) var(--spacing-l)}
+.split-media__heading{
+  font-family:var(--font-display);letter-spacing:-.02em;line-height:1;
+  font-size:clamp(1.75rem,1.25rem + 1.6vw,2.5rem);
+}
+.split-media__body{max-width:24rem}
+.split-media__body p{text-wrap:pretty}
+.split-media__btn{margin-top:0}
+/* A flat tint over a whole photograph has to be heavy enough for its brightest
+   corner, which flattens the rest. The content is bottom-anchored, so the ground
+   it needs is too: same device as the product tiles. */
+.split-media__panel::after{
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:linear-gradient(to top,var(--color-black) 0%,rgba(20,20,20,0) 62%);
+  opacity:.85;
+}
+@media (min-width:48rem){
+  .split-media__content{padding:var(--spacing-xxl) var(--spacing-xl)}
+}
