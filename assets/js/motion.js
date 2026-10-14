@@ -1,5 +1,8 @@
 /* Kjöthúsið : motion layer, ported 1:1 from the CO'COON system (auw.studio)
-   by way of the Heiðmörk and Eimverk builds. Constants below are the
+   by way of the Heiðmörk and Eimverk builds. Production changes from the
+   approved prototype: price rows are server rendered, the category panel reads
+   #kj-data, paths respect the site base, and the fixed element is the
+   .site-header (notice strip + navbar) rather than the navbar alone. Constants below are the
    reference's own (theme.js, lines 4894-4934); the UI block retimes
    interactive motion only, as the motion review required. */
 (function () {
@@ -39,42 +42,30 @@
   /* bull.svg has no ids, so the regions are matched by path order. */
   var CUT_BY_PATH = ['laeri','skanki','klumpur','sida','mjadmasteik','sida','framhryggur','bogur','spjaldhryggur','bringa','bringa','framskanki','hals','framskanki'];
 
-  var CATEGORY_ORDER = ['Nautakjöt','Lambakjöt','Svínakjöt','Kjúklingur','Tilbúið','Álegg','Fiskur','Grænmeti','Annað'];
+  var DATA = (function () {
+    try { return JSON.parse(document.getElementById('kj-data').textContent); } catch (e) { return {}; }
+  })();
+  var BASE = DATA.base || '/';
   var CATEGORY_COPY = {
     'Nautakjöt': 'Hakk, gúllas, snitsel og steikur. Segðu okkur í hvað á að nota kjötið og við skerum það eftir því.',
     'Lambakjöt': 'Læri, hryggur og bitar fyrir pönnuna. Ræðum skurð, magn og pökkun.',
     'Svínakjöt': 'Hnakki, kótilettur, hamborgarhryggur og fleiri bitar.',
-    'Kjúklingur': 'Bringur, leggir og unnar vörur úr kjúklingi.',
-    'Tilbúið': 'Bollur, snitsel og aðrar unnar vörur, tilbúnar í ofninn eða á pönnuna.',
-    'Álegg': 'Áleggsvörur, meðal annars hangiálegg og skinka.',
-    'Fiskur': 'Fiskur úr vöruúrvali mánaðarins.',
-    'Grænmeti': 'Grænmeti sem fylgir mánaðartilboðinu.',
-    'Annað': 'Aðrar vörur í vöruúrvali mánaðarins.'
+    'Unnar kjötvörur': 'Bollur, fars, bjúgu og aðrar unnar vörur, tilbúnar í ofninn eða á pönnuna.'
   };
   var CATEGORY_IMAGE = {
-    'Nautakjöt': ['assets/img/patties-800.webp', 800, 800],
-    'Lambakjöt': ['assets/img/fillet-800.webp', 800, 696],
-    'Svínakjöt': ['assets/img/steaks-800.webp', 800, 532],
-    'Kjúklingur': ['assets/img/bowl-800.webp', 800, 600],
-    'Tilbúið': ['assets/img/bowl-800.webp', 800, 600],
-    'Álegg': ['assets/img/steaks-800.webp', 800, 532],
-    'Fiskur': ['assets/img/bowl-800.webp', 800, 600],
-    'Grænmeti': ['assets/img/bowl-800.webp', 800, 600],
-    'Annað': ['assets/img/patties-800.webp', 800, 800]
+    'Nautakjöt': ['patties-800.webp', 800, 800],
+    'Lambakjöt': ['fillet-800.webp', 800, 696],
+    'Svínakjöt': ['steaks-800.webp', 800, 532],
+    'Unnar kjötvörur': ['bowl-800.webp', 800, 600]
   };
 
-  var PRODUCTS = window.KJ_PRODUCTS || [];
-  var PRICE_SOURCE = window.KJ_PRICE_SOURCE || '';
-
-  function isk(n) {
-    return new Intl.NumberFormat('de-DE').format(n) + ' kr.';
-  }
+  var UNIT = { kg: 'kr/kg', stk: 'kr/stk', pk: 'kr/pk', flat: 'kr' };
   function priceLabel(p) {
-    if (typeof p.price !== 'number') return 'Verð í síma 557 8833';
-    return isk(p.price) + (p.unit ? ' / ' + p.unit : '');
+    if (typeof p.p !== 'number') return 'Verð í síma';
+    return new Intl.NumberFormat('de-DE').format(p.p) + ' ' + (UNIT[p.u] || 'kr');
   }
   function byCategory(cat) {
-    return PRODUCTS.filter(function (p) { return p.category === cat; });
+    return (DATA.categories && DATA.categories[cat]) || [];
   }
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -82,8 +73,11 @@
     });
   }
 
-  if (typeof gsap === 'undefined') { buildPriceLists(); buildCutMap(); return; }
+  if (typeof gsap === 'undefined') { buildCutMap(); return; }
   gsap.registerPlugin(ScrollTrigger);
+  /* iOS fires resize as the URL bar collapses, which is as the fling starts. A
+     refresh there writes scroll and WebKit cancels the momentum dead. */
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   /* CustomEase is a paid plugin; register the reference's "luxe" curve
      (0.16, 1, 0.3, 1) as an equivalent solved cubic bezier. */
@@ -123,15 +117,34 @@
     root.style.setProperty('--lvh', '1vh');
   }
   setVH();
-  window.addEventListener('resize', setVH, false);
+  /* On a phone the URL bar collapses continuously DURING a scroll and fires
+     resize on every step. Re-running this mid-fling re-lays out everything
+     sized in these vars, which WebKit answers by cancelling the momentum. Only
+     a real width change is a resize on touch. */
+  function onResize(fn) {
+    var lastW = window.innerWidth; // per handler: a shared one lets the first
+    return function () {           // wrapper swallow every later wrapper's call
+      if (isTouchPointer() && window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
+      fn();
+    };
+  }
+  function isTouchPointer() {
+    return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  }
+  window.addEventListener('resize', onResize(setVH), false);
 
   var rem = parseFloat(getComputedStyle(root).fontSize) || 16;
   function toPx(v) { return parseFloat(v) * rem; }
 
-  /* ---- Lenis: reference config exactly (lerp .1, smoothWheel only), so
-     touch scrolling stays native. Driven by the gsap ticker. ---- */
+  /* ---- Lenis: reference config exactly (lerp .1, smoothWheel only). NEVER
+     mounted on a touch device. iOS Safari only collapses its bottom toolbar to
+     the floating pill for a natively scrolled document, and Lenis's rAF loop
+     also fights iOS momentum for the scroll position every frame. Guard on the
+     pointer, not on width: a narrow desktop window still gets the damped feel. */
   var lenis = null;
-  if (!reduce && typeof Lenis !== 'undefined') {
+  var isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (!reduce && !isTouch && typeof Lenis !== 'undefined') {
     lenis = new Lenis({ lerp: .1, smoothWheel: true });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
@@ -192,7 +205,7 @@
       sections.forEach(function (s) { io.observe(s); });
     }
     build();
-    window.addEventListener('resize', function () { requestAnimationFrame(build); }, { passive: true });
+    window.addEventListener('resize', onResize(function () { requestAnimationFrame(build); }), { passive: true });
 
     /* Transparent over the hero, with a real ground below it. */
     var hero = page.querySelector('.hero');
@@ -242,7 +255,7 @@
         outer.appendChild(inner); heading.appendChild(outer);
         return inner;
       });
-      gsap.set(lines, { yPercent: 110 });
+      gsap.set(lines, { yPercent: 150 }); // below the widened clip (see .line in site.css)
     }
     gsap.set(fades, { autoAlpha: 0, y: toPx(DIST.Y) });
 
@@ -250,6 +263,33 @@
     if (media) tl.from(media, { scale: 1.06, duration: DUR.SLOW }, 0);
     if (lines.length) tl.to(lines, { yPercent: 0, stagger: UI.STAGGER }, 0);
     tl.to(fades, { autoAlpha: 1, y: 0, stagger: UI.STAGGER }, '<+=' + STAG.RELAXED);
+  })();
+
+  /* ================= page heads (subpages) =================
+     The hero's split-line rise on each subpage title, shorter and without the
+     image scale, so every page opens the same way the home page does. */
+  (function pageHead() {
+    var heading = document.querySelector('[data-split-heading]');
+    if (!heading) return;
+    var fades = document.querySelectorAll('[data-head-fade]');
+    var done = function () { root.classList.add('motion-done'); };
+    if (reduce) { done(); return; }
+    var parts = heading.innerHTML.split(/<br\s*\/?>/i).map(function (t) { return t.trim(); });
+    heading.innerHTML = '';
+    var lines = parts.map(function (t) {
+      var outer = document.createElement('span'); outer.className = 'line';
+      var inner = document.createElement('span'); inner.innerHTML = t;
+      outer.appendChild(inner); heading.appendChild(outer);
+      return inner;
+    });
+    gsap.set(lines, { yPercent: 150 }); // below the widened clip (see .line in site.css)
+    gsap.set(fades, { autoAlpha: 0, y: 12 });
+    done();
+    // Shorter than the hero (.8 s): this plays on every subpage, and the
+    // intro text should be readable within half a second.
+    var tl = gsap.timeline({ defaults: { ease: EASE.LUXE, duration: .55 } });
+    tl.to(lines, { yPercent: 0, stagger: UI.STAGGER }, 0);
+    tl.to(fades, { autoAlpha: 1, y: 0, stagger: UI.STAGGER, duration: .35, ease: UI.OUT, clearProps: 'transform,opacity,visibility' }, .12);
   })();
 
   /* ================= footer ================= */
@@ -293,27 +333,6 @@
     });
   })();
 
-  /* ================= price lists =================
-     Every row is Kjöthúsið's own September 2026 offer list, ex VAT. Two items
-     carry no price in the source and say so instead of guessing. */
-  function buildPriceLists() {
-    var host = document.querySelector('[data-price-lists]');
-    if (!host) return;
-    var html = CATEGORY_ORDER.map(function (cat) {
-      var items = byCategory(cat);
-      if (!items.length) return '';
-      return '<div class="prices__group">' +
-        '<div class="prices__head"><h3 class="type-medium font-bold text-black">' + esc(cat) + '</h3>' +
-        '<button type="button" class="prices__more type-small" data-category="' + esc(cat) + '" data-modal-open="category">Fyrirspurn</button></div>' +
-        '<ul class="prices__list">' + items.map(function (p) {
-          return '<li class="prices__row"><span class="type-small text-black">' + esc(p.name) + '</span>' +
-            '<span class="type-small text-dark-gray">' + esc(priceLabel(p)) + '</span></li>';
-        }).join('') + '</ul></div>';
-    }).join('');
-    host.innerHTML = html;
-  }
-  buildPriceLists();
-
   /* ================= category panel ================= */
   (function categoryPanel() {
     var panel = document.querySelector('[data-panel="category"]');
@@ -322,20 +341,21 @@
     var name = panel.querySelector('[data-cat-name]');
     var copy = panel.querySelector('[data-cat-copy]');
     var prices = panel.querySelector('[data-cat-prices]');
-    var mail = panel.querySelector('[data-cat-mail]');
+    var more = panel.querySelector('[data-cat-more]');
     var scroller = panel.querySelector('.product__scroll');
 
     function fill(cat) {
       var items = byCategory(cat);
-      if (!items.length) return;
       var pic = CATEGORY_IMAGE[cat] || CATEGORY_IMAGE['Nautakjöt'];
-      img.src = pic[0]; img.width = pic[1]; img.height = pic[2]; img.alt = '';
+      img.src = BASE + 'assets/img/' + pic[0]; img.width = pic[1]; img.height = pic[2]; img.alt = '';
       name.textContent = cat;
-      copy.innerHTML = '<p>' + esc(CATEGORY_COPY[cat] || '') + '</p>';
+      copy.innerHTML = '<p>' + esc(CATEGORY_COPY[cat] || '') + '</p>' +
+        (items.length ? '' : '<p>Engin vara í þessum flokki er á verðlistum núna. Hringdu í 557 8833 eða skoðaðu flokkinn.</p>');
       prices.innerHTML = items.map(function (p) {
-        return '<div class="product__spec"><dt>' + esc(p.name) + '</dt><dd>' + esc(priceLabel(p)) + '</dd></div>';
+        return '<div class="product__spec"><dt>' + esc(p.n) + '</dt><dd>' + esc(priceLabel(p)) + '</dd></div>';
       }).join('');
-      if (mail) mail.href = 'mailto:kjothusid@kjothusid.is?subject=' + encodeURIComponent('Fyrirspurn: ' + cat);
+      var slug = DATA.slugs && DATA.slugs[cat];
+      if (more) more.href = BASE + 'voruurval/' + (slug ? slug + '/' : '');
       if (scroller) scroller.scrollTop = 0;
     }
     /* Capture phase, so the panel is filled before the modal opens it. */
@@ -370,13 +390,27 @@
         return '<li><button type="button" class="cuts__list-btn" data-cut="' + key + '">' + esc(CUTS[key][0]) + '</button></li>';
       }).join('');
       listEl.addEventListener('pointerover', function (e) {
+        if (!isMouse(e)) return;
         var b = e.target.closest('[data-cut]'); if (b) show(b.getAttribute('data-cut'));
       });
       listEl.addEventListener('focusin', function (e) {
         var b = e.target.closest('[data-cut]'); if (b) show(b.getAttribute('data-cut'));
       });
-      listEl.addEventListener('pointerleave', function () { show(null); });
+      listEl.addEventListener('pointerleave', function (e) { if (isMouse(e)) show(null); });
+      /* A finger has no hover: the pointerleave above fires the instant it lifts,
+         so a touch could only ever make the highlight flash. Tap LATCHES, and
+         tapping the same cut again clears it. */
+      listEl.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-cut]'); if (!b) return;
+        var key = b.getAttribute('data-cut');
+        show(key === active ? null : key);
+      });
     }
+
+    /* A touch pointer reports 'touch'; a mouse reports 'mouse'. Older WebKit
+       sends plain mouse events with no pointerType at all, so treat those as a
+       mouse rather than swallowing them. */
+    function isMouse(e) { return !e.pointerType || e.pointerType === 'mouse'; }
 
     function show(key) {
       active = key && CUTS[key] ? key : null;
@@ -394,6 +428,16 @@
       if (tag) {
         tag.textContent = active ? CUTS[active][0] : '';
         tag.classList.toggle('is-on', Boolean(active));
+        /* Place from whichever region owns the cut, so selecting from the LIST
+           puts the tag on the drawing too instead of leaving it where the last
+           hover dropped it. */
+        if (active) {
+          var owner = null;
+          for (var i = 0; i < paths.length; i++) {
+            if (paths[i].dataset.cut === active) { owner = paths[i]; break; }
+          }
+          if (owner) place(owner);
+        }
       }
     }
 
@@ -404,7 +448,7 @@
       tag.style.transform = 'translate(' + (r.left - box.left + r.width / 2) + 'px,' + (r.top - box.top + r.height / 2) + 'px)';
     }
 
-    fetch('assets/img/bull.svg')
+    fetch(BASE + 'assets/img/bull.svg')
       .then(function (r) { return r.text(); })
       .then(function (text) {
         svgHost.innerHTML = text;
@@ -414,16 +458,18 @@
           p.dataset.cut = CUTS[key] ? key : '';
         });
         host.addEventListener('pointerover', function (e) {
+          if (!isMouse(e)) return;
           var p = e.target.closest && e.target.closest('path');
           if (!p || !p.dataset.cut) return;
-          place(p); show(p.dataset.cut);
+          show(p.dataset.cut);
         });
-        host.addEventListener('pointerdown', function (e) {
+        host.addEventListener('pointerleave', function (e) { if (isMouse(e)) show(null); });
+        /* Same latch as the list: on a phone the drawing is the primary control. */
+        host.addEventListener('click', function (e) {
           var p = e.target.closest && e.target.closest('path');
           if (!p || !p.dataset.cut) return;
-          place(p); show(p.dataset.cut);
+          show(p.dataset.cut === active ? null : p.dataset.cut);
         });
-        host.addEventListener('pointerleave', function () { show(null); });
       })
       .catch(function () {});
   }
@@ -433,7 +479,7 @@
   (function modal() {
     var page = document.getElementById('page');
     var overlay = document.querySelector('[data-overlay]');
-    var navbar = document.querySelector('.navbar');
+    var navbar = document.querySelector('.site-header');
     var openId = null, lastFocus = null, openedAt = 0;
 
     function panelFor(id) { return document.querySelector('[data-panel="' + id + '"]'); }

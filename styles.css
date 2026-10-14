@@ -387,9 +387,9 @@ main{flex:1 0 auto}
 [data-overlay].is-active{pointer-events:auto;-webkit-backdrop-filter:blur(var(--blur-overlay));backdrop-filter:blur(var(--blur-overlay))}
 [data-panel]{z-index:50;background:var(--color-black);color:var(--color-white);position:fixed}
 [data-panel][data-axis="y"]{width:100%;top:0;left:0;transform:translateY(-100%)}
-[data-panel][data-axis="x"]{height:calc(var(--dvh) * 100);width:min(28rem,100vw);top:0;right:0;transform:translate(100%)}
+[data-panel][data-axis="x"]{height:calc(var(--dvh) * 100);height:100dvh;width:min(28rem,100vw);top:0;right:0;transform:translate(100%)}
 body.is-modal-open{overflow:hidden}
-.mega{height:auto;max-height:calc(var(--dvh) * 100);display:flex;flex-direction:column}
+.mega{height:auto;max-height:calc(var(--dvh) * 100);max-height:100dvh;display:flex;flex-direction:column}
 .mega__bar{position:relative;display:flex;align-items:center;justify-content:space-between;padding:var(--spacing-m) var(--spacing-l);border-bottom:1px solid var(--color-dark-gray)}
 .mega__grid{display:grid;grid-template-columns:1fr;gap:var(--spacing-xl);flex:0 1 auto;align-content:start;min-height:0;overflow-y:auto;padding:var(--spacing-xl) var(--spacing-l) var(--spacing-xxl)}
 .mega__cols{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--spacing-xl);row-gap:var(--spacing-l);align-items:start}
@@ -703,4 +703,73 @@ html{color-scheme:light}
 }
 @media (min-width:48rem){
   .split-media__content{padding:var(--spacing-xxl) var(--spacing-xl)}
+}
+
+/* ---------------- touch hit areas ----------------
+   Measured on the deployed build at 320/375/390/402/430: every control on a
+   phone was 17 to 26px tall, because the reference's hit areas are cursor
+   sized. Controls that sit in a stack get real height, which separates the
+   rows as well; isolated inline controls get an invisible ::after, so nothing
+   drawn moves. Keyed on the pointer, never on width: a narrow desktop window
+   is not a phone. */
+@media (pointer:coarse){
+  .btn{min-height:44px}
+  .cuts__list-btn{min-height:44px;display:flex;align-items:center}
+  .mega__list{gap:var(--spacing-xs)}
+  .footer__nav{gap:var(--spacing-m) var(--spacing-l)}
+  /* .navbar__logo is absolutely centred and .navbar__burger is already
+     relative: re-declaring position here knocked the wordmark out of the
+     centre and it collided with the Fyrirspurn link on a 402pt screen. */
+  .prices__more{position:relative}
+  .link__anchor::after,.prices__more::after,.navbar__logo::after,.navbar__burger::after{
+    content:"";position:absolute;left:0;right:0;top:50%;
+    height:44px;transform:translateY(-50%);
+  }
+  .navbar__burger::after{left:-10px;right:-10px}
+}
+
+/* ---------------- media overlay: phone corrections ----------------
+   Found on an iPhone 17 Pro, iOS 26, against the running build. */
+
+/* 1. The card is a 20% paper wash over a bright photograph. On a desktop
+   monitor the 50px backdrop blur carries it; over this red and green frame on
+   a phone the values inside were barely readable. The ground gets real opacity
+   and the values move off #898989 (3.07:1 on paper, worse over a photo) onto
+   the same mid grey the price list already uses. */
+.media-overlay__card{background:#f0f0f0e6}
+.media-overlay__card .text-dark-gray{color:var(--color-mid-gray)}
+
+/* 2. See index.html: the authored two-line title splits an Icelandic compound. */
+@media (max-width:47.99rem){ .br-wide{display:none} }
+
+/* 3. The collage is four absolutely placed tiles on a 28rem canvas. Those
+   offsets are a composition for the desktop card; at 402pt the tiles overlapped
+   each other and left a void under them, which reads as a broken layout rather
+   than an arrangement. On a phone they become a plain two-up instead. */
+@media (max-width:47.99rem){
+  .media-overlay__collage{
+    height:auto;display:grid;grid-template-columns:1fr 1fr;
+    gap:var(--spacing-xs);
+  }
+  .media-overlay__tile{position:static;width:auto;aspect-ratio:3/4}
+  .media-overlay__tile--2{aspect-ratio:3/4}
+}
+
+/* 4. Verslunin and Fyrir fyrirtæki set white text over a photograph with only a
+   flat 20% black wash. Over the pale grater and cheese in the Verslunin frame
+   the address and the button were washing out on the phone. The content is
+   bottom anchored, so the ramp starts below the midpoint and the first line of
+   text lands well inside it rather than at a transparent stop. */
+.split-media__panel::after{
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:linear-gradient(180deg,transparent 30%,#14141459 58%,#141414bf 100%);
+}
+
+/* 5. The footer is a full viewport tall. On a desktop monitor its content fills
+   that; on a 402pt phone it left roughly 200pt of empty black between the email
+   address and the nav row, which reads as a void rather than as space. On a
+   phone the footer is sized by its content instead. */
+@media (max-width:47.99rem){
+  .footer{min-height:0}
+  .footer__nav{margin-top:var(--spacing-xxl)}
 }
