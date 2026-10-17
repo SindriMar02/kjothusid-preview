@@ -78,8 +78,5 @@
 @media (min-width:64rem){
   .meatday{position:relative}
   .meatday__actions{position:absolute;top:var(--spacing-l);right:0;margin:0}
-  .meatday--hook .hook{right:6.25rem}
 }
 .offers__foot .ibtn,.page-head__actions .ibtn{width:3rem;height:3rem}
-/* Kjötkrókur's scene, smaller under the icons on phones so his card stays close to the others */
-@media (max-width:63.99rem){.meatday--hook .hook{width:3.25rem;height:5.5rem;margin-top:0}}

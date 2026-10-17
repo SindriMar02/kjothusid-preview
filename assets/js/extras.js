@@ -1,5 +1,5 @@
 /* The fun layer (17 Oct): "Minna mig á" for the meat days and the monthly
-   offer, the calendar menu they share, Kjötkrókur's hook, and the offer's
+   offer, the calendar menu they share, and the offer's
    "gildir í X daga enn". Everything runs here, in the visitor's browser: no
    account, nothing stored on a server. The calendar files come from KjCal
    (calendar.js); without it the reminder buttons stay hidden. */
@@ -173,65 +173,4 @@
     b.addEventListener('click', function () { window.print(); });
   });
 
-  /* ── Kjötkrókur ────────────────────────────────────────────────────────── */
-  document.querySelectorAll('[data-hook]').forEach(function (hook) {
-    hook.hidden = false;
-    var card = hook.closest('.meatday');
-    var line = hook.querySelector('.hook__line');
-    var slice = hook.querySelector('.hook__slice');
-    var caught = card.querySelector('[data-hook-caught]');
-    var busy = false, gone = false;
-    var anim = function (el, frames, opts) { return el.animate(frames, Object.assign({ fill: 'forwards' }, opts)).finished; };
-
-    function steal() {
-      busy = true;
-      var after = function () { busy = false; gone = true; caught.hidden = false; hook.setAttribute('aria-label', 'Setja nýjan bita á diskinn'); };
-      if (reduce || !line.animate) {
-        slice.style.opacity = '0';
-        after();
-        return;
-      }
-      anim(line, [{ transform: 'translateY(-160px)' }, { transform: 'translateY(0)' }], { duration: 560, easing: EASE_IO })
-        .then(function () { return new Promise(function (r) { setTimeout(r, 140); }); })
-        .then(function () {
-          var up = [{ transform: 'translateY(0)' }, { transform: 'translateY(-190px)' }];
-          anim(slice, up, { duration: 520, easing: EASE_IO });
-          return anim(line, up, { duration: 520, easing: EASE_IO });
-        })
-        .then(after);
-    }
-    function serve() {
-      busy = true;
-      caught.hidden = true;
-      hook.setAttribute('aria-label', 'Hvar er hangikjötið? Kjötkrókur kemur og nær í bita.');
-      var reset = function () {
-        line.getAnimations().forEach(function (a) { a.cancel(); });
-        slice.getAnimations().forEach(function (a) { a.cancel(); });
-        slice.style.opacity = '';
-        busy = false; gone = false;
-      };
-      if (reduce || !slice.animate) { reset(); return; }
-      line.getAnimations().forEach(function (a) { a.cancel(); });
-      slice.getAnimations().forEach(function (a) { a.cancel(); });
-      slice.animate([{ transform: 'translateY(-14px)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }], { duration: 260, easing: EASE_OUT }).finished.then(reset);
-    }
-    hook.addEventListener('click', function () { if (!busy) (gone ? serve : steal)(); });
-
-    // 23 December, or ?kjotkrokur in the address: he comes by himself, once, when the card is in view.
-    var t = todayIso();
-    var due = t.slice(5) === '12-23' || /[?&]kjotkrokur\b/.test(location.search);
-    function seenToday() {
-      try { return localStorage.getItem('kj-hook') === t; } catch (err) { return false; }
-    }
-    if (due && !seenToday() && 'IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        if (!entries[0].isIntersecting) return;
-        io.disconnect();
-        if (seenToday()) return; // Another tab may have played it since load.
-        try { localStorage.setItem('kj-hook', t); } catch (err) { /* private mode */ }
-        setTimeout(function () { if (!busy && !gone) steal(); }, 400);
-      }, { threshold: 0.6 });
-      io.observe(hook);
-    }
-  });
 })();
