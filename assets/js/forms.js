@@ -379,10 +379,9 @@
         return {
           key: l.k, source: parts[0], name: c.n, list: c.l || '', qty: l.q, unit: l.u,
           approx: l.u === 'kg', unitPrice: typeof c.p === 'number' ? c.p : null, priceUnit: c.u || null,
-          // Phase 2: each line carries the Business Central item number once the
-          // Items export is mapped. Null until then; the field is here so the
-          // payload shape does not change when it arrives.
-          bcItemNo: null
+          // The Business Central item number, from Karen's Items export (scripts/bc-items.js).
+          // Shown in the order email so staff type the order in without looking it up.
+          bcItemNo: c.b || null
         };
       }),
       notes: v('notes'),
