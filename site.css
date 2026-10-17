@@ -39,6 +39,8 @@
 
 /* Subpages start on paper under a solid bar. */
 .is-subpage main{padding-top:var(--top-chrome)}
+/* The footer reveals underneath the page; its transform must not cover content. */
+main{position:relative;z-index:1;background:var(--color-white)}
 
 /* ---------------- page head ---------------- */
 .page-head{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
@@ -451,3 +453,83 @@ input[type="date"].field__input{appearance:none;-webkit-appearance:none}
 .listpage .prices__group{content-visibility:auto;contain-intrinsic-size:auto 32rem}
 /* A focused field never hides under the fixed header. */
 input,textarea,select,button,summary{scroll-margin-top:calc(var(--top-chrome) + var(--spacing-l))}
+
+/* ---------------- kjarnhiti (Karen, 15 Oct: its own tab, high on the site) ---------------- */
+.tempspage,.about{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.tempspage__grid{display:grid;gap:var(--spacing-xxl)}
+@media (min-width:48rem){.tempspage__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--spacing-xl)}}
+.tempspage__h{margin-bottom:var(--spacing-l)}
+.tempspage__col .temps{max-width:none}
+.tempspage__note,.tempspage__more{margin-top:var(--spacing-m);max-width:34rem;text-wrap:pretty}
+.tempspage__more:empty{display:none}
+.tempspage__rest{margin-top:var(--spacing-xxl);max-width:40rem;text-wrap:pretty}
+.tempspage__foot{display:flex;flex-wrap:wrap;gap:var(--spacing-s);margin-top:var(--spacing-xxl)}
+.temps__dot{display:inline-block;width:.625rem;height:.625rem;margin-right:var(--spacing-s);border-radius:50%;vertical-align:.05em;
+  background:#a04040;background:color-mix(in oklab,#c23a48 calc((1 - var(--doneness)) * 100%),#7b5a49)}
+
+/* ---------------- um okkur ---------------- */
+.about__grid{display:grid;gap:var(--spacing-xl);align-items:start}
+@media (min-width:48rem){.about__grid{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:var(--spacing-xxl)}}
+.about__crest img{display:block;width:100%;max-width:13rem;height:auto}
+@media (min-width:48rem){.about__crest img{max-width:20rem}}
+.about__body{display:grid;gap:var(--spacing-m);max-width:40rem;text-wrap:pretty}
+.about__facts{display:grid;margin-top:var(--spacing-xxl);border-top:var(--ink-hair)}
+@media (min-width:48rem){.about__facts{grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--spacing-l)}}
+.about__facts>div{display:grid;gap:var(--spacing-xxs);padding-block:var(--spacing-m);border-bottom:var(--hair)}
+.about__facts dd{margin:0}
+.about--foot .tempspage__foot{margin-top:0}
+
+/* ---------------- pick-up time ---------------- */
+.field__select{appearance:none;-webkit-appearance:none;padding-right:2.5rem;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23141414' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right var(--spacing-s) center;background-size:.75rem auto}
+.mega__mark{display:grid;line-height:0}
+.mega__mark img{display:block;height:1.75rem;width:auto}
+/* the map is one big tap target into Google Maps */
+.map__frame{display:block;color:inherit}
+.map__open{position:absolute;right:var(--spacing-s);bottom:var(--spacing-s);display:inline-flex;align-items:center;min-height:2.75rem;padding:0 var(--spacing-m);background:var(--color-black);color:var(--color-white);letter-spacing:.02em;transition:background-color .16s ease}
+.map__frame:focus-visible{outline:1px solid var(--color-black);outline-offset:3px}
+@media (hover:hover) and (pointer:fine){.map__frame:hover .map__open{background:var(--color-brand)}}
+.footer__addr{color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent);text-underline-offset:.2em}
+@media (hover:hover) and (pointer:fine){.footer__addr:hover{text-decoration-color:currentColor}}
+
+/* ---------------- uppskriftabæklingar ---------------- */
+.booklets{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.booklets__list{display:grid;gap:var(--spacing-l);margin-top:var(--spacing-m);grid-template-columns:repeat(auto-fill,minmax(10rem,1fr));max-width:44rem}
+.booklets__item{display:grid;gap:var(--spacing-xxs);color:inherit}
+.booklets__item img{width:100%;height:auto;aspect-ratio:5/7;object-fit:cover;border:var(--hair);margin-bottom:var(--spacing-xs)}
+
+/* ---------------- flýtileiðir undir hetjunni ---------------- */
+.quick{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.quick__list{display:grid;border-bottom:var(--hair)}
+@media (min-width:48rem){.quick__list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.quick__cell{position:relative;display:grid;gap:var(--spacing-xxs);align-content:start;min-height:100%;padding:var(--spacing-l) var(--spacing-xl) var(--spacing-l) 0;color:inherit;border-top:var(--hair)}
+@media (min-width:48rem){
+  .quick__list>li+li .quick__cell{padding-left:var(--spacing-l);border-left:var(--hair)}
+  .quick__cell{border-top:0}
+}
+.quick__cell>svg,.quick__cell>.arrow{position:absolute;right:0;top:50%;transform:translateY(-50%);transition:transform .2s cubic-bezier(.23,1,.32,1)}
+@media (min-width:48rem){.quick__list>li+li .quick__cell>svg{right:0}}
+@media (hover:hover) and (pointer:fine){.quick__cell:hover>svg{transform:translate(.25rem,-50%)}}
+.quick__cell:focus-visible{outline:1px solid var(--color-black);outline-offset:-1px}
+.quick__meta{display:flex;flex-wrap:wrap;gap:0 var(--spacing-xs);align-items:baseline}
+.count{font-variant-numeric:tabular-nums;white-space:nowrap}
+.count__n{font-weight:700;color:var(--color-brand)}
+
+/* ---------------- kjötdagarnir ---------------- */
+.meatdays{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.meatdays__list{display:grid;border-top:var(--ink-hair)}
+@media (min-width:64rem){.meatdays__list{grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--spacing-l)}}
+.meatday{display:grid;grid-template-columns:6.5rem minmax(0,1fr);gap:var(--spacing-m);padding-block:var(--spacing-l);border-bottom:var(--hair)}
+@media (min-width:64rem){.meatday{grid-template-columns:1fr;gap:var(--spacing-s)}}
+.meatday__when{display:grid;gap:var(--spacing-xxs);align-content:start}
+.meatday .count__n{font-family:var(--font-display);font-weight:400;font-size:clamp(2rem,1.4rem + 2vw,3rem);line-height:1;color:var(--color-black)}
+.meatday:first-child .count__n{color:var(--color-brand)}
+.meatday .count{display:flex;align-items:baseline;gap:var(--spacing-xxs);flex-wrap:wrap}
+.meatday .count__u{font-size:.875rem;color:var(--color-mid-gray)}
+.meatday__date::first-letter{text-transform:uppercase}
+.meatday__body{display:grid;gap:var(--spacing-xs);align-content:start}
+.meatday__fact{max-width:34rem;text-wrap:pretty}
+.meatday__tag{display:inline-block;margin-left:var(--spacing-xxs);padding:.1rem .45rem;border:var(--hair);font-weight:400;letter-spacing:.04em;vertical-align:.15em;color:var(--color-mid-gray)}
+/* Cards stretch to their row; keep the spare space at the bottom so every heading lines up. */
+.meatday{align-content:start}

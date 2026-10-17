@@ -503,6 +503,7 @@
       if (navbar && axis === 'x') gsap.to(navbar, { x: -r.width, duration: d, ease: ez });
       if (overlay) gsap.to(overlay, { opacity: 1, duration: d, ease: ez });
       panel.setAttribute('aria-hidden', 'false');
+      panel.inert = false;
       var f = panel.querySelector('button, [href], input, [tabindex]');
       if (f) f.focus();
       megaIntro(panel);
@@ -529,7 +530,7 @@
         opacity: 0, duration: d, ease: ez,
         onComplete: function () { overlay.classList.remove('is-active'); }
       });
-      if (panel) panel.setAttribute('aria-hidden', 'true');
+      if (panel) { panel.setAttribute('aria-hidden', 'true'); panel.inert = true; }
       if (lastFocus) lastFocus.focus();
       delete root.dataset.modal; delete root.dataset.modalAxis;
       document.dispatchEvent(new CustomEvent('shift-modal:close', { detail: { id: closedId } }));
@@ -557,9 +558,24 @@
     document.addEventListener('click', function (e) {
       var o = e.target.closest('[data-modal-open]');
       if (o) { e.preventDefault(); open(o.getAttribute('data-modal-open')); return; }
-      if (e.target.closest('[data-modal-close]')) { e.preventDefault(); close(); }
+      var closer = e.target.closest('[data-modal-close]');
+      if (closer) {
+        if (!closer.matches('a[href]')) e.preventDefault();
+        close();
+      }
     });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key !== 'Tab' || !openId) return;
+      var panel = panelFor(openId);
+      var items = Array.prototype.filter.call(panel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'), function (el) { return el.getClientRects().length && !el.closest('[hidden]'); });
+      var first = items[0], last = items[items.length - 1];
+      if (!first) { e.preventDefault(); return; }
+      if (!panel.contains(document.activeElement) || (e.shiftKey && document.activeElement === first) || (!e.shiftKey && document.activeElement === last)) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
+    });
     if (overlay) overlay.addEventListener('click', close);
 
     window.addEventListener('wheel', function (e) {

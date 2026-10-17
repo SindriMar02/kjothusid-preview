@@ -106,7 +106,7 @@
     if (!pill) {
       pill = document.createElement('a');
       pill.className = 'basket';
-      pill.href = BASE + 'panta/';
+      pill.href = BASE + 'pantanir/';
       document.body.appendChild(pill);
     }
     pill.hidden = false;
@@ -180,4 +180,49 @@
       if (window.ScrollTrigger) window.ScrollTrigger.refresh();
     }
   });
+})();
+
+/* Kjötdagarnir: the page carries the next few dates of each day, the browser
+   counts down to the first one that has not passed (Iceland = UTC, no DST)
+   and keeps the soonest day first, so the static page stays right between builds. */
+(function () {
+  'use strict';
+  var cells = document.querySelectorAll('[data-day]');
+  if (!cells.length) return;
+  var WD = ['sunnudagur', 'mánudagur', 'þriðjudagur', 'miðvikudagur', 'fimmtudagur', 'föstudagur', 'laugardagur'];
+  var MO = ['janúar', 'febrúar', 'mars', 'apríl', 'maí', 'júní', 'júlí', 'ágúst', 'september', 'október', 'nóvember', 'desember'];
+  /* Our own names: not every browser ships Icelandic dates and would fall back to English. */
+  var dayIs = function (iso) { var d = new Date(iso + 'T12:00:00Z'); return WD[d.getUTCDay()] + ' ' + d.getUTCDate() + '.\u00a0' + MO[d.getUTCMonth()]; };
+  var dagar = function (n) { return n % 10 === 1 && n % 100 !== 11 ? 'dagur' : 'dagar'; };
+  var between = function (a, b) { return Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000); };
+  function updateDays() {
+    var today = new Date().toISOString().slice(0, 10);
+    cells.forEach(function (el) {
+      var next = (el.getAttribute('data-dates') || '').split(',').filter(function (d) { return d >= today; })[0];
+      if (!next) return;
+      var left = between(today, next);
+      el.setAttribute('data-left', String(left));
+      var n = el.querySelector('[data-count-n]'), u = el.querySelector('[data-count-u]'), when = el.querySelector('[data-day-date]');
+      if (n) n.textContent = left === 0 ? 'Í dag' : String(left);
+      if (u) { u.textContent = left === 0 ? '' : dagar(left); u.hidden = left === 0; }
+      if (when) when.textContent = dayIs(next);
+    });
+    document.querySelectorAll('[data-days]').forEach(function (list) {
+      var items = Array.prototype.slice.call(list.children);
+      items.sort(function (a, b) { return Number(a.getAttribute('data-left') || 1e9) - Number(b.getAttribute('data-left') || 1e9); });
+      items.forEach(function (li) { list.appendChild(li); });
+    });
+    var next = document.querySelector('[data-days] > [data-day]');
+    var quick = document.querySelector('.quick__cell[data-day]');
+    if (next && quick) {
+      quick.setAttribute('data-dates', next.getAttribute('data-dates'));
+      quick.querySelector('[data-next-name]').textContent = next.getAttribute('data-day-name');
+      quick.querySelector('[data-count]').innerHTML = next.querySelector('[data-count]').innerHTML;
+      quick.querySelector('[data-day-date]').textContent = next.querySelector('[data-day-date]').textContent;
+    }
+  }
+  updateDays();
+  // Refresh a tab left open over midnight, including one restored from sleep.
+  setInterval(updateDays, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) updateDays(); });
 })();
