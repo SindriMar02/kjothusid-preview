@@ -424,7 +424,7 @@
         '<h2 class="type-header uppercase text-black sent__title">Takk fyrir pöntunina</h2>' +
         '<p class="type-medium">Pöntunin er komin til okkar. Þú vildir sækja hana ' + esc(when) + '. Við höfum samband í síma ' + esc(payload.customer.phone) + ' til að staðfesta.</p>' +
         '<ul class="slip__lines type-small">' + summary + '</ul>' +
-        '<div class="sent__actions"><button type="button" class="chip chip--fill" data-pickup-remind' + (window.KjRemind ? '' : ' hidden') + ' aria-expanded="false"><svg class="chip__icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.2"/></svg>Setja afhendinguna í dagatalið</button></div>' +
+        '<div class="sent__actions"><button type="button" class="chip chip--fill" data-pickup-remind aria-label="Setja afhendinguna í dagatalið"' + (window.KjRemind ? '' : ' hidden') + ' aria-expanded="false"><svg class="chip__icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.2"/></svg>Í dagatalið</button></div>' +
         '<p class="type-small">Spurningar? Hringdu í <a href="tel:+3545578833">' + PHONE + '</a>.</p></div></div>';
       var pr = form.querySelector('[data-pickup-remind]');
       if (pr && window.KjRemind) pr.addEventListener('click', function () {

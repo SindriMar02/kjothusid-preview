@@ -46,3 +46,40 @@
 .basket__n{font-family:var(--font-sans);letter-spacing:0}
 
 @media (forced-colors:active){.tag+.tag::before{color:CanvasText}}
+
+/* ── icon buttons (Sindri, 17 Oct: "use more icons than texts") ──────────────
+   A 44 px square with a 20 px line icon; the words live in aria-label and in a
+   small tooltip on hover or keyboard focus. Plain = transparent, --line = a
+   hairline box, --fill = the action (black, red on hover). */
+.ibtn{position:relative;display:inline-grid;place-items:center;flex:none;width:2.75rem;height:2.75rem;padding:0;color:var(--color-black);background:transparent;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease,transform .16s cubic-bezier(.23,1,.32,1)}
+.ibtn[hidden]{display:none}
+.ibtn svg{width:1.25rem;height:1.25rem}
+.ibtn:active{transform:scale(.94)}
+.ibtn--line{border-color:var(--color-black)}
+.ibtn--fill{background:var(--color-black);border-color:var(--color-black);color:var(--color-white)}
+.ibtn--lg{width:3rem;height:3rem}
+.ibtn[aria-expanded="true"]{background:var(--color-black);color:var(--color-white)}
+@media (hover:hover) and (pointer:fine){
+  .ibtn:not(.ibtn--fill):hover{background:rgba(20,20,20,.07)}
+  .ibtn--line:hover{background:var(--color-black);color:var(--color-white)}
+  .ibtn--fill:hover{background:var(--color-brand);border-color:var(--color-brand)}
+}
+/* the tooltip: only where hover exists, and on keyboard focus */
+.ibtn[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;z-index:5;padding:.35rem .55rem;white-space:nowrap;
+  font-family:var(--font-mark);font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--color-white);background:var(--color-black);
+  opacity:0;transform:translate(-50%,3px);pointer-events:none;transition:opacity .12s ease,transform .16s cubic-bezier(.23,1,.32,1)}
+.ibtn[data-tip]:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+@media (hover:hover) and (pointer:fine){.ibtn[data-tip]:hover::after{opacity:1;transform:translate(-50%,0);transition-delay:.25s}}
+.ibtn[aria-expanded="true"]::after{opacity:0!important}
+@media (prefers-reduced-motion:reduce){.ibtn[data-tip]::after{transform:translate(-50%,0)}}
+
+/* meat days: the two icons sit in the countdown corner, no extra row */
+.meatday__actions{display:flex;gap:.375rem;margin-top:var(--spacing-xs)}
+@media (min-width:64rem){
+  .meatday{position:relative}
+  .meatday__actions{position:absolute;top:var(--spacing-l);right:0;margin:0}
+  .meatday--hook .hook{right:6.25rem}
+}
+.offers__foot .ibtn,.page-head__actions .ibtn{width:3rem;height:3rem}
+/* Kjötkrókur's scene, smaller under the icons on phones so his card stays close to the others */
+@media (max-width:63.99rem){.meatday--hook .hook{width:3.25rem;height:5.5rem;margin-top:0}}

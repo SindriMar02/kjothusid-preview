@@ -110,7 +110,7 @@
       var id = card.getAttribute('data-day-id');
       var date = nextDate(card.getAttribute('data-dates'));
       if (!date) return null;
-      var order = card.querySelector('.chip--fill');
+      var order = card.querySelector('[data-day-order]');
       var orderUrl = order ? order.href : here('/');
       var reminderDays = Number(card.getAttribute('data-remind-days') || '3');
       if (!Number.isSafeInteger(reminderDays) || reminderDays < 0) reminderDays = 3;
