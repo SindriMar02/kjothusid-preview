@@ -20,8 +20,10 @@
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/Marcellus-Regular.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/NimbusSans-Regular.woff2" crossorigin>
 
-<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=5bc13665">
-<link rel="stylesheet" href="/kjothusid-preview/site.css?v=5bc13665">
+<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=46bc6fbd">
+<link rel="stylesheet" href="/kjothusid-preview/site.css?v=46bc6fbd">
+<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=46bc6fbd">
+<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=46bc6fbd">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Forsíða","item":"https://kjothusid.is/"},{"@type":"ListItem","position":2,"name":"Kjarnhiti","item":"https://kjothusid.is/kjarnhiti/"}]}</script>
 </head>
 <body class="is-subpage is-preview" data-page="coretemps">
@@ -73,6 +75,75 @@
     
   </div>
 </section>
+<section class="doneness" id="doneness-tool" data-doneness data-nav-theme="light" aria-labelledby="dn-heading" hidden>
+  <script type="application/json" id="dn-data">{"beef":[{"label":"Lítið steikt (rare)","celsius":52},{"label":"Minna en meðalsteikt (medium rare)","celsius":54},{"label":"Meðalsteikt (medium)","celsius":58},{"label":"Vel meðalsteikt (medium well)","celsius":64},{"label":"Gegnumsteikt (well done)","celsius":70}],"lamb":[{"label":"Lítið steikt","celsius":55},{"label":"Meðalsteikt","celsius":60,"range":"60 til 65"},{"label":"Gegnumsteikt","celsius":70,"range":"70 til 75"}]}</script>
+  <div class="doneness__card">
+    <header class="doneness__header">
+      <div><p class="doneness__eyebrow">Kjarnhiti</p><h2 id="dn-heading">Steikin að innan</h2></div>
+      <fieldset class="doneness__meats"><legend class="doneness__sr">Veldu kjöt</legend>
+        <label><input type="radio" name="dn-meat" value="beef" checked><span>Naut</span></label>
+        <label><input type="radio" name="dn-meat" value="lamb"><span>Lamb</span></label>
+      </fieldset>
+    </header>
+    <div class="doneness__workbench">
+      <div class="doneness__explorer">
+        <div class="doneness__reading">
+          <p class="doneness__temperature"><output data-dn-t for="dn-range" aria-live="off">58</output><span>°C</span></p>
+          <div class="doneness__result"><p class="doneness__name" data-dn-label>Meðalsteikt</p><p class="doneness__reference" data-dn-reference>58 °C í töflu</p></div>
+        </div>
+        <figure class="doneness__figure"><svg class="doneness__drawing" viewBox="40 30 520 250" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="dn-crust" x2="0" y2="1"><stop stop-color="#78503a"/><stop offset=".48" stop-color="#493023"/><stop offset="1" stop-color="#2e201a"/></linearGradient>
+    <linearGradient id="dn-fat" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#f3e1b8"/><stop offset=".55" stop-color="#d5b887"/><stop offset="1" stop-color="#95744c"/></linearGradient>
+    <linearGradient id="dn-light" x2=".2" y2="1"><stop stop-color="#fff8e6" stop-opacity=".18"/><stop offset=".55" stop-color="#fff8e6" stop-opacity="0"/><stop offset="1" stop-color="#321711" stop-opacity=".2"/></linearGradient>
+    <pattern id="dn-grain" width="21" height="17" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)">
+      <path d="M2 4l4 1m7 7 5 1M9 0l1 3" fill="none" stroke="#371f18" stroke-width=".65" opacity=".13"/>
+      <path d="M0 12l4-1m8-5 4 1" fill="none" stroke="#fff1d7" stroke-width=".65" opacity=".18"/>
+    </pattern>
+    <pattern id="dn-sear" width="29" height="23" patternUnits="userSpaceOnUse">
+      <path d="m2 4 6-2 3 4-6 3zm14 10 8-3 2 4-7 3z" fill="#221b16" opacity=".5"/>
+      <path d="m13 2 4 3m-15 14 6 1m11 2 4-1" stroke="#b58a57" stroke-width="2" opacity=".55"/>
+    </pattern>
+    <path id="dn-face" d="M77 136C98 108 163 99 220 105c56 5 88 9 135-2 54-13 115-8 154 18 24 17 30 44 15 66-22 34-88 51-164 55-78 4-143-1-201-13-63-13-109-49-82-93Z"/>
+    <clipPath id="dn-face-clip"><use href="#dn-face"/></clipPath>
+  </defs>
+  <ellipse cx="302" cy="258" rx="224" ry="13" fill="#3b2a20" opacity=".055"/>
+  <ellipse cx="304" cy="254" rx="191" ry="7" fill="#3b2a20" opacity=".07"/>
+  <path d="M68 127c-1-39 35-69 91-77 57-9 101 4 149-3 73-11 128 3 170 27 32 19 57 44 57 76l-8 35-449-8Z" fill="url(#dn-crust)"/>
+  <path d="M70 123c10-30 48-54 101-56 52-3 86 8 139-1 70-12 126 4 163 25 24 14 40 31 49 46-45-24-95-25-147-12-64 15-102 10-161 5-55-5-104-2-144 10Z" fill="url(#dn-sear)" opacity=".65"/>
+  <path d="M73 129c29-27 87-39 148-33 54 5 89 10 138-3 57-15 116-6 152 20l12 19c-40-25-100-32-155-18-54 14-91 9-149 4-61-5-117 3-147 28Z" fill="url(#dn-fat)"/>
+  <use href="#dn-face" fill="var(--dn-band)" stroke="#573825" stroke-width="9" stroke-linejoin="round"/>
+  <g clip-path="url(#dn-face-clip)">
+    <g class="doneness__core"><path d="M91 150c22-26 72-32 128-26 64 8 95 10 145-3 52-13 104-6 139 16 19 12 19 32 5 46-29 28-88 40-151 43-75 4-134-2-186-13-52-10-98-36-80-63Z" fill="var(--dn-core)"/>
+      <g fill="none" stroke="#f8d8be" stroke-linecap="round" opacity=".4">
+        <path d="M112 160c31-9 43 10 70 6s35-20 63-11 36 27 67 17 49-25 76-19 56 20 90 8" stroke-width="2.3"/>
+        <path d="m183 166 8 20 28 12m24-43 13-17m54 35 23 23 31 8m24-51 19-16m-73 58 11 19M136 157l-6-16m320 29 14 18" stroke-width="1.3"/>
+        <path d="M120 185c17 2 30 12 46 12m68-10 27 9m117 7 22-8m31-56 24 3" stroke-width="1"/>
+      </g>
+    </g>
+    <use href="#dn-face" fill="url(#dn-light)"/>
+    <use href="#dn-face" fill="url(#dn-grain)"/>
+    <path d="M87 141c25-26 80-31 125-26m163 1c57-12 100-2 127 16" fill="none" stroke="#eed3ad" stroke-width="2" opacity=".55"/>
+  </g>
+  <path d="M99 213c37 23 98 32 158 35m179-9c37-8 67-21 82-38" fill="none" stroke="#3e291e" stroke-width="3" stroke-linecap="round"/>
+</svg><figcaption>Skýringarmynd · litir til viðmiðunar</figcaption></figure>
+        <div class="doneness__slider">
+          <div class="doneness__ruler" aria-hidden="true"><div data-dn-ticks></div></div>
+          <input id="dn-range" class="doneness__range" type="range" min="51" max="75" step="1" value="58" aria-label="Kjarnhiti" aria-valuetext="58 gráður, Meðalsteikt" aria-describedby="dn-help">
+          <div class="doneness__ends" aria-hidden="true"><span>51 °C</span><span>75 °C</span></div>
+        </div>
+        <p class="doneness__help" id="dn-help"><span aria-hidden="true">↔</span> Dragðu mælinn</p>
+      </div>
+      <div class="doneness__guide">
+        <p class="doneness__eyebrow" id="dn-steps-heading">Veldu steikingu</p>
+        <div class="doneness__steps" data-dn-steps role="group" aria-labelledby="dn-steps-heading"></div>
+        
+      </div>
+    </div>
+    <p class="doneness__foot">Notaðu kjöthitamæli við eldun.</p>
+    <p class="doneness__sr" data-dn-status role="status" aria-live="polite" aria-atomic="true"></p>
+  </div>
+</section>
 <section class="tempspage section-spacing" data-nav-theme="light" data-pt="none" data-pb="xxl" aria-label="Kjarnhitatöflur">
   <div class="tempspage__grid">
     <div class="tempspage__col" id="naut">
@@ -102,7 +173,9 @@
   <div class="tempspage__foot">
     <a class="btn btn-fill" href="/kjothusid-preview/uppskriftir/">Uppskriftir</a>
     <a class="btn btn-outline" href="/kjothusid-preview/pantanir/">Pantanir</a>
+    <button type="button" class="btn btn-outline" data-print hidden>Prenta ísskápsspjald</button>
   </div>
+  <p class="printcard__foot" aria-hidden="true">Kjöthúsið · Smiðjuvegi 24D, Kópavogi · 557 8833 · kjothusid.is</p>
 </section>
 </main>
 <footer class="footer" data-nav-theme="dark">
@@ -230,8 +303,11 @@
 <script src="/kjothusid-preview/assets/vendor/lenis.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/gsap.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/ScrollTrigger.min.js" defer></script>
-<script src="/kjothusid-preview/assets/js/motion.js?v=5bc13665" defer></script>
-<script src="/kjothusid-preview/assets/js/site.js?v=5bc13665" defer></script>
+<script src="/kjothusid-preview/assets/js/motion.js?v=46bc6fbd" defer></script>
+<script src="/kjothusid-preview/assets/js/site.js?v=46bc6fbd" defer></script>
+<script src="/kjothusid-preview/assets/js/calendar.js?v=46bc6fbd" defer></script>
+<script src="/kjothusid-preview/assets/js/extras.js?v=46bc6fbd" defer></script>
+<script src="/kjothusid-preview/assets/js/doneness.js?v=46bc6fbd" defer></script>
 
 </body>
 </html>

@@ -5,6 +5,7 @@
 (function () {
   'use strict';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BASE_PATH = (function () { try { return JSON.parse(document.getElementById('kj-data').textContent).base || '/'; } catch (e) { return '/'; } })();
   var PHONE = '557 8833';
   var UNIT = { kg: 'kr/kg', stk: 'kr/stk', pk: 'kr/pk', flat: 'kr' };
   var fmt = function (n) { return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(n); };
@@ -329,6 +330,29 @@
   }
   refreshFirstDay();
   date.addEventListener('focus', refreshFirstDay);
+
+  /* Arriving from a meat day (?dagur=sprengidagur): say so, pick the last
+     possible pick-up day before it and leave the day's note. The products came
+     in with ?v= above. */
+  (function dayPreset() {
+    var id = new URLSearchParams(location.search).get('dagur');
+    var days = {};
+    try { days = JSON.parse(document.getElementById('kj-days').textContent); } catch (e) {}
+    var d = id && Object.prototype.hasOwnProperty.call(days, id) && days[id];
+    if (!d) return;
+    var t = new Date().toISOString().slice(0, 10);
+    var day = (d.dates || []).filter(function (x) { return x >= t; })[0];
+    var ban = form.querySelector('[data-dayban]');
+    if (ban) { ban.innerHTML = '<span class="dayban__k">' + esc(d.banner) + '</span>' + (day ? '<span class="dayban__d">' + esc(dayIs(day)) + '</span>' : ''); ban.hidden = false; }
+    if (day) {
+      var p = new Date(day + 'T12:00:00Z');
+      do { p.setUTCDate(p.getUTCDate() - 1); } while (weekdaysOnly && isWeekend(p));
+      var pick = p.toISOString().slice(0, 10);
+      if (pick >= first) date.value = pick;
+    }
+    var notes = form.querySelector('[name="notes"]');
+    if (notes && !notes.value && d.note) notes.value = d.note;
+  })();
   document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshFirstDay(); });
   function checkDate() {
     refreshFirstDay();
@@ -392,10 +416,30 @@
       if (Basket) Basket.clear();
       var summary = payload.lines.map(function (l) { return '<li>' + esc(l.name) + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg (um það bil)' : 'stk.') + '</li>'; }).join('');
       form.classList.add('is-sent');
-      form.innerHTML = '<div class="sent"><h2 class="type-header uppercase text-black">Takk fyrir pöntunina</h2>' +
-        '<p class="type-medium">Pöntunin er komin til okkar. Þú vildir sækja hana ' + esc(dayAcc(payload.fulfilment.date)) + ' klukkan ' + esc(payload.fulfilment.time) + '. Við höfum samband í síma ' + esc(payload.customer.phone) + ' til að staðfesta.</p>' +
-        '<p class="type-small text-mid-gray">Tilvísun: ' + esc(ref) + '</p><ul class="plainlist type-small">' + summary + '</ul>' +
-        '<p class="type-small">Spurningar? Hringdu í <a href="tel:+3545578833">' + PHONE + '</a>.</p></div>';
+      // The sent view is the order slip, stamped. Its button saves the pick-up to the calendar.
+      var when = dayAcc(payload.fulfilment.date) + ' klukkan ' + payload.fulfilment.time;
+      form.innerHTML = '<div class="sent">' +
+        '<div class="slip slip--sent"><span class="stamp" aria-hidden="true">Móttekið</span>' +
+        '<p class="slip__head"><img src="' + BASE_PATH + 'assets/img/crest.svg" alt="" width="398" height="244" class="slip__crest"><span class="slip__title">Pöntunarmiði</span><span class="slip__sub type-xsmall">' + esc(ref) + '</span></p>' +
+        '<h2 class="type-header uppercase text-black sent__title">Takk fyrir pöntunina</h2>' +
+        '<p class="type-medium">Pöntunin er komin til okkar. Þú vildir sækja hana ' + esc(when) + '. Við höfum samband í síma ' + esc(payload.customer.phone) + ' til að staðfesta.</p>' +
+        '<ul class="slip__lines type-small">' + summary + '</ul>' +
+        '<div class="sent__actions"><button type="button" class="chip chip--fill" data-pickup-remind' + (window.KjRemind ? '' : ' hidden') + ' aria-expanded="false"><svg class="chip__icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.2"/></svg>Setja afhendinguna í dagatalið</button></div>' +
+        '<p class="type-small">Spurningar? Hringdu í <a href="tel:+3545578833">' + PHONE + '</a>.</p></div></div>';
+      var pr = form.querySelector('[data-pickup-remind]');
+      if (pr && window.KjRemind) pr.addEventListener('click', function () {
+        window.KjRemind.open(pr, {
+          uid: 'pontun-' + ref + '@kjothusid.is',
+          title: 'Sækja pöntun hjá Kjöthúsinu',
+          description: 'Pöntun ' + ref + '\n' + payload.lines.map(function (l) { return '- ' + l.name + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg' : 'stk.'); }).join('\n') + '\n\nSími 557 8833',
+          location: 'Kjöthúsið, Smiðjuvegi 24D, 200 Kópavogi',
+          url: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Kjöthúsið, Smiðjuvegur 24D, 200 Kópavogur'),
+          date: payload.fulfilment.date,
+          time: payload.fulfilment.time,
+          durationMinutes: 15,
+          alarms: [{ minutesBefore: 60 }]
+        }, 'kjothusid-pontun-' + ref + '.ics');
+      });
       window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 120, behavior: reduce ? 'auto' : 'smooth' });
     }).catch(function (err) { status(form, 'error', failMessage(err)); });
   });

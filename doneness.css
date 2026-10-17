@@ -1,0 +1,78 @@
+/* Scoped butcher's reference card. Shared buttons and tags do not style it. */
+.doneness{--dn-paper:#fbf8f1;--dn-ink:#141414;--dn-muted:#686158;--dn-red:#c91b24;--dn-core:#d27c7e;--dn-band:#a3836c;--dn-core-scale:.8;box-sizing:border-box;width:100%;padding:0 16px 48px;color:var(--dn-ink);font-family:var(--font-sans);font-size:16px;line-height:1.4}
+.doneness[hidden]{display:none!important}
+.doneness *{box-sizing:border-box}
+.doneness p,.doneness h2,.doneness figure{margin:0}
+.doneness__card{max-width:1376px;margin-inline:auto;padding:20px;background:var(--dn-paper);border:1px solid #d6cbb9;border-top:3px solid var(--dn-ink)}
+.doneness__header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:16px;border-bottom:1px solid #d6cbb9}
+.doneness .doneness__eyebrow{font-family:var(--font-mark);font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:var(--dn-muted);line-height:1.3}
+.doneness h2{font-family:var(--font-display);font-size:clamp(25px,3vw,42px);font-weight:400;line-height:1.08;margin-top:5px;letter-spacing:-.035em}
+.doneness__header>div{flex:1;min-width:0}
+.doneness__meats{display:flex;flex-shrink:0;gap:2px;margin:0;padding:3px;border:1px solid #958776;min-width:0}
+.doneness__meats label{position:relative;display:block;cursor:pointer}
+.doneness__meats input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.doneness__meats span{display:flex;align-items:center;justify-content:center;min-height:44px;min-width:50px;padding:0 8px;font-family:var(--font-mark);font-size:14px;text-transform:uppercase;letter-spacing:.06em;user-select:none;-webkit-user-select:none}
+.doneness__meats input:checked+span{background:var(--dn-ink);color:var(--dn-paper)}
+.doneness__meats input:focus-visible+span{outline:2px solid var(--dn-red);outline-offset:3px}
+.doneness__meats input,.doneness__step{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.doneness__workbench{display:grid;gap:16px;padding-block:16px}
+.doneness__explorer{min-width:0}
+.doneness__reading{display:flex;align-items:center;gap:20px;min-height:80px}
+.doneness__temperature{display:flex;align-items:flex-start;flex-shrink:0;line-height:1;font-family:var(--font-display);font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.06em}
+.doneness__temperature output{display:block;min-width:2ch;font-size:72px;text-align:right}
+.doneness__temperature>span{font-family:var(--font-sans);font-size:21px;letter-spacing:-.04em;padding-top:10px;margin-left:3px}
+.doneness__result{min-width:0;flex:1}
+.doneness .doneness__name{font-family:var(--font-display);font-size:23px;line-height:1.18;letter-spacing:-.02em;color:var(--dn-red);overflow-wrap:break-word}
+.doneness .doneness__reference{font-size:12px;line-height:1.4;color:var(--dn-muted);margin-top:7px}
+.doneness__figure{position:relative}
+.doneness__drawing{display:block;width:100%;height:auto;overflow:visible;max-height:240px}
+.doneness__core{transform:scale(1,var(--dn-core-scale));transform-origin:300px 174px}
+.doneness__figure figcaption{text-align:center;color:var(--dn-muted);font-size:11px;letter-spacing:.03em;margin-top:-6px}
+.doneness__slider{position:relative;margin-top:18px;padding-top:4px}
+.doneness__ruler{position:absolute;top:0;left:22px;right:22px;height:28px;background:repeating-linear-gradient(90deg,#958776 0 1px,transparent 1px calc(100% / var(--dn-divisions,24)));border-bottom:1px solid #5b5044;pointer-events:none}
+.doneness__ruler::before{content:"";position:absolute;inset:0 0 13px;background:var(--dn-paper)}
+.doneness__ruler::after{content:"";position:absolute;left:0;bottom:-1px;width:var(--dn-position,0%);height:2px;background:var(--dn-red)}
+.doneness__ruler i{position:absolute;top:0;width:1px;height:28px;background:#4e453a}
+.doneness__range{position:relative;display:block;appearance:none;-webkit-appearance:none;width:100%;height:48px;border:0;border-radius:0;margin:0;background:transparent;cursor:ew-resize;touch-action:pan-y;font-size:16px;outline-offset:5px;-webkit-tap-highlight-color:transparent}
+.doneness__range::-webkit-slider-runnable-track{height:2px;background:transparent}
+.doneness__range::-moz-range-track{height:2px;background:transparent}
+.doneness__range::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:44px;height:44px;margin-top:-21px;border:5px solid var(--dn-paper);border-radius:50%;background:var(--dn-ink) linear-gradient(var(--dn-paper),var(--dn-paper)) center/2px 14px no-repeat;box-shadow:0 0 0 1px var(--dn-ink)}
+.doneness__range::-moz-range-thumb{box-sizing:border-box;width:44px;height:44px;border:5px solid var(--dn-paper);border-radius:50%;background:var(--dn-ink) linear-gradient(var(--dn-paper),var(--dn-paper)) center/2px 14px no-repeat;box-shadow:0 0 0 1px var(--dn-ink)}
+.doneness__range:active::-webkit-slider-thumb{background-color:var(--dn-red)}
+.doneness__range:active::-moz-range-thumb{background-color:var(--dn-red)}
+.doneness__range:focus-visible{outline:2px solid var(--dn-red)}
+.doneness__ends{display:flex;justify-content:space-between;font-size:12px;font-variant-numeric:tabular-nums;color:var(--dn-muted);margin-top:1px}
+.doneness .doneness__help{display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 104px);min-height:18px;font-size:12px;color:var(--dn-muted);margin:-18px auto 0}
+.doneness__help>span{font-size:18px;line-height:1;color:var(--dn-ink)}
+.doneness__guide{min-width:0}
+.doneness__steps{display:grid;grid-template-rows:repeat(var(--dn-rows,5),minmax(48px,1fr));min-height:241px;margin-top:12px;border-top:1px solid #d6cbb9}
+.doneness .doneness__step{position:relative;display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:48px;padding:10px 9px;border:0;border-bottom:1px solid #d6cbb9;border-radius:0;background:transparent;color:var(--dn-ink);font-family:var(--font-sans);font-weight:400;font-size:14px;line-height:1.25;text-align:left;cursor:pointer;user-select:none;-webkit-user-select:none}
+.doneness__step-marker{width:7px;height:7px;border:1px solid #827464;border-radius:50%}
+.doneness__step[data-passed="true"] .doneness__step-marker{background:#827464}
+.doneness__step-value{white-space:nowrap;font-family:var(--font-mark);font-size:17px;letter-spacing:.025em}
+.doneness .doneness__step[aria-pressed="true"]{background:var(--dn-ink);color:var(--dn-paper);border-bottom-color:var(--dn-ink)}
+.doneness__step[aria-pressed="true"] .doneness__step-marker{background:var(--dn-paper);border-color:var(--dn-paper);border-radius:0;clip-path:polygon(0 0,100% 50%,0 100%)}
+.doneness__step:focus-visible{outline:2px solid var(--dn-red);outline-offset:3px;z-index:1}
+.doneness .doneness__foot{padding-top:16px;border-top:1px solid #d6cbb9;color:var(--dn-muted);font-size:12px;line-height:1.5}
+.doneness__sr{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (hover:hover) and (pointer:fine){.doneness__meats input:not(:checked):hover+span{background:#e6d7bd}.doneness .doneness__step:not([aria-pressed="true"]):hover{background:#e6d7bd}}
+.doneness .doneness__step:active{background:#e6d7bd;color:var(--dn-ink)}
+@media(min-width:48rem){
+  .doneness{padding-inline:24px;padding-bottom:64px}
+  .doneness__card{padding:32px}
+  .doneness__header{padding-bottom:24px}
+  .doneness__meats span{min-width:75px;padding-inline:18px;font-size:18px}
+  .doneness__workbench{grid-template-columns:minmax(0,1.3fr) minmax(260px,1fr);gap:40px;padding-block:24px}
+  .doneness__guide{border-left:1px solid #d6cbb9;padding-left:32px;padding-top:8px}
+  .doneness__temperature output{font-size:88px}
+  .doneness__reading{gap:24px;min-height:92px}
+  .doneness .doneness__name{font-size:28px}
+  .doneness__steps{min-height:281px}
+  .doneness .doneness__eyebrow{font-size:14px}
+}
+@media(min-width:75rem){.doneness__card{padding:28px 40px}.doneness__workbench{grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);gap:64px}.doneness__guide{padding-left:48px}.doneness__steps{min-height:311px}.doneness .doneness__step{min-height:62px;font-size:16px}.doneness__drawing{max-width:580px;margin-inline:auto}.doneness__reading{padding-inline:20px}}
+@media(max-width:359px){.doneness{padding-inline:12px}.doneness__card{padding:18px}.doneness__reading{gap:14px}.doneness__temperature output{font-size:62px}.doneness .doneness__name{font-size:21px}.doneness .doneness__step{font-size:13px;gap:8px;padding-inline:7px}}
+/* All value-driven drawing and controls update immediately, even with motion on. */
+@media(prefers-reduced-motion:reduce){.doneness *,.doneness *::before,.doneness *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(forced-colors:active){.doneness__meats input:checked+span,.doneness .doneness__step[aria-pressed="true"]{outline:2px solid Highlight;outline-offset:-3px}.doneness__range{appearance:auto}.doneness__ruler{display:none}}
+@media print{body[data-page="coretemps"] .doneness{display:none!important}}
