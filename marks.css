@@ -1,78 +1,48 @@
-/* Búðarmerki: the shop's marks (Sindri, 17 Oct: "the buttons and tags seem so
-   generic", then "make sure the font in the buttons makes sense for the entire
-   design"). Buttons are butcher's tickets, punched at both sides, the main ones
-   with a perforated stub that carries the arrow; tags are hang tags with a
-   pointed end and a punched hole. Labels are the site's own display face,
-   Marcellus, in tracked capitals: the same voice as the headings and the list
-   titles. (Tanker, a condensed slab, was tried and dropped: a third type
-   personality next to Marcellus and the crest.) Loaded after styles.css and
-   site.css, so it restyles without touching them. */
-:root{--font-mark:var(--font-display);--kraft:#e6d7bd;--kraft-ink:#3b2a20;--paper:#fbf8f1;--notch:.42rem}
+/* Búðarmerki, round 2 (Sindri, 17 Oct: the ticket buttons and hang tags
+   "look a bit strange and the tags take wayy too much space").
+   Buttons keep the site's display face, Marcellus, in tracked capitals (the
+   same voice as the headings) but lose the punched notches and the dashed
+   stub: a clean box, the main action carries a small arrow that nudges on
+   hover. Tags stop being shapes: one quiet line of small capitals under the
+   product name, Sértilboð in the brand red, Ný vara in ink, the rest grey,
+   separated by a middle dot. A price row stays one or two lines tall.
+   Loaded after styles.css and site.css, so it restyles without touching them. */
+:root{--font-mark:var(--font-display)}
 
-/* ── the ticket: every .btn and .chip ───────────────────────────────────── */
-.btn,.chip{
-  font-family:var(--font-mark);font-weight:400;text-transform:uppercase;letter-spacing:.12em;line-height:1;
-  -webkit-mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat;
-  mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat;
-}
-.btn{font-size:.9375rem;padding:var(--spacing-s) calc(var(--spacing-l) + .15rem);min-height:3rem}
-.btn-outline{border-width:1.5px}
-/* The main action carries a stub: a dashed tear line and the arrow. */
-.btn-fill{padding-right:calc(var(--spacing-l) + 2.9rem);transition:color var(--btn-duration) var(--btn-ease),background-color .2s ease,transform .16s cubic-bezier(.23,1,.32,1)}
-.btn-fill::after{content:"";position:absolute;top:0;right:0;bottom:0;width:2.75rem;border-left:2px dashed rgba(240,240,240,.42);
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11M9 4l4 4-4 4' fill='none' stroke='%23f0f0f0' stroke-width='1.6'/%3E%3C/svg%3E") center/1rem no-repeat;
-  transition:background-position .2s cubic-bezier(.23,1,.32,1)}
+/* ── buttons ────────────────────────────────────────────────────────────── */
+.btn,.chip{font-family:var(--font-mark);font-weight:400;text-transform:uppercase;letter-spacing:.12em;line-height:1}
+.btn{font-size:.875rem;padding:var(--spacing-s) var(--spacing-l);min-height:3rem}
+.btn-fill{gap:.7em;transition:color var(--btn-duration) var(--btn-ease),background-color .2s ease,transform .16s cubic-bezier(.23,1,.32,1)}
+.btn-fill::after{content:"";flex:none;width:.9em;height:.9em;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11M9 4l4 4-4 4' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11M9 4l4 4-4 4' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition:transform .2s cubic-bezier(.23,1,.32,1)}
 @media (hover:hover) and (pointer:fine){
   .btn-fill:hover:not(:disabled){background:var(--color-brand);transform:none}
-  .btn-fill:hover:not(:disabled)::after{background-position:calc(50% + 3px) center}
+  .btn-fill:hover:not(:disabled)::after{transform:translateX(3px)}
 }
-.btn--full.btn-fill{padding-right:calc(var(--spacing-l) + 2.9rem)}
 
-/* chips: the small tickets (meat-day actions, offer reminder, list filters) */
-.chip{--notch:.32rem;font-size:.8125rem;padding:0 1rem 0 1.05rem;min-height:2.75rem;border-width:1.5px;border-color:var(--color-black)}
+/* chips: the small actions (meat days, offer reminder, list filters) */
+.chip{font-size:.75rem;padding:0 .95rem;min-height:2.75rem;border:1px solid var(--color-black)}
 .chip--fill,.chip[aria-pressed="true"]{background:var(--color-black);color:var(--color-white)}
 @media (hover:hover) and (pointer:fine){.chip:not(.chip--fill):not([aria-pressed="true"]):hover{background:var(--color-black);color:var(--color-white)}.chip--fill:hover{background:var(--color-brand);border-color:var(--color-brand)}}
-.chip[data-done]{background:var(--color-brand);border-color:var(--color-brand);color:#fbefe2}
+.chip[data-done]{background:var(--color-brand);border-color:var(--color-brand);color:var(--color-white)}
 
-/* ── the hang tag ───────────────────────────────────────────────────────── */
-.tag{
-  --tag-bg:var(--kraft);--tag-fg:var(--kraft-ink);
-  height:1.625rem;padding:0 .6rem 0 1.25rem;border:0;
-  font-family:var(--font-mark);font-size:.75rem;letter-spacing:.1em;line-height:1;text-transform:uppercase;
-  color:var(--tag-fg);background:var(--tag-bg);
-  clip-path:polygon(.6rem 0,100% 0,100% 100%,.6rem 100%,0 50%);
-  -webkit-mask:radial-gradient(circle .17rem at .68rem 50%,#0000 95%,#000);mask:radial-gradient(circle .17rem at .68rem 50%,#0000 95%,#000);
-}
-.tag--offer{--tag-bg:var(--color-brand);--tag-fg:#fbefe2}
-.tag--new{--tag-bg:var(--paper);--tag-fg:var(--color-brand);box-shadow:inset 0 0 0 1.5px var(--color-brand)}
-.meatday__tag{border:0;padding:0 .55rem 0 1.15rem;height:1.5rem;font-family:var(--font-mark);font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--kraft-ink);background:var(--kraft);vertical-align:.2em;
-  clip-path:polygon(.55rem 0,100% 0,100% 100%,.55rem 100%,0 50%);-webkit-mask:radial-gradient(circle .16rem at .62rem 50%,#0000 95%,#000);mask:radial-gradient(circle .16rem at .62rem 50%,#0000 95%,#000)}
+/* form choices in the same voice; picked = brand red */
+.choice span{font-family:var(--font-mark);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;border-color:var(--color-black)}
+.choice input:checked+span{background:var(--color-brand);border-color:var(--color-brand);color:var(--color-white)}
 
-/* ── the small tickets: + on the price rows, form choices, quantity steps ── */
-.prices__add,.oline__step{--notch:.22rem;border:1.5px solid var(--color-black);color:var(--color-black);
-  -webkit-mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat;
-  mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat}
-.prices__add.is-added{background:var(--color-brand);border-color:var(--color-brand)}
-@media (hover:hover) and (pointer:fine){.prices__row:hover .prices__add:not(.is-added){border-color:var(--color-black)}.prices__add:not(.is-added):hover{background:var(--color-black);color:var(--color-white)}}
-@media (pointer:coarse){.prices__add{border-color:var(--color-black)}}
-.oline__step{font-size:1.25rem;background:transparent}
-.oline__step:active{background:var(--color-black);color:var(--color-white)}
-.choice span{--notch:.3rem;font-family:var(--font-mark);font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;padding:0 var(--spacing-m);border:1.5px solid var(--color-black);
-  -webkit-mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat;
-  mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat}
-.choice input:checked+span{background:var(--color-brand);border-color:var(--color-brand);color:#fbefe2}
+/* ── tags: a line of small capitals, not a row of shapes ──────────────────── */
+.prices__name .tags{display:flex;flex-wrap:wrap;flex-basis:100%;align-items:baseline;gap:0 .55rem;margin-top:-.1rem}
+.tag{display:inline;height:auto;padding:0;border:0;background:none;
+  font-family:var(--font-mark);font-size:.6875rem;letter-spacing:.1em;line-height:1.5;text-transform:uppercase;color:var(--color-mid-gray);white-space:nowrap}
+.tag+.tag::before{content:"·";margin-right:.55rem;color:var(--color-light-gray)}
+.tag--offer{color:var(--color-brand);background:none}
+.tag--new{color:var(--color-black)}
+.meatday__tag{margin-left:.35rem;padding:0;border:0;background:none;height:auto;font-family:var(--font-mark);font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--color-mid-gray);vertical-align:.1em}
 
-/* the basket: a ticket that follows you, the count in its stub */
-.basket{--notch:.36rem;padding-left:1.15rem;box-shadow:inset 0 0 0 1.5px rgba(240,240,240,.38);font-family:var(--font-mark);font-size:.875rem;letter-spacing:.12em;text-transform:uppercase;
-  -webkit-mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat;
-  mask:radial-gradient(circle var(--notch) at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--notch) at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat}
-.basket__n{align-self:stretch;height:auto;min-width:2.5rem;margin-left:.35rem;background:transparent;color:inherit;border-left:2px dashed rgba(240,240,240,.42);font-family:var(--font-sans);font-size:.875rem;letter-spacing:0}
+/* the basket keeps its count, set apart by a hairline */
+.basket{font-family:var(--font-mark);font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase}
+.basket__n{font-family:var(--font-sans);letter-spacing:0}
 
-/* Focus that survives the punch: a mask clips everything outside the ticket,
-   the browser's outline included, so masked controls draw their ring inside. */
-.btn:focus-visible,.chip:focus-visible,.prices__add:focus-visible,.oline__step:focus-visible,.basket:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--color-brand),inset 0 0 0 4px #fbf8f1}
-.btn-outline.text-white:focus-visible,.footer .btn:focus-visible{box-shadow:inset 0 0 0 2px var(--color-white),inset 0 0 0 4px var(--color-brand)}
-.choice input:focus-visible+span{outline:none;box-shadow:inset 0 0 0 2px var(--color-brand),inset 0 0 0 4px #fbf8f1}
-
-@media (forced-colors:active){.btn,.chip,.tag,.meatday__tag,.prices__add,.oline__step,.choice span,.basket{-webkit-mask:none;mask:none;clip-path:none;border:1px solid CanvasText}}
-@media print{.btn,.chip{-webkit-mask:none;mask:none}.btn-fill::after{display:none}}
+@media (forced-colors:active){.tag+.tag::before{color:CanvasText}}
