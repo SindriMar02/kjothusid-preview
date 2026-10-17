@@ -77,7 +77,7 @@
         value.className = 'doneness__step-value';
         value.textContent = (row.range || row.celsius) + ' °C';
         button.append(marker, name, value);
-        button.addEventListener('click', function () { range.value = row.celsius; update(true); });
+        button.addEventListener('click', function () { glide(row.celsius); });
         steps.append(button);
         var tick = document.createElement('i');
         tick.style.left = ((row.celsius - min) / (max - min) * 100) + '%';
@@ -85,6 +85,24 @@
         return button;
       });
     }
+    // A tapped step glides the thermometer there (the numbers count, the meat
+    // cooks or cools), ~420 ms ease-out. Dragging stays direct: no tween on input.
+    var reduce = typeof matchMedia !== 'function' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var canAnimate = typeof requestAnimationFrame === 'function' && typeof performance !== 'undefined';
+    var glideId = 0;
+    function glide(target) {
+      var from = Number(range.value);
+      if (reduce || !canAnimate || from === target) { range.value = target; update(true); return; }
+      var id = ++glideId, t0 = performance.now(), dur = 420;
+      (function frame(now) {
+        if (id !== glideId) return;
+        var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+        range.value = Math.round(from + (target - from) * e);
+        update(k === 1);
+        if (k < 1) requestAnimationFrame(frame);
+      })(t0);
+    }
+    range.addEventListener('pointerdown', function () { glideId++; });
     // Native range supplies pointer capture, touch and all keyboard semantics.
     // No snapping, animation frame queue, transitions or deferred work on input.
     range.addEventListener('input', function () { update(false); });
@@ -93,6 +111,7 @@
       radio.addEventListener('change', function () {
         if (!radio.checked || !data[radio.value] || !data[radio.value].length) return;
         meat = radio.value;
+        tool.dataset.meat = meat;
         drawSteps();
         update(true);
       });

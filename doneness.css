@@ -76,3 +76,14 @@
 @media(prefers-reduced-motion:reduce){.doneness *,.doneness *::before,.doneness *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(forced-colors:active){.doneness__meats input:checked+span,.doneness .doneness__step[aria-pressed="true"]{outline:2px solid Highlight;outline-offset:-3px}.doneness__range{appearance:auto}.doneness__ruler{display:none}}
 @media print{body[data-page="coretemps"] .doneness{display:none!important}}
+
+/* Round 3 drawings: a sliced steak (Naut) and crossed frenched chops (Lamb).
+   Both sit in one stage; the chosen one slides in, the other slides out. */
+.dn-stage{position:relative;display:grid}
+.dn-stage>.dn-art{grid-area:1/1;transition:opacity .26s cubic-bezier(.23,1,.32,1),transform .32s cubic-bezier(.23,1,.32,1)}
+.doneness[data-meat="beef"] .dn-art--lamb,.doneness[data-meat="lamb"] .dn-art--beef{opacity:0;pointer-events:none}
+.doneness[data-meat="beef"] .dn-art--lamb{transform:translateX(18px) scale(.97)}
+.doneness[data-meat="lamb"] .dn-art--beef{transform:translateX(-18px) scale(.97)}
+.dn-core{transform:scale(var(--dn-core-scale));transform-box:fill-box;transform-origin:center}
+.dn-animal{width:1.15em;height:1.15em;margin-right:.4em;vertical-align:-.2em}
+@media (prefers-reduced-motion:reduce){.dn-stage>.dn-art{transition:opacity .15s ease;transform:none!important}}
