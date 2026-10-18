@@ -67,9 +67,11 @@
 /* the tooltip: only where hover exists, and on keyboard focus */
 .ibtn[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;z-index:5;padding:.35rem .55rem;white-space:nowrap;
   font-family:var(--font-mark);font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--color-white);background:var(--color-black);
-  opacity:0;transform:translate(-50%,3px);pointer-events:none;transition:opacity .12s ease,transform .16s cubic-bezier(.23,1,.32,1)}
-.ibtn[data-tip]:focus-visible::after{opacity:1;transform:translate(-50%,0)}
-@media (hover:hover) and (pointer:fine){.ibtn[data-tip]:hover::after{opacity:1;transform:translate(-50%,0);transition-delay:.25s}}
+  opacity:0;transform:translate(-50%,3px);pointer-events:none;transition:opacity .12s ease,transform .16s cubic-bezier(.23,1,.32,1);
+  /* collapsed while hidden: an invisible nowrap label still widens the page on a phone (7 px at 375) */
+  max-width:0;padding-inline:0;overflow:hidden}
+.ibtn[data-tip]:focus-visible::after{opacity:1;transform:translate(-50%,0);max-width:30rem;padding-inline:.55rem}
+@media (hover:hover) and (pointer:fine){.ibtn[data-tip]:hover::after{opacity:1;transform:translate(-50%,0);transition-delay:.25s;max-width:30rem;padding-inline:.55rem}}
 .ibtn[aria-expanded="true"]::after{opacity:0!important}
 @media (prefers-reduced-motion:reduce){.ibtn[data-tip]::after{transform:translate(-50%,0)}}
 
