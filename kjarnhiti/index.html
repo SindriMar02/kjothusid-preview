@@ -20,10 +20,10 @@
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/Marcellus-Regular.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/NimbusSans-Regular.woff2" crossorigin>
 
-<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=54e05e63">
-<link rel="stylesheet" href="/kjothusid-preview/site.css?v=54e05e63">
-<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=54e05e63">
-<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=54e05e63">
+<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=3e0ffe58">
+<link rel="stylesheet" href="/kjothusid-preview/site.css?v=3e0ffe58">
+<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=3e0ffe58">
+<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=3e0ffe58">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Forsíða","item":"https://kjothusid.is/"},{"@type":"ListItem","position":2,"name":"Kjarnhiti","item":"https://kjothusid.is/kjarnhiti/"}]}</script>
 </head>
 <body class="is-subpage is-preview" data-page="coretemps">
@@ -81,95 +81,28 @@
     <header class="doneness__header">
       <div><p class="doneness__eyebrow">Kjarnhiti</p><h2 id="dn-heading">Steikin að innan</h2></div>
       <fieldset class="doneness__meats"><legend class="doneness__sr">Veldu kjöt</legend>
-        <label><input type="radio" name="dn-meat" value="beef" checked><span><svg class="dn-animal" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8C3.5 8 2 6.2 2 4m16 4c2.5 0 4-1.8 4-4M7 7.5h10l-1 9a4 4 0 0 1-8 0Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 17.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Naut</span></label>
-        <label><input type="radio" name="dn-meat" value="lamb"><span><svg class="dn-animal" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9.5a3 3 0 0 1 2-4.6 3 3 0 0 1 4 0 3 3 0 0 1 2 4.6M8.5 9.5h7l-.8 6a2.7 2.7 0 0 1-5.4 0Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 10.5 5 12m10.5-1.5L19 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Lamb</span></label>
+        <label><input type="radio" name="dn-meat" value="beef" checked><span><svg class="dn-animal" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 7.5C5.2 7.6 3.8 6 3.6 3.6M16.5 7.5c2.3.1 3.7-1.5 3.9-3.9M7.4 9 3.2 9.8c.6 1.5 2.2 2.1 4 1.6M16.6 9l4.2.8c-.6 1.5-2.2 2.1-4 1.6M7.2 7.5h9.6l-.6 6.3H7.8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><rect x="7.4" y="13.4" width="9.2" height="5.6" rx="2.8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.3 16.2h.01m3.4 0h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Naut</span></label>
+        <label><input type="radio" name="dn-meat" value="lamb"><span><svg class="dn-animal" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.3 9.6a2.4 2.4 0 0 1 1.4-4.1 2.6 2.6 0 0 1 3.3-1.6 2.6 2.6 0 0 1 3.3 1.6 2.4 2.4 0 0 1 1.4 4.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8.6 9.4h6.8l-.9 6.9a2.5 2.5 0 0 1-5 0Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.6 10.6 4.6 12.4c1 .9 2.5 1 4.2.3m6.6-2.1 4 1.8c-1 .9-2.5 1-4.2.3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>Lamb</span></label>
       </fieldset>
     </header>
     <div class="doneness__workbench">
       <div class="doneness__explorer">
-        <div class="doneness__reading">
-          <p class="doneness__temperature"><output data-dn-t for="dn-range" aria-live="off">58</output><span>°C</span></p>
-          <div class="doneness__result"><p class="doneness__name" data-dn-label>Meðalsteikt</p><p class="doneness__reference" data-dn-reference>58 °C í töflu</p></div>
+        <div class="doneness__board">
+          <div class="doneness__reading">
+            <p class="doneness__temperature"><output class="doneness__sr" data-dn-t for="dn-range" aria-live="off">58</output><span class="dn-roll" data-dn-roll aria-hidden="true">58</span><span class="doneness__unit" aria-hidden="true">°C</span></p>
+            <div class="doneness__result"><p class="doneness__name" data-dn-label>Meðalsteikt</p><p class="doneness__reference" data-dn-reference>58 °C í töflu</p></div>
+          </div>
+          <figure class="doneness__figure"><div class="dn-stage" role="img" aria-label="Sneidd nautasteik eða lambahryggur með tveimur kótilettum, skýringarmynd"><div class="dn-set dn-set--beef" data-dn-set="beef"><img class="dn-frame" data-dn-frame data-t="51" src="/kjothusid-preview/assets/img/doneness/beef-raw.webp" width="1200" height="797" alt="" decoding="async"><img class="dn-frame" data-dn-frame data-t="52" src="/kjothusid-preview/assets/img/doneness/beef-52.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="54" src="/kjothusid-preview/assets/img/doneness/beef-54.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="58" src="/kjothusid-preview/assets/img/doneness/beef-58.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="64" src="/kjothusid-preview/assets/img/doneness/beef-64.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="70" src="/kjothusid-preview/assets/img/doneness/beef-70.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"></div><div class="dn-set dn-set--lamb" data-dn-set="lamb"><img class="dn-frame" data-dn-frame data-t="51" src="/kjothusid-preview/assets/img/doneness/lamb-raw.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="55" src="/kjothusid-preview/assets/img/doneness/lamb-55.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="60" src="/kjothusid-preview/assets/img/doneness/lamb-60.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"><img class="dn-frame" data-dn-frame data-t="70" src="/kjothusid-preview/assets/img/doneness/lamb-70.webp" width="1200" height="797" alt="" decoding="async" loading="lazy"></div></div><figcaption>Skýringarmynd · litirnir til viðmiðunar</figcaption></figure>
         </div>
-        <figure class="doneness__figure"><div class="dn-stage"><svg class="doneness__drawing dn-art dn-art--beef" viewBox="0 72 600 196" aria-hidden="true" focusable="false">
-    <ellipse cx="300" cy="252" rx="250" ry="12" fill="#3b2a20" opacity=".08"/>
-    <rect x="44" y="214" width="512" height="30" rx="15" fill="#c99a68"/>
-    <rect x="44" y="214" width="512" height="8" rx="4" fill="#ddb684"/>
-    <path d="M70 214c-8-34 4-62 34-68 44-8 118-9 170-4 20 2 30 12 30 26v46Z" fill="#6a3c26"/>
-    <path d="M96 158l20 5m26-8 22 6m26-6 22 5m26-5 20 5m-150 18 16 4m48-5 18 5m40-4 16 4" stroke="#3b2116" stroke-width="4" stroke-linecap="round" opacity=".55"/>
-    <path d="M86 150c40-10 128-12 192-6" stroke="#f0dcb3" stroke-width="10" fill="none" stroke-linecap="round"/>
-    <rect x="282" y="144" width="48" height="70" rx="12" fill="#6a3c26"/>
-    <rect x="287" y="156" width="38" height="53" rx="9" fill="var(--dn-band)"/>
-    <rect class="dn-core" x="292" y="163" width="28" height="39" rx="8" fill="var(--dn-core)"/>
-    <g class="dn-slice" transform="translate(370 214) rotate(9)">
-      <rect x="-24" y="-74" width="48" height="74" rx="12" fill="#6a3c26"/>
-      <rect x="-24" y="-74" width="48" height="13" rx="6.5" fill="#f0dcb3"/>
-      <rect x="-19" y="-62" width="38" height="57" rx="9" fill="var(--dn-band)"/>
-      <rect class="dn-core" x="-14" y="-55" width="28" height="43" rx="8" fill="var(--dn-core)"/>
-      <path d="M-9 -46c5 4-1 9 4 14s0 9 3 13" stroke="#f6d9c4" stroke-width="1.2" fill="none" opacity=".35"/>
-    </g><g class="dn-slice" transform="translate(424 214) rotate(18)">
-      <rect x="-24" y="-74" width="48" height="74" rx="12" fill="#6a3c26"/>
-      <rect x="-24" y="-74" width="48" height="13" rx="6.5" fill="#f0dcb3"/>
-      <rect x="-19" y="-62" width="38" height="57" rx="9" fill="var(--dn-band)"/>
-      <rect class="dn-core" x="-14" y="-55" width="28" height="43" rx="8" fill="var(--dn-core)"/>
-      <path d="M-9 -46c5 4-1 9 4 14s0 9 3 13" stroke="#f6d9c4" stroke-width="1.2" fill="none" opacity=".35"/>
-    </g><g class="dn-slice" transform="translate(478 214) rotate(28)">
-      <rect x="-24" y="-74" width="48" height="74" rx="12" fill="#6a3c26"/>
-      <rect x="-24" y="-74" width="48" height="13" rx="6.5" fill="#f0dcb3"/>
-      <rect x="-19" y="-62" width="38" height="57" rx="9" fill="var(--dn-band)"/>
-      <rect class="dn-core" x="-14" y="-55" width="28" height="43" rx="8" fill="var(--dn-core)"/>
-      <path d="M-9 -46c5 4-1 9 4 14s0 9 3 13" stroke="#f6d9c4" stroke-width="1.2" fill="none" opacity=".35"/>
-    </g><g class="dn-slice" transform="translate(530 214) rotate(40)">
-      <rect x="-24" y="-74" width="48" height="74" rx="12" fill="#6a3c26"/>
-      <rect x="-24" y="-74" width="48" height="13" rx="6.5" fill="#f0dcb3"/>
-      <rect x="-19" y="-62" width="38" height="57" rx="9" fill="var(--dn-band)"/>
-      <rect class="dn-core" x="-14" y="-55" width="28" height="43" rx="8" fill="var(--dn-core)"/>
-      <path d="M-9 -46c5 4-1 9 4 14s0 9 3 13" stroke="#f6d9c4" stroke-width="1.2" fill="none" opacity=".35"/>
-    </g>
-  </svg><svg class="doneness__drawing dn-art dn-art--lamb" viewBox="0 72 600 196" aria-hidden="true" focusable="false">
-    <ellipse cx="300" cy="252" rx="250" ry="12" fill="#3b2a20" opacity=".08"/>
-    <rect x="44" y="214" width="512" height="30" rx="15" fill="#c99a68"/>
-    <rect x="44" y="214" width="512" height="8" rx="4" fill="#ddb684"/>
-    <g transform="translate(300 214) scale(1.22 .86) translate(-300 -214)"><g class="dn-chop" transform="translate(170 120) rotate(76)">
-      <rect x="-8" y="-190" width="16" height="152" rx="8" fill="#efe5d1" stroke="#c8b796" stroke-width="2"/>
-      <ellipse cx="0" cy="-192" rx="11" ry="9" fill="#efe5d1" stroke="#c8b796" stroke-width="2"/>
-      <path d="M-12 -40c2-10 4-14 12-14s10 4 12 14Z" fill="#f0dcb3"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" fill="#f0dcb3"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" transform="translate(0 -6) scale(.86)" fill="#4a2a1d"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" transform="translate(0 -6) scale(.78)" fill="var(--dn-band)"/>
-      <g transform="translate(0 -6) scale(.6)"><path class="dn-core" d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" fill="var(--dn-core)"/></g>
-      <path d="M-26 10c10-6 18 4 28-1s14-6 22 1" stroke="#f6d9c4" stroke-width="1.4" fill="none" opacity=".35"/>
-    </g><g class="dn-chop" transform="translate(236 176) rotate(88)">
-      <rect x="-8" y="-190" width="16" height="152" rx="8" fill="#efe5d1" stroke="#c8b796" stroke-width="2"/>
-      <ellipse cx="0" cy="-192" rx="11" ry="9" fill="#efe5d1" stroke="#c8b796" stroke-width="2"/>
-      <path d="M-12 -40c2-10 4-14 12-14s10 4 12 14Z" fill="#f0dcb3"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" fill="#f0dcb3"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" transform="translate(0 -6) scale(.86)" fill="#4a2a1d"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" transform="translate(0 -6) scale(.78)" fill="var(--dn-band)"/>
-      <g transform="translate(0 -6) scale(.6)"><path class="dn-core" d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" fill="var(--dn-core)"/></g>
-      <path d="M-26 10c10-6 18 4 28-1s14-6 22 1" stroke="#f6d9c4" stroke-width="1.4" fill="none" opacity=".35"/>
-    </g><g class="dn-chop" transform="translate(302 122) rotate(100)">
-      <rect x="-8" y="-190" width="16" height="152" rx="8" fill="#efe5d1" stroke="#c8b796" stroke-width="2"/>
-      <ellipse cx="0" cy="-192" rx="11" ry="9" fill="#efe5d1" stroke="#c8b796" stroke-width="2"/>
-      <path d="M-12 -40c2-10 4-14 12-14s10 4 12 14Z" fill="#f0dcb3"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" fill="#f0dcb3"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" transform="translate(0 -6) scale(.86)" fill="#4a2a1d"/>
-      <path d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" transform="translate(0 -6) scale(.78)" fill="var(--dn-band)"/>
-      <g transform="translate(0 -6) scale(.6)"><path class="dn-core" d="M0 -46C34 -46 70 -16 68 22C66 62 34 84 0 84C-34 84 -66 62 -68 22C-70 -16 -34 -46 0 -46Z" fill="var(--dn-core)"/></g>
-      <path d="M-26 10c10-6 18 4 28-1s14-6 22 1" stroke="#f6d9c4" stroke-width="1.4" fill="none" opacity=".35"/>
-    </g></g>
-  </svg></div><figcaption>Skýringarmynd · litirnir til viðmiðunar</figcaption></figure>
         <div class="doneness__slider">
-          <div class="doneness__ruler" aria-hidden="true"><div data-dn-ticks></div></div>
+          <div class="doneness__track" data-dn-track aria-hidden="true"><div data-dn-ticks></div></div>
           <input id="dn-range" class="doneness__range" type="range" min="51" max="75" step="1" value="58" aria-label="Kjarnhiti" aria-valuetext="58 gráður, Meðalsteikt" aria-describedby="dn-help">
-          <div class="doneness__ends" aria-hidden="true"><span>51 °C</span><span>75 °C</span></div>
+          <div class="doneness__ends" aria-hidden="true"><span>51 °C</span><span class="doneness__help" id="dn-help"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 6h22M5 2 1 6l4 4m14-8 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Dragðu mælinn</span><span>75 °C</span></div>
         </div>
-        <p class="doneness__help" id="dn-help"><span aria-hidden="true">↔</span> Dragðu mælinn</p>
       </div>
       <div class="doneness__guide">
         <p class="doneness__eyebrow" id="dn-steps-heading">Veldu steikingu</p>
         <div class="doneness__steps" data-dn-steps role="group" aria-labelledby="dn-steps-heading"></div>
-        
       </div>
     </div>
     <p class="doneness__foot">Notaðu kjöthitamæli við eldun.</p>
@@ -335,11 +268,11 @@
 <script src="/kjothusid-preview/assets/vendor/lenis.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/gsap.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/ScrollTrigger.min.js" defer></script>
-<script src="/kjothusid-preview/assets/js/motion.js?v=54e05e63" defer></script>
-<script src="/kjothusid-preview/assets/js/site.js?v=54e05e63" defer></script>
-<script src="/kjothusid-preview/assets/js/calendar.js?v=54e05e63" defer></script>
-<script src="/kjothusid-preview/assets/js/extras.js?v=54e05e63" defer></script>
-<script src="/kjothusid-preview/assets/js/doneness.js?v=54e05e63" defer></script>
+<script src="/kjothusid-preview/assets/js/motion.js?v=3e0ffe58" defer></script>
+<script src="/kjothusid-preview/assets/js/site.js?v=3e0ffe58" defer></script>
+<script src="/kjothusid-preview/assets/js/calendar.js?v=3e0ffe58" defer></script>
+<script src="/kjothusid-preview/assets/js/extras.js?v=3e0ffe58" defer></script>
+<script src="/kjothusid-preview/assets/js/doneness.js?v=3e0ffe58" defer></script>
 
 </body>
 </html>
