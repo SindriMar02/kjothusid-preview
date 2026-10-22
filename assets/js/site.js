@@ -211,6 +211,9 @@
       var items = Array.prototype.slice.call(list.children);
       items.sort(function (a, b) { return Number(a.getAttribute('data-left') || 1e9) - Number(b.getAttribute('data-left') || 1e9); });
       items.forEach(function (li) { list.appendChild(li); });
+      var show = Number(list.getAttribute('data-show') || 0);
+      var all = list.hasAttribute('data-expanded');
+      items.forEach(function (li, i) { li.hidden = !!show && !all && i >= show; });
     });
     var next = document.querySelector('[data-days] > [data-day]');
     var quick = document.querySelector('.quick__cell[data-day]');
@@ -221,6 +224,18 @@
       quick.querySelector('[data-day-date]').textContent = next.querySelector('[data-day-date]').textContent;
     }
   }
+  document.querySelectorAll('[data-days-more]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var list = document.getElementById(btn.getAttribute('aria-controls'));
+      if (!list) return;
+      var open = !list.hasAttribute('data-expanded');
+      if (open) list.setAttribute('data-expanded', ''); else list.removeAttribute('data-expanded');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = btn.getAttribute(open ? 'data-label-less' : 'data-label-more');
+      updateDays();
+      if (!open) list.scrollIntoView({ block: 'nearest' });
+    });
+  });
   updateDays();
   // Refresh a tab left open over midnight, including one restored from sleep.
   setInterval(updateDays, 60000);

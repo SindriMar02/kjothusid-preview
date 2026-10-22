@@ -533,6 +533,8 @@ input,textarea,select,button,summary{scroll-margin-top:calc(var(--top-chrome) + 
 .meatday__tag{display:inline-block;margin-left:var(--spacing-xxs);padding:.1rem .45rem;border:var(--hair);font-weight:400;letter-spacing:.04em;vertical-align:.15em;color:var(--color-mid-gray)}
 /* Cards stretch to their row; keep the spare space at the bottom so every heading lines up. */
 .meatday{align-content:start}
+.meatday[hidden]{display:none}
+.meatdays__more{margin-top:var(--spacing-m)}
 
 /* ================= the fun layer (17 Oct) ================= */
 :root{--ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1)}
