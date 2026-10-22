@@ -168,33 +168,48 @@
   var totalEl = form.querySelector('[data-lines-total]');
   var linesErr = form.querySelector('[data-lines-error]');
 
-  function unitLabel(u) { return u === 'kg' ? 'kg' : 'stk.'; }
+  function unitLabel(u) { return u === 'kg' ? 'kg' : u === 'g' ? 'g' : 'stk.'; }
+  // Karen, 22 Oct: they sell a lot under the kilo (300 g, 2 x 300 g, 4 x 500 g)
+  // and nobody will guess that 0,3 means 300 g. So a weight line is typed as
+  // an exact amount in g or kg: kilos to one decimal, grams in tens.
+  function snap(u, v) {
+    if (u === 'kg') return Math.max(0.1, Math.round(v * 10) / 10);
+    if (u === 'g') return Math.max(10, Math.round(v / 10) * 10);
+    return Math.max(1, Math.round(v));
+  }
+  function unitOptions(c, u) {
+    var fixedUnit = c.u === 'kg' || c.u === 'stk' || c.u === 'flat' || c.u === 'pk';
+    var opts = fixedUnit ? [['g', 'g'], ['kg', 'kg']] : [['g', 'g'], ['kg', 'kg'], ['stk', 'stk.']];
+    return opts.map(function (o) { return '<option value="' + o[0] + '"' + (u === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+  }
   function render() {
     emptyEl.hidden = lines.length > 0;
     listEl.innerHTML = lines.map(function (l, i) {
       var c = byKey[l.k];
       var priced = typeof c.p === 'number';
       var fixedUnit = c.u === 'kg' || c.u === 'stk' || c.u === 'flat' || c.u === 'pk';
-      var unitCtl = fixedUnit
+      var weight = c.u === 'kg' || !fixedUnit;
+      var unitCtl = !weight
         ? '<span class="oline__unit">' + unitLabel(l.u) + '</span>'
-        : '<select class="oline__unit-select" data-line-unit="' + i + '" aria-label="Eining fyrir ' + esc(c.n) + '"><option value="kg"' + (l.u === 'kg' ? ' selected' : '') + '>kg</option><option value="stk"' + (l.u === 'stk' ? ' selected' : '') + '>stk.</option></select>';
+        : '<select class="oline__unit-select" data-line-unit="' + i + '" aria-label="Eining fyrir ' + esc(c.n) + ', grömm eða kíló">' + unitOptions(c, l.u) + '</select>';
+      var kgLine = l.u === 'kg', gLine = l.u === 'g';
       return '<li class="oline' + (l.k === justAdded ? ' is-new' : '') + '">' +
         '<div class="oline__name"><span class="type-small text-black">' + esc(c.n) + '</span>' +
         '<span class="type-xsmall text-mid-gray">' + esc(c.l || '') + (priced ? ' · ' + fmt(c.p) + ' ' + UNIT[c.u] : ' · Verð í síma') + '</span></div>' +
         '<div class="oline__qty">' +
         '<button type="button" class="oline__step" data-line-step="' + i + '" data-d="-1" aria-label="Minna af ' + esc(c.n) + '">−</button>' +
-        '<input class="oline__input" type="number" inputmode="decimal" min="0.5" step="' + (l.u === 'kg' ? '0.5' : '1') + '" value="' + l.q + '" data-line-q="' + i + '" aria-label="Magn af ' + esc(c.n) + '">' +
+        '<input class="oline__input' + (gLine ? ' oline__input--g' : '') + '" type="number" inputmode="' + (kgLine ? 'decimal' : 'numeric') + '" min="' + (kgLine ? '0.1' : gLine ? '10' : '1') + '" step="' + (kgLine ? '0.1' : gLine ? '10' : '1') + '" value="' + l.q + '" data-line-q="' + i + '" aria-label="Magn af ' + esc(c.n) + (kgLine ? ' í kílóum' : gLine ? ' í grömmum' : '') + '">' +
         '<button type="button" class="oline__step" data-line-step="' + i + '" data-d="1" aria-label="Meira af ' + esc(c.n) + '">+</button>' +
         unitCtl +
         '</div>' +
-        (l.u === 'kg' ? '<p class="oline__approx type-xsmall text-mid-gray">Um það bil. Endanleg þyngd ræðst við vigtun.</p>' : '') +
+        (kgLine || gLine ? '<p class="oline__approx type-xsmall text-mid-gray">Skrifaðu nákvæmt magn. Endanleg þyngd ræðst við vigtun.</p>' : '') +
         '<button type="button" class="oline__remove type-xsmall" data-line-remove="' + i + '">Fjarlægja</button>' +
         '</li>';
     }).join('');
     var est = 0, missing = 0;
     lines.forEach(function (l) {
       var c = byKey[l.k];
-      if (typeof c.p === 'number') est += c.p * l.q; else missing++;
+      if (typeof c.p === 'number') est += c.p * (l.u === 'g' && c.u === 'kg' ? l.q / 1000 : l.q); else missing++;
     });
     if (lines.length && est) {
       totalEl.hidden = false;
@@ -216,8 +231,8 @@
     var step = e.target.closest('[data-line-step]');
     if (step) {
       var l = lines[+step.getAttribute('data-line-step')];
-      var inc = l.u === 'kg' ? 0.5 : 1;
-      l.q = Math.max(inc, Math.round((l.q + inc * +step.getAttribute('data-d')) * 2) / 2);
+      var inc = l.u === 'kg' ? 0.5 : l.u === 'g' ? 100 : 1;
+      l.q = snap(l.u, l.q + inc * +step.getAttribute('data-d'));
       persist(); render();
       var again = listEl.querySelector('[data-line-step="' + step.getAttribute('data-line-step') + '"][data-d="' + step.getAttribute('data-d') + '"]');
       if (again) again.focus();
@@ -235,11 +250,19 @@
     if (q) {
       var l = lines[+q.getAttribute('data-line-q')];
       var v = parseFloat(String(q.value).replace(',', '.'));
-      l.q = isFinite(v) && v > 0 ? Math.round(v * 2) / 2 : l.q;
+      l.q = isFinite(v) && v > 0 ? snap(l.u, v) : l.q;
       persist(); render();
     }
     var u = e.target.closest('[data-line-unit]');
-    if (u) { lines[+u.getAttribute('data-line-unit')].u = u.value; persist(); render(); }
+    if (u) {
+      var ln = lines[+u.getAttribute('data-line-unit')], from = ln.u, to = u.value;
+      // Switching the unit keeps the amount: 0,5 kg becomes 500 g and back.
+      if (from === 'kg' && to === 'g') ln.q = Math.round(ln.q * 1000);
+      else if (from === 'g' && to === 'kg') ln.q = snap('kg', ln.q / 1000);
+      else if (from !== to) ln.q = 1;
+      ln.u = to;
+      persist(); render();
+    }
   });
   document.addEventListener('kj:basket', function () { load(); render(); });
 
@@ -402,7 +425,7 @@
         var parts = l.k.split(':');
         return {
           key: l.k, source: parts[0], name: c.n, list: c.l || '', qty: l.q, unit: l.u,
-          approx: l.u === 'kg', unitPrice: typeof c.p === 'number' ? c.p : null, priceUnit: c.u || null,
+          approx: l.u === 'kg' || l.u === 'g', unitPrice: typeof c.p === 'number' ? c.p : null, priceUnit: c.u || null,
           // The Business Central item number, from Karen's Items export (scripts/bc-items.js).
           // Shown in the order email so staff type the order in without looking it up.
           bcItemNo: c.b || null
@@ -414,7 +437,7 @@
     };
     send(form, payload).then(function () {
       if (Basket) Basket.clear();
-      var summary = payload.lines.map(function (l) { return '<li>' + esc(l.name) + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg (um það bil)' : 'stk.') + '</li>'; }).join('');
+      var summary = payload.lines.map(function (l) { return '<li>' + esc(l.name) + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg (um það bil)' : l.unit === 'g' ? 'g (um það bil)' : 'stk.') + '</li>'; }).join('');
       form.classList.add('is-sent');
       // The sent view is the order slip, stamped. Its button saves the pick-up to the calendar.
       var when = dayAcc(payload.fulfilment.date) + ' klukkan ' + payload.fulfilment.time;
@@ -431,7 +454,7 @@
         window.KjRemind.open(pr, {
           uid: 'pontun-' + ref + '@kjothusid.is',
           title: 'Sækja pöntun hjá Kjöthúsinu',
-          description: 'Pöntun ' + ref + '\n' + payload.lines.map(function (l) { return '- ' + l.name + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg' : 'stk.'); }).join('\n') + '\n\nSími 557 8833',
+          description: 'Pöntun ' + ref + '\n' + payload.lines.map(function (l) { return '- ' + l.name + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg' : l.unit === 'g' ? 'g' : 'stk.'); }).join('\n') + '\n\nSími 557 8833',
           location: 'Kjöthúsið, Smiðjuvegi 24D, 200 Kópavogi',
           url: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Kjöthúsið, Smiðjuvegur 24D, 200 Kópavogur'),
           date: payload.fulfilment.date,

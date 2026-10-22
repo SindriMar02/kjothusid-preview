@@ -331,6 +331,7 @@ input[type="date"].field__input{appearance:none;-webkit-appearance:none}
 .oline__step{width:2.75rem;height:2.75rem;display:grid;place-items:center;font-size:1.125rem;border:1px solid #b3b3b3;background:#f7f7f6;transition:background-color .16s ease}
 .oline__step:active{background:var(--color-light-gray)}
 .oline__input{width:4rem;height:2.75rem;text-align:center;font-size:1rem;font-variant-numeric:tabular-nums;border-block:1px solid #b3b3b3;background:#fff;-moz-appearance:textfield}
+.oline__input--g{width:4.75rem}
 .oline__input::-webkit-inner-spin-button,.oline__input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .oline__unit{margin-left:var(--spacing-xs);font-size:.875rem;min-width:2rem}
 .oline__unit-select{margin-left:var(--spacing-xs);height:2.75rem;padding:0 var(--spacing-xs);border:1px solid #b3b3b3;font-size:1rem;background-color:#fff;color:var(--color-black);appearance:auto}
