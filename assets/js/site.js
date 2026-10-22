@@ -118,23 +118,123 @@
     set: function (items) { basket = items.slice(); store(KEY, basket); renderPill(); },
     clear: function () { basket = []; store(KEY, null); renderPill(); }
   };
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-order-add]');
-    if (!b) return;
-    var k = b.getAttribute('data-order-add'), n = b.getAttribute('data-order-name');
-    if (basket.some(function (x) { return x.k === k; })) {
-      say(n + ' er þegar í pöntuninni.');
-    } else {
-      basket.push({ k: k, n: n });
-      store(KEY, basket);
-      say(n + ' komið í pöntunina.');
-      b.classList.add('is-added');
-      if (document.body.dataset.page === 'order') document.dispatchEvent(new CustomEvent('kj:basket'));
-    }
+  /* ── the amount control in the row (Karen, 22 Oct) ──
+     The plus puts the product on the order with its default amount (set per
+     product in the studio, else 1 kg or 1 stk.) and becomes − amount + right
+     in the row, with g/kg on weight rows. Minus below the minimum takes the
+     product off again and the plus returns. Focus moves only on keyboard
+     clicks (e.detail === 0): a tapped control must never paint a ring. */
+  var MIN = { kg: 0.1, g: 10, stk: 1 };
+  var STEP = { kg: 0.5, g: 100, stk: 1 };
+  function snap(u, v) {
+    if (u === 'kg') return Math.round(v * 10) / 10;
+    if (u === 'g') return Math.round(v / 10) * 10;
+    return Math.round(v);
+  }
+  function find(k) { for (var i = 0; i < basket.length; i++) if (basket[i].k === k) return basket[i]; return null; }
+  function defaults(wrap) {
+    var base = wrap.getAttribute('data-buy-unit') === 'kg' ? 'kg' : 'stk';
+    var dq = parseFloat(wrap.getAttribute('data-buy-dq'));
+    var du = wrap.getAttribute('data-buy-du');
+    if (dq > 0 && (du === 'g' || du === 'kg' || du === 'stk')) return { q: dq, u: du };
+    return { q: 1, u: base };
+  }
+  function setItem(k, n, q, u) {
+    var item = find(k);
+    if (q === null) basket = basket.filter(function (x) { return x.k !== k; });
+    else if (item) { item.q = q; item.u = u; item.n = n; }
+    else basket.push({ k: k, n: n, q: q, u: u });
+    store(KEY, basket.length ? basket : null);
     renderPill();
+    if (document.body.dataset.page === 'order') document.dispatchEvent(new CustomEvent('kj:basket'));
+  }
+  function renderBuy(wrap) {
+    var k = wrap.getAttribute('data-buy'), n = wrap.getAttribute('data-buy-name');
+    var item = find(k);
+    var plus = wrap.querySelector('[data-order-add]');
+    var ctl = wrap.querySelector('.buy__ctl');
+    if (!item) { if (ctl) ctl.remove(); plus.hidden = false; plus.classList.remove('is-added'); wrap.classList.remove('is-on'); return; }
+    plus.hidden = true; wrap.classList.add('is-on');
+    var weight = wrap.getAttribute('data-buy-unit') === 'kg';
+    var u = item.u === 'g' || item.u === 'kg' || item.u === 'stk' ? item.u : (weight ? 'kg' : 'stk');
+    var html = '<button type="button" class="buy__step" data-buy-step="-1" aria-label="Minna af ' + n + '">−</button>' +
+      '<input class="buy__q" type="number" inputmode="' + (u === 'kg' ? 'decimal' : 'numeric') + '" min="' + MIN[u] + '" step="' + (u === 'kg' ? '0.1' : u === 'g' ? '10' : '1') + '" value="' + item.q + '" data-buy-q aria-label="Magn af ' + n + (u === 'kg' ? ' í kílóum' : u === 'g' ? ' í grömmum' : '') + '">' +
+      (weight
+        ? '<button type="button" class="buy__unit" data-buy-toggle aria-label="Skipta um einingu, núna ' + (u === 'kg' ? 'kíló' : 'grömm') + '">' + (u === 'kg' ? 'kg' : 'g') + '</button>'
+        : '<span class="buy__unit buy__unit--fixed">stk.</span>') +
+      '<button type="button" class="buy__step" data-buy-step="1" aria-label="Meira af ' + n + '">+</button>';
+    if (!ctl) { ctl = document.createElement('span'); ctl.className = 'buy__ctl'; wrap.appendChild(ctl); }
+    ctl.innerHTML = html;
+  }
+  function renderAllBuys() { document.querySelectorAll('[data-buy]').forEach(renderBuy); }
+  var escK = function (k) { return window.CSS && CSS.escape ? CSS.escape(k) : k; };
+  document.addEventListener('click', function (e) {
+    var wrap = e.target.closest('[data-buy]');
+    var b = e.target.closest('[data-order-add]');
+    var kb = e.detail === 0;
+    if (b) {
+      var k = b.getAttribute('data-order-add'), n = b.getAttribute('data-order-name');
+      if (find(k)) { say(n + ' er þegar í pöntuninni.'); return; }
+      if (wrap) {
+        var d = defaults(wrap);
+        setItem(k, n, d.q, d.u);
+        renderBuy(wrap);
+        var pl = wrap.querySelector('[data-buy-step="1"]');
+        if (pl && kb) pl.focus();
+      } else {
+        // a button outside a row (the boxes): on the order with one of it, said out loud
+        setItem(k, n, 1, 'stk');
+        say(n + ' komið í pöntunina.');
+        b.classList.add('is-added');
+      }
+      return;
+    }
+    if (!wrap) return;
+    var step = e.target.closest('[data-buy-step]');
+    if (step) {
+      var it = find(wrap.getAttribute('data-buy'));
+      if (!it) return;
+      var dir = step.getAttribute('data-buy-step');
+      var next = snap(it.u, it.q + STEP[it.u] * +dir);
+      if (next < MIN[it.u]) {
+        setItem(it.k, it.n, null);
+        renderBuy(wrap);
+        var p = wrap.querySelector('[data-order-add]');
+        if (p && kb) p.focus();
+        return;
+      }
+      setItem(it.k, it.n, next, it.u);
+      renderBuy(wrap);
+      var again = wrap.querySelector('[data-buy-step="' + dir + '"]');
+      if (again && kb) again.focus();
+      return;
+    }
+    var tog = e.target.closest('[data-buy-toggle]');
+    if (tog) {
+      var cur = find(wrap.getAttribute('data-buy'));
+      if (!cur) return;
+      // the amount survives the switch: 0,5 kg is 500 g and back
+      if (cur.u === 'kg') setItem(cur.k, cur.n, Math.max(MIN.g, Math.round(cur.q * 1000)), 'g');
+      else setItem(cur.k, cur.n, Math.max(MIN.kg, snap('kg', cur.q / 1000)), 'kg');
+      renderBuy(wrap);
+      var t2 = wrap.querySelector('[data-buy-toggle]');
+      if (t2 && kb) t2.focus();
+    }
   });
+  document.addEventListener('change', function (e) {
+    var q = e.target.closest('[data-buy-q]');
+    if (!q) return;
+    var wrap = q.closest('[data-buy]');
+    var it = find(wrap.getAttribute('data-buy'));
+    if (!it) return;
+    var v = parseFloat(String(q.value).replace(',', '.'));
+    if (!isFinite(v) || v <= 0) { setItem(it.k, it.n, null); renderBuy(wrap); return; }
+    setItem(it.k, it.n, Math.max(MIN[it.u], snap(it.u, v)), it.u);
+    renderBuy(wrap);
+  });
+  renderAllBuys();
   basket.forEach(function (x) {
-    document.querySelectorAll('[data-order-add="' + (window.CSS && CSS.escape ? CSS.escape(x.k) : x.k) + '"]').forEach(function (b) { b.classList.add('is-added'); });
+    document.querySelectorAll('[data-order-add="' + escK(x.k) + '"]').forEach(function (b) { if (!b.closest('[data-buy]')) b.classList.add('is-added'); });
   });
   renderPill();
 

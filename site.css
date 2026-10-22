@@ -114,6 +114,30 @@ main{position:relative;z-index:1;background:var(--color-white)}
   .prices__add:not(.is-added):hover{border-color:var(--color-black)!important}
 }
 @media (pointer:coarse){.prices__add{width:2.75rem;height:2.75rem;margin-block:-.5rem;border-color:var(--color-light-gray);color:var(--color-black)}}
+.prices__add[hidden]{display:none}
+/* the amount control the plus turns into (site.js renderBuy) */
+.buy{display:inline-flex;align-items:center;flex:none}
+.buy__ctl{display:inline-flex;align-items:stretch;height:2rem;border:1px solid var(--color-black);background:var(--color-white);animation:buy-in .18s cubic-bezier(.23,1,.32,1)}
+.buy__step{width:2rem;display:grid;place-items:center;font:inherit;font-size:1rem;line-height:1;color:var(--color-black);background:transparent;border:0;cursor:pointer;transition:transform .16s cubic-bezier(.23,1,.32,1)}
+.buy__step:active{transform:scale(.92)}
+.buy__q{width:3.25rem;text-align:center;font:inherit;font-size:.875rem;font-variant-numeric:tabular-nums;color:var(--color-black);background:transparent;border:0;border-left:1px solid var(--color-light-gray);-moz-appearance:textfield}
+.buy__q::-webkit-inner-spin-button,.buy__q::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.buy__unit{display:grid;place-items:center;padding:0 .45rem;font:inherit;font-size:.75rem;letter-spacing:.04em;color:var(--color-mid-gray);background:transparent;border:0;border-right:1px solid var(--color-light-gray);cursor:pointer}
+.buy__unit:not(.buy__unit--fixed):hover{color:var(--color-black)}
+.buy__unit--fixed{cursor:default}
+.buy__step:focus-visible,.buy__q:focus-visible,.buy__unit:focus-visible{outline:1px solid var(--color-black);outline-offset:-2px}
+@keyframes buy-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.buy__ctl{animation:none}}
+@media (pointer:coarse){.buy__ctl{height:2.75rem;margin-block:-.5rem}.buy__step{width:2.75rem}.buy__q{width:3.5rem;font-size:1rem}}
+/* One column on phones must never grow past the container (a grid track defaults to
+   auto, so the widest row would push every plus off the edge), and a row whose
+   control is open drops the price and the control onto their own line. */
+@media (max-width:47.99rem){
+  .prices__list{grid-template-columns:minmax(0,1fr)}
+  .prices__row:has(.buy.is-on){flex-wrap:wrap;row-gap:var(--spacing-xs)}
+  .prices__row:has(.buy.is-on) .prices__end{flex-basis:100%;justify-content:space-between}
+  .buy__ctl{margin-block:0}
+}
 @media (max-width:47.99rem){
   .prices__row{align-items:flex-start;padding-block:var(--spacing-s)}
   .prices__end{padding-top:.05rem}

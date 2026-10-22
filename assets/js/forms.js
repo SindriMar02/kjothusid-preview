@@ -149,16 +149,16 @@
     var saved = Basket ? Basket.all() : [];
     lines = saved.map(function (x) {
       var c = byKey[x.k];
-      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || c.u) } : null;
+      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u) } : null;
     }).filter(Boolean);
     var params = new URLSearchParams(location.search);
     params.getAll('v').forEach(function (k) {
-      if (byKey[k] && !lines.some(function (l) { return l.k === k; })) lines.push({ k: k, q: defaultQty(byKey[k]), u: orderUnit(byKey[k].u) });
+      if (byKey[k] && !lines.some(function (l) { return l.k === k; })) lines.push({ k: k, q: defaultQty(byKey[k]), u: orderUnit((byKey[k].dq ? byKey[k].du : null) || byKey[k].u) });
     });
   }
-  function defaultQty(c) { return c.u === 'kg' ? 1 : 1; }
+  function defaultQty(c) { return typeof c.dq === 'number' && c.dq > 0 ? c.dq : 1; }
   // A price unit describes the price; the relay's quantity is kilograms or pieces.
-  function orderUnit(u) { return u === 'flat' || u === 'pk' ? 'stk' : (u || 'kg'); }
+  function orderUnit(u) { return u === 'flat' || u === 'pk' ? 'stk' : u === 'g' ? 'g' : (u || 'kg'); }
   function persist() {
     if (Basket) Basket.set(lines.map(function (l) { return { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u }; }));
   }
@@ -222,7 +222,7 @@
   function add(k) {
     if (!byKey[k]) return;
     if (lines.some(function (l) { return l.k === k; })) return;
-    lines.push({ k: k, q: defaultQty(byKey[k]), u: orderUnit(byKey[k].u) });
+    lines.push({ k: k, q: defaultQty(byKey[k]), u: orderUnit((byKey[k].dq ? byKey[k].du : null) || byKey[k].u) });
     justAdded = k;
     persist(); render();
     justAdded = null;
