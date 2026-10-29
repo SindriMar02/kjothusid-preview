@@ -518,11 +518,7 @@ input,textarea,select,button,summary{scroll-margin-top:calc(var(--top-chrome) + 
 .footer__addr{color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent);text-underline-offset:.2em}
 @media (hover:hover) and (pointer:fine){.footer__addr:hover{text-decoration-color:currentColor}}
 
-/* ---------------- uppskriftabæklingar ---------------- */
-.booklets{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
-.booklets__list{display:grid;gap:var(--spacing-l);margin-top:var(--spacing-m);grid-template-columns:repeat(auto-fill,minmax(10rem,1fr));max-width:44rem}
-.booklets__item{display:grid;gap:var(--spacing-xxs);color:inherit}
-.booklets__item img{width:100%;height:auto;aspect-ratio:5/7;object-fit:cover;border:var(--hair);margin-bottom:var(--spacing-xs)}
+/* uppskriftabæklingar: booklet.css (23 Oct) */
 
 /* ---------------- flýtileiðir undir hetjunni ---------------- */
 .quick{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}

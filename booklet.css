@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Bæklingar (23 Oct): the booklet cards and the flip viewer. Tokens of the
+   approved system only: ink for the stage, their own printed pages as the
+   paper, 1px hairlines, radius 0, Marcellus and Nimbus. Functional motion is
+   transform and opacity at 160 to 240 ms on cubic-bezier(.23,1,.32,1).
+   ========================================================================== */
+
+/* ---------------- cards: the folded leaflet, its name, what is in it ---------------- */
+.booklets{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.booklets__head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--spacing-m);padding-bottom:var(--spacing-s);border-bottom:var(--ink-hair)}
+.booklets__all{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px;text-decoration-color:var(--color-light-gray)}
+@media (pointer:coarse){.booklets__all{display:inline-flex;align-items:center;min-height:2.75rem;margin-block:-.75rem}}
+.booklets__list{list-style:none;margin:var(--spacing-l) 0 0;padding:0;display:grid;gap:var(--spacing-xxl) var(--spacing-xxl);grid-template-columns:minmax(0,1fr)}
+@media (min-width:64rem){.booklets__list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bk-card__link{display:grid;grid-template-columns:6rem minmax(0,1fr);gap:var(--spacing-m);align-items:start;color:inherit;text-decoration:none}
+@media (min-width:48rem){.bk-card__link{grid-template-columns:11rem minmax(0,1fr);gap:var(--spacing-xl)}}
+.bk-card__object{position:relative;display:block;perspective:60rem;margin:0 .5rem .5rem 0}
+.bk-card__object img{display:block;width:100%;height:auto}
+/* the next leaf of the folded sheet, just behind the cover */
+.bk-card__inside{position:absolute;inset:0;transform:translate(.5rem,.5rem);filter:brightness(.9);box-shadow:0 1px 2px rgba(20,20,20,.2)}
+.bk-card__cover{position:relative;transform-origin:0 50%;box-shadow:0 1px 2px rgba(20,20,20,.22),0 14px 28px -12px rgba(20,20,20,.4);transition:transform .16s cubic-bezier(.23,1,.32,1)}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .bk-card__link:hover .bk-card__cover{transform:rotateY(-16deg);transition-duration:.24s}
+  .bk-card__link:hover .bk-card__go .arrow{transform:translateX(.25rem)}
+}
+.bk-card__text{display:grid;gap:var(--spacing-xs);align-content:start;min-width:0;container-type:inline-size}
+.bk-card__kicker{letter-spacing:.02em}
+.bk-card__title{font-size:clamp(1.25rem,12.5cqi,2.75rem);text-wrap:balance;overflow-wrap:break-word;margin-block:var(--spacing-xxs) var(--spacing-xs)}
+.bk-card__lede{max-width:36ch;text-wrap:pretty}
+.bk-card__what{max-width:40ch;text-wrap:pretty}
+.bk-card__go{display:inline-flex;align-items:center;gap:.5rem;width:fit-content;margin-top:var(--spacing-s);padding-top:var(--spacing-s);border-top:var(--ink-hair)}
+.bk-card__go .arrow{transition:transform .2s cubic-bezier(.23,1,.32,1)}
+.bk-card__link:focus-visible{outline:1px solid var(--color-black);outline-offset:6px}
+
+/* ---------------- the viewer ---------------- */
+.bk-stage{width:100%;background:var(--color-black);color:var(--color-white)}
+.bk{--bk-pw:min(36rem,calc(100vw - 2.5rem));--bk-gap:.75rem;position:relative}
+@media (min-width:64rem){.bk{--bk-pw:min(28rem,calc((100vw - 6rem) / 3))}}
+.bk img{display:block;width:100%;height:auto}
+
+/* Without JavaScript, and in "Allar síður í röð": every page one under the other. */
+.bk__track{position:relative;display:grid;justify-items:center;gap:var(--spacing-l);padding:var(--spacing-l) var(--spacing-m) 0;outline:none}
+.bk__spread{display:contents}
+.bk__panel{margin:0;width:min(100%,36rem);background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.6),0 24px 60px -24px rgba(0,0,0,.8);scroll-margin-top:calc(var(--top-chrome) + 4.5rem)}
+.bk__track:focus-visible{outline:1px solid var(--color-white);outline-offset:-1px}
+
+/* Flip: one view at a time, centred, the neighbours showing at the edges. */
+.js .bk:not(.is-stack) .bk__track{display:flex;align-items:flex-start;gap:var(--bk-gap);padding:var(--spacing-l) 0 0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.js .bk:not(.is-stack) .bk__track::-webkit-scrollbar{display:none}
+/* spacers, so the first and the last view can sit in the middle (padding at the end of a flex scroller is unreliable in Safari) */
+.js .bk:not(.is-stack) .bk__track::before,.js .bk:not(.is-stack) .bk__track::after{content:"";flex:0 0 calc(50% - var(--bk-pw) / 2 - var(--bk-gap));align-self:stretch}
+.js .bk:not(.is-stack) .bk__spread{display:flex;flex:none;scroll-snap-align:center;scroll-snap-stop:always;box-shadow:0 1px 2px rgba(0,0,0,.6),0 24px 60px -24px rgba(0,0,0,.8)}
+.js .bk:not(.is-stack) .bk__panel{flex:none;width:var(--bk-pw);position:relative;box-shadow:none}
+/* the fold between two panels of one sheet */
+.js .bk:not(.is-stack) .bk__panel + .bk__panel::before{content:"";position:absolute;inset-block:0;left:-.75rem;width:1.5rem;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,0) 0,rgba(0,0,0,.06) 38%,rgba(0,0,0,.15) 50%,rgba(255,255,255,.12) 53%,rgba(255,255,255,0) 100%)}
+.js .bk:not(.is-stack) .bk__spread:not(.is-on){cursor:pointer}
+.js .bk:not(.is-stack) .bk__spread:not(.is-on) .bk__panel{opacity:.55;transition:opacity .24s cubic-bezier(.23,1,.32,1)}
+.js .bk:not(.is-stack) .bk__spread.is-on .bk__panel{opacity:1;transition:opacity .24s cubic-bezier(.23,1,.32,1)}
+
+/* the bar: where you are, the map of the sheets, the controls */
+.bk__bar{position:sticky;top:var(--top-chrome);z-index:3;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--spacing-s);padding:var(--spacing-xxs) var(--spacing-m);background:var(--color-black);border-block:1px solid var(--color-light-black)}
+.bk__count{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;color:var(--color-light-gray);font-variant-numeric:tabular-nums}
+.bk__map{display:flex;align-items:center;gap:.375rem;min-width:0;padding:.25rem .25rem .5rem;overflow-x:auto;scrollbar-width:none}
+.bk__map-spread{display:flex;gap:1px;min-width:0}
+/* Safari sizes a map group from the thumbnails' image width; contain + width keep each thumb at its basis. */
+.bk__thumb{position:relative;display:block;flex:0 1 .8125rem;width:.8125rem;contain:inline-size;min-width:.5rem;opacity:.4;transition:opacity .2s cubic-bezier(.23,1,.32,1)}
+.bk__thumb.is-on{opacity:1}
+/* a white rule under the pages in view */
+.bk__thumb::before{content:"";position:absolute;left:0;right:0;bottom:-.3125rem;height:1px;background:var(--color-white);transform:scaleX(0);transition:transform .2s cubic-bezier(.23,1,.32,1)}
+.bk__thumb.is-on::before{transform:scaleX(1)}
+.bk__thumb:focus-visible{outline:1px solid var(--color-white);outline-offset:2px;opacity:1}
+@media (hover:hover) and (pointer:fine){.bk__thumb:hover{opacity:.85}}
+/* on a touch screen the map only shows where you are: swipe, the arrows and the contents list move you */
+@media (pointer:coarse){.bk__thumb{pointer-events:none}}
+.bk__ctl{display:flex;align-items:center;gap:.125rem}
+.bk .ibtn{color:var(--color-white);touch-action:manipulation}
+.bk .ibtn:disabled{opacity:.3;cursor:default}
+.bk .ibtn[aria-pressed="true"]{border-color:var(--color-white)}
+@media (hover:hover) and (pointer:fine){.bk .ibtn:not(.ibtn--fill):not(:disabled):hover{background:rgba(240,240,240,.1)}}
+.bk .ibtn:focus-visible{outline:1px solid var(--color-white);outline-offset:-1px}
+.bk__btn--zoom{display:none}
+.bk__sep{width:1px;height:1.5rem;background:var(--color-light-black);margin-inline:.25rem}
+/* tooltips open downwards here, the bar sits under the header */
+.bk .ibtn[data-tip]::after,.bk__thumb[data-tip]::after{bottom:auto;top:calc(100% + 8px);color:var(--color-black);background:var(--color-white);transform:translate(-50%,-3px)}
+.bk__thumb[data-tip]::after{content:attr(data-tip);position:absolute;left:50%;z-index:5;padding:.35rem .55rem;white-space:nowrap;font-family:var(--font-mark);font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .12s ease,transform .16s cubic-bezier(.23,1,.32,1);max-width:0;padding-inline:0;overflow:hidden}
+.bk__thumb[data-tip]:focus-visible::after{opacity:1;transform:translate(-50%,0);max-width:30rem;padding-inline:.55rem}
+@media (hover:hover) and (pointer:fine){.bk__thumb[data-tip]:hover::after{opacity:1;transform:translate(-50%,0);transition-delay:.25s;max-width:30rem;padding-inline:.55rem}}
+@media (min-width:48rem){
+  .bk__bar{grid-template-columns:auto minmax(0,1fr) auto;gap:var(--spacing-m);padding-block:var(--spacing-xs)}
+  .bk__map{gap:.5rem;padding:.375rem .25rem .625rem}
+  .bk__count{position:static;width:auto;height:auto;overflow:visible;clip-path:none;min-width:9rem}
+  .bk__map{justify-content:center}
+  .bk__thumb{flex-basis:1.375rem;width:1.375rem}
+  .bk__btn--zoom{display:inline-grid}
+}
+
+/* under the pages: back and on, sized to be found after reading down a tall page */
+.bk__foot{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--spacing-s);padding:var(--spacing-xl) var(--spacing-m) 0}
+.bk__foot .btn{gap:.625rem;touch-action:manipulation}
+.bk__foot .btn span{overflow:hidden;text-overflow:ellipsis;max-width:60vw}
+.bk__foot .btn-fill{background:var(--color-white);color:var(--color-black)}
+.bk__foot .btn:disabled{opacity:.3;cursor:default}
+.arrow--back{transform:rotate(180deg)}
+.bk.is-stack .bk__foot,html:not(.js) .bk__bar,html:not(.js) .bk__foot{display:none}
+
+/* ---------------- the page around it ---------------- */
+/* A CMS title can contain a word wider than the narrow tablet heading column. */
+body[data-page="booklet"] .page-head__title{overflow-wrap:anywhere}
+.bk__dl{gap:.625rem}
+.bk__dl-size{color:var(--color-mid-gray);font-size:.75rem}
+.bk__meta-link,.bk-inline{color:inherit;text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px;text-decoration-color:var(--color-light-gray)}
+@media (hover:hover) and (pointer:fine){.bk__meta-link:hover,.bk-inline:hover,.booklets__all:hover{text-decoration-color:currentColor}}
+
+.bk-toc{width:100%;padding-inline:var(--spacing-m);background:var(--color-white)}
+.bk-toc__pages{list-style:none;margin:var(--spacing-s) 0 0;padding:var(--spacing-m) 0 0;border-top:var(--ink-hair);display:grid;gap:var(--spacing-xl) var(--spacing-xl);grid-template-columns:repeat(auto-fill,minmax(13rem,1fr))}
+.bk-toc__num{display:inline-block;margin-bottom:var(--spacing-xs);text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px;text-decoration-color:var(--color-light-gray)}
+.bk-toc__list{list-style:none;margin:0;padding:0;display:grid;gap:.375rem}
+.bk-toc__sub{padding-left:var(--spacing-s)}
+.bk-toc__aside{display:block;margin-top:.125rem}
+.bk-toc__link{display:inline-flex;align-items:center;gap:.375rem;color:inherit;text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px;text-decoration-color:var(--color-light-gray)}
+.bk-toc__link .arrow{flex:none;transition:transform .2s cubic-bezier(.23,1,.32,1)}
+@media (hover:hover) and (pointer:fine){.bk-toc__link:hover{text-decoration-color:currentColor}.bk-toc__link:hover .arrow{transform:translateX(.2rem)}}
+@media (pointer:coarse){
+  .bk-toc__link,.bk-toc__num,.bk__meta-link{display:inline-flex;align-items:center;min-height:2.75rem;padding-block:.375rem;margin-block:-.375rem}
+  .bk-toc__num{min-width:2.75rem}
+  .bk-inline{padding-block:.9375rem}
+  .bk-toc__list{gap:.5rem}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .bk-card__cover,.bk-card__go .arrow,.bk__thumb,.bk__thumb::before,.bk__panel,.bk-toc__link .arrow{transition:none!important}
+}
+@media print{
+  .bk__bar,.bk__foot,.bk-card__inside{display:none!important}
+  .bk-stage{background:none}
+}
