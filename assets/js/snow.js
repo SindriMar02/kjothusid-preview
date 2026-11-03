@@ -16,11 +16,14 @@
     var context = canvas.getContext('2d');
     if (!context) { canvas.remove(); return; }
 
+    // Three falling layers, plus a few large out-of-focus flakes close to the
+    // lens (every ninth) that give the scene depth.
     var depths = [
-      { min: 0.8, max: 1.3, alpha: 0.35, slow: 12, fast: 18 },
-      { min: 1.3, max: 2, alpha: 0.55, slow: 18, fast: 28 },
-      { min: 2, max: 2.6, alpha: 0.8, slow: 28, fast: 40 }
+      { min: 0.9, max: 1.4, alpha: 0.4, slow: 12, fast: 18, soft: 0.5 },
+      { min: 1.4, max: 2.2, alpha: 0.6, slow: 18, fast: 28, soft: 0.5 },
+      { min: 2.2, max: 3.2, alpha: 0.85, slow: 28, fast: 42, soft: 0.5 }
     ];
+    var bokeh = { min: 5, max: 10, alpha: 0.16, slow: 9, fast: 15, soft: 0 };
     var flakes = [];
     var width = 0, height = 0, dpr = 1;
     var frame = 0, previous = 0, elapsed = 0;
@@ -30,21 +33,21 @@
 
     // Each soft sprite is prepared once, never during a drawing frame.
     function flake(x, y, index) {
-      var depth = depths[index % 3];
+      var depth = index % 9 === 8 ? bokeh : depths[index % 3];
       var radius = random(depth.min, depth.max);
       var sprite = document.createElement('canvas');
-      var extent = radius + 0.6;
+      var extent = depth === bokeh ? radius * 1.6 : radius + 0.6;
       sprite.width = sprite.height = Math.ceil(extent * 2 * dpr);
       var brush = sprite.getContext('2d');
       var center = sprite.width / 2;
-      var gradient = brush.createRadialGradient(center, center, radius * dpr * 0.5, center, center, extent * dpr);
+      var gradient = brush.createRadialGradient(center, center, radius * dpr * depth.soft, center, center, extent * dpr);
       gradient.addColorStop(0, 'rgba(240,240,240,' + depth.alpha + ')');
       gradient.addColorStop(1, 'rgba(240,240,240,0)');
       brush.fillStyle = gradient;
       brush.fillRect(0, 0, sprite.width, sprite.height);
       return {
         x: x, y: y, speed: random(depth.slow, depth.fast),
-        amplitude: random(6, 18), period: random(4, 9), phase: random(0, Math.PI * 2),
+        amplitude: depth === bokeh ? random(14, 28) : random(6, 18), period: random(4, 9), phase: random(0, Math.PI * 2),
         sprite: sprite, size: extent * 2
       };
     }
@@ -57,7 +60,7 @@
       canvas.width = Math.ceil(width * dpr);
       canvas.height = Math.ceil(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var count = Math.min(matchMedia('(max-width: 47.999rem)').matches ? Number(layer.dataset.snowPhone || 40) : Number(layer.dataset.snowDesktop || 90), Math.round(width * height / 9000));
+      var count = Math.min(matchMedia('(max-width: 47.999rem)').matches ? Number(layer.dataset.snowPhone || 40) : Number(layer.dataset.snowDesktop || 90), Math.round(width * height / 6500));
       // Preserve existing trajectories; populate only the newly exposed strips.
       flakes = flakes.filter(function (f) { return f.x <= width + 30 && f.y <= height + 5; });
       flakes.length = Math.min(flakes.length, count);
@@ -86,8 +89,8 @@
         var f = flakes[i];
         f.x += 4 * dt;
         f.y += f.speed * dt;
-        if (f.y > height + 5) f.y = -5;
-        if (f.x > width + 30) f.x = -30;
+        if (f.y > height + f.size) f.y = -f.size;
+        if (f.x > width + 30 + f.size) f.x = -30 - f.size;
         var sway = Math.sin(elapsed * Math.PI * 2 / f.period + f.phase) * f.amplitude;
         context.drawImage(f.sprite, f.x + sway - f.size / 2, f.y - f.size / 2, f.size, f.size);
       }

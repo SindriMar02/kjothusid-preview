@@ -62,8 +62,8 @@ main{position:relative;z-index:1;background:var(--color-white)}
 /* ---------------- "waiting for the client" (preview builds only) ---------------- */
 .pending{
   position:relative;display:inline-flex;align-items:center;gap:.35em;vertical-align:.1em;
-  margin-left:var(--spacing-xxs);padding:.05rem .45rem;white-space:nowrap;cursor:help;
-  font-family:var(--font-sans);font-size:.6875rem;line-height:1.2;letter-spacing:.04em;font-weight:400;text-transform:none;
+  margin-left:var(--spacing-xxs);padding:.15rem .5rem;white-space:nowrap;cursor:help;
+  font-family:var(--font-sans);font-size:.75rem;line-height:1.25;letter-spacing:.02em;font-weight:400;text-transform:none;
   color:var(--color-brand);border:1px dashed var(--color-brand);background:#c91b240d;
 }
 .pending::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-brand)}
@@ -680,7 +680,6 @@ html[data-input="pointer"] :focus-visible:not(input):not(textarea):not(select):n
 /* ==================== JÓL ROUND 2: S1–S10 ====================
    Structural gates hide only newly introduced decoration outside the theme.
    All seasonal colour and motion rules live under html.is-jol. */
-html:not(.is-jol) :is(.notice__flake,.season__body > .jol-stamp,.jol-tag,.mega .jol-snowflake) { display: none; }
 /* The tokens are global so the Pantanir dropdown can wear them from the start of
    Christmas orders (mid November), before the full theme turns on in December. */
 :root,
@@ -705,17 +704,13 @@ html.is-jol .footer { border-top: 1px solid var(--jol-gold); }
 html.is-jol :is(.footer,.mega) :is(.text-dark-gray,.text-mid-gray,.mega__section-title,.sndr) { color: var(--jol-cream); }
 html.is-jol .mega__promo-inner { background: var(--jol-spruce-2); }
 html.is-jol .notice__close { color: var(--jol-cream); min-width: 44px; min-height: 44px; }
-html.is-jol .notice__flake { display: inline-flex; vertical-align: middle; margin-right: .5em; }
-html.is-jol .notice__flake svg { width: 10px; height: 10px; }
-html.is-jol .hero__overlay { background: linear-gradient(to top,rgba(18,26,22,.88),transparent 62%); opacity: 1; }
+/* Hero takeover: spruce-black floor, a warm candle glow low right, the countdown in gold, a red CTA. */
+html.is-jol .hero__overlay { background: radial-gradient(70% 55% at 78% 100%, rgb(255 160 80 / .2), transparent 70%), linear-gradient(to top,rgba(18,26,22,.9),transparent 64%); opacity: 1; }
+html.is-jol .hero__countdown { display: block; margin-bottom: .4em; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); line-height: 1.1; letter-spacing: .04em; text-transform: uppercase; color: var(--jol-gold-text); }
+html.is-jol .hero__offers { display: none; }
+html.is-jol .btn-jol { background: var(--jol-red); color: var(--jol-cream); border: 1px solid var(--jol-red); transition: background-color .2s var(--jol-ui), border-color .2s var(--jol-ui), transform .16s var(--jol-ui); }
+html.is-jol .btn-jol:active { background: var(--jol-red-deep); border-color: var(--jol-red-deep); }
 html.is-jol .hero__christmas a { gap: .6em; color: var(--jol-cream); }
-html.is-jol .jol-snowflake { width: 1.25em; height: 1.25em; flex: none; color: var(--jol-gold); }
-html.is-jol .jol-stamp { display: block; flex: none; color: var(--jol-cream); }
-/* Snowflake, label and JÓL tag on one line in the menu (the label span is otherwise a block). */
-html.is-jol .mega .link__text:has(> .jol-snowflake) { display: inline-flex; align-items: center; gap: .5em; }
-html.is-jol .mega .jol-snowflake { width: 1em; height: 1em; }
-html.is-jol .mega .jol-tag { margin-left: 0; }
-html.is-jol .jol-tag { display: inline-block; padding: .2em .45em; margin-left: .6em; background: var(--jol-red); color: var(--jol-cream); font: .7em Marcellus,serif; letter-spacing: .08em; vertical-align: middle; }
 /* S4 buttons. Transitions belong to the base state, including release. */
 html.is-jol .btn { min-height: 44px; --btn-duration: .2s; --btn-ease: var(--jol-ui); }
 html.is-jol .btn-fill { background: var(--jol-spruce); color: var(--jol-cream); transition: background-color .2s var(--jol-ui),color .2s var(--jol-ui),transform .16s var(--jol-ui),border-color .2s var(--jol-ui); }
@@ -729,8 +724,9 @@ html.is-jol .season--jol { background: var(--jol-spruce); color: var(--jol-cream
 html.is-jol .season--jol .text-black { color: var(--jol-cream); }
 html.is-jol :is(.season--jol .text-mid-gray,.jol-kicker) { color: var(--jol-gold-text); text-transform: uppercase; letter-spacing: .12em; }
 html.is-jol .season--jol .season__body { position: relative; }
-html.is-jol .season--jol .jol-stamp { width: 140px; align-self: flex-end; margin-bottom: var(--spacing-xs); }
-html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot) .pending { color: var(--jol-cream); background: var(--jol-spruce); border-color: var(--jol-gold); }
+/* Preview markers on dark Christmas surfaces: a solid light chip, readable at a glance. */
+html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot,.hero,.notice,.footer) .pending { color: #8f1411; background: var(--jol-cream); border: 1px solid var(--jol-cream); }
+html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot,.hero,.notice,.footer) .pending::before { background: #8f1411; }
 /* S2 disclosure. Panel colours are independent of the navbar's light/dark ink. */
 .orders-nav { display: flex; align-items: center; position: relative; }
 .navdrop { display: none; }
@@ -740,26 +736,26 @@ html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot) .pending { color:
   .navdrop__toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 12px; color: inherit; cursor: pointer; }
   .navdrop__toggle svg { width: 20px; height: 20px; transition: transform .2s var(--jol-ui); }
   .navdrop.is-open .navdrop__toggle svg { transform: rotate(180deg); }
-  .navdrop__panel { position: absolute; right: 0; top: calc(100% + 14px); width: 340px; max-width: calc(100vw - 2 * var(--spacing-m)); padding: 8px; border: 1px solid var(--jol-gold); background: var(--jol-cream); color: var(--jol-spruce); box-shadow: 0 18px 40px -18px rgba(20,20,20,.45); transform-origin: top right; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .16s var(--jol-ui),transform .16s var(--jol-ui),visibility 0s .16s; }
+  .navdrop__panel { position: absolute; right: 0; top: calc(100% + 14px); width: 330px; max-width: calc(100vw - 2 * var(--spacing-m)); padding: 10px 0 14px; border: 1px solid rgb(20 20 20 / .08); background: var(--color-white); color: var(--color-black); box-shadow: 0 28px 56px -30px rgb(20 20 20 / .5); transform-origin: top right; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .16s var(--jol-ui),transform .16s var(--jol-ui),visibility 0s .16s; }
   .navdrop__panel::before { content: ''; position: absolute; bottom: 100%; inset-inline: -14px; height: 14px; }
   .navdrop.is-open .navdrop__panel { opacity: 1; visibility: visible; transform: translateY(0); transition-duration: .2s,.2s,0s; transition-delay: 0s; }
-  .navdrop__ordinary { display: flex; flex-direction: column; gap: 6px; padding: 14px; min-height: 44px; color: var(--jol-spruce); }
-  .navdrop small { display: block; font-size: .75rem; line-height: 1.5; }
-  .navdrop__card { display: flex; gap: 12px; padding: 16px 12px; background: var(--jol-spruce); color: var(--jol-cream); transition: background-color .2s var(--jol-ui); }
-  .navdrop__card > .jol-snowflake { width: 36px; height: 36px; margin-top: 4px; transition: transform .6s var(--jol-luxe); }
-  .navdrop__copy { flex: 1; min-width: 0; }
-  .navdrop__title { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; position: relative; font-family: Marcellus,serif; text-transform: uppercase; letter-spacing: .05em; color: var(--jol-cream); }
-  .navdrop__title::after { content: ''; position: absolute; bottom: 0; inset-inline: 0; height: 2px; background: var(--jol-red); transform: scaleX(0); transform-origin: left; transition: transform .26s var(--jol-luxe); }
-  .navdrop__arrow { transition: transform .26s var(--jol-luxe); }
-  .navdrop__copy > p { font-size: .875rem; margin-block: 6px 12px; }
-  .navdrop__chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .navdrop__chips a { min-height: 44px; padding: 8px; border: 1px solid var(--jol-gold); color: var(--jol-cream); transition: background-color .16s var(--jol-ui); }
-  .navdrop__card:is(:hover,:focus-within) { background: var(--jol-spruce-2); }
-  .navdrop__card:is(:hover,:focus-within) > .jol-snowflake { transform: rotate(30deg); }
-  .navdrop__card:is(:hover,:focus-within) .navdrop__title::after { transform: scaleX(1); }
-  .navdrop__card:is(:hover,:focus-within) .navdrop__arrow { transform: translateX(4px); }
-  .navdrop__chips a:is(:hover,:focus-visible) { background: var(--jol-red); }
-  .navdrop__ordinary:is(:hover,:focus-visible) { text-decoration: underline; text-underline-offset: .2em; }
+  /* A quiet typographic list in the site's own type; Christmas shows in the red label, the red
+     rule that grows on hover and a soft spruce wash. No boxes inside the panel. */
+  .navdrop__row { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 16px; align-items: center; min-height: 44px; padding: 12px 24px; color: inherit; transition: background-color .2s var(--jol-ui); }
+  .navdrop__row::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 2px; background: var(--color-black); transform: scaleY(0); transition: transform .26s var(--jol-luxe); }
+  .navdrop__row--jol::before { background: var(--jol-red); }
+  .navdrop__name { grid-column: 1; font-family: var(--font-display); font-size: 1.375rem; line-height: 1.1; letter-spacing: -.01em; transition: color .2s var(--jol-ui); }
+  .navdrop__meta { grid-column: 1; margin-top: 3px; font-size: .8125rem; line-height: 1.4; letter-spacing: .02em; color: rgb(20 20 20 / .66); }
+  .navdrop__go { grid-column: 2; grid-row: 1 / span 2; opacity: 0; transform: translateX(-6px); transition: opacity .2s var(--jol-ui), transform .26s var(--jol-luxe); }
+  .navdrop__label { margin: 8px 24px 2px; padding-top: 14px; border-top: 1px solid rgb(20 20 20 / .1); font-family: var(--font-display); font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--jol-red-deep); }
+  .navdrop__all { display: inline-flex; gap: .4em; margin: 10px 24px 0; padding-block: 10px; font-size: .8125rem; letter-spacing: .02em; color: var(--jol-spruce); background: linear-gradient(currentColor,currentColor) 0 calc(100% - 6px) / 0 1px no-repeat; transition: background-size .3s var(--jol-luxe); }
+  .navdrop__row:is(:hover,:focus-visible) { background: rgb(20 20 20 / .04); }
+  .navdrop__row--jol:is(:hover,:focus-visible) { background: rgb(35 57 47 / .07); }
+  .navdrop__row--jol:is(:hover,:focus-visible) .navdrop__name { color: var(--jol-spruce); }
+  .navdrop__row:is(:hover,:focus-visible)::before { transform: scaleY(1); }
+  .navdrop__row:is(:hover,:focus-visible) .navdrop__go { opacity: 1; transform: translateX(0); }
+  .navdrop__all:is(:hover,:focus-visible) { background-size: 100% 1px; }
+  html.is-jol .btn-jol:hover { background: var(--jol-red-deep); border-color: var(--jol-red-deep); }
   html.is-jol .hero__christmas a:hover { text-decoration-color: var(--jol-red); }
   html.is-jol .btn-fill:hover:not(:disabled) { background: var(--jol-red); }
   html.is-jol .btn-outline:hover:not(:disabled) { color: var(--btn-on-fill); }
@@ -768,13 +764,15 @@ html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot) .pending { color:
 .navdrop__panel a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 /* S10 Christmas page: full-bleed band, packaging cards, gift band. */
 html.is-jol .jol-head { position: relative; isolation: isolate; overflow: hidden; background: var(--jol-spruce); color: var(--jol-cream); padding-inline: var(--spacing-m); }
-html.is-jol .jol-head__inner { position: relative; z-index: 22; display: grid; gap: var(--spacing-s); grid-template-columns: minmax(0,1fr) 180px; column-gap: var(--spacing-l); align-items: center; }
-html.is-jol .jol-head .jol-stamp { grid-column: 2; grid-row: 1 / 4; width: 180px; }
+html.is-jol .jol-head__inner { position: relative; z-index: 22; display: grid; gap: var(--spacing-s); grid-template-columns: minmax(0,1fr) auto; column-gap: var(--spacing-l); align-items: center; }
+/* The countdown is the band's focal point: a big gold numeral, the words under it. */
+html.is-jol .jol-count { grid-column: 2; grid-row: 1 / 4; display: grid; justify-items: end; text-align: right; }
+html.is-jol .jol-count__num { font-family: var(--font-display); font-size: clamp(5rem, 2.5rem + 9vw, 11rem); line-height: .82; letter-spacing: -.04em; color: var(--jol-gold-text); }
+html.is-jol .jol-count__label { margin-top: .5em; font-family: var(--font-display); font-size: .875rem; letter-spacing: .16em; text-transform: uppercase; color: var(--jol-cream); }
 html.is-jol .jol-head__intro { max-width: 42rem; color: rgb(244 238 226 / .88); }
 html.is-jol .occasion-card { position: relative; isolation: isolate; border: 0; border-top: 4px solid var(--jol-red); background: var(--jol-card); color: var(--color-black); padding: var(--spacing-l); }
 html.is-jol .occasion-card--jol::before { content: ''; position: absolute; inset: 6px; z-index: -1; border: 1px solid var(--jol-gold); pointer-events: none; }
 html.is-jol .occasion-card--aramot { background: var(--jol-spruce); color: var(--jol-cream); border-top-color: var(--jol-gold); }
-html.is-jol .jol-star { position: absolute; right: var(--spacing-m); top: var(--spacing-m); width: 56px; height: 56px; color: var(--jol-gold); }
 html.is-jol .occasion-card .plainlist li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding-block: 6px; }
 html.is-jol .occasion-card__weekday { font-variant: small-caps; color: #6b6b6b; }
 html.is-jol .occasion-card--aramot .occasion-card__weekday { color: var(--jol-cream); }
@@ -782,34 +780,29 @@ html.is-jol .occasion-card--jol .btn-fill { background: var(--jol-red); color: v
 html.is-jol .occasion-card--jol .btn-fill:active { background: var(--jol-red-deep); }
 html.is-jol .occasion-card--aramot .btn-fill { border: 1px solid var(--jol-cream); background: var(--jol-cream); color: var(--jol-spruce); }
 html.is-jol .occasion-card--aramot .btn-fill:active { border-color: var(--jol-gold); background: var(--jol-cream); }
-html.is-jol .jol-products { display: flex; align-items: center; gap: .5em; margin-bottom: var(--spacing-l); }
+html.is-jol .jol-products { margin-bottom: var(--spacing-l); }
 /* Gift boxes: a light card with the Jól red ribbon, so the page alternates spruce, cream, spruce
    and the band never runs into the spruce footer. */
 html.is-jol .jol-gifts { color: var(--color-black); }
-html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-l) 200px var(--spacing-l) var(--spacing-l); background: var(--jol-card); border: 0; border-top: 4px solid var(--jol-red); outline: 1px solid var(--jol-gold); outline-offset: -7px; }
-html.is-jol .jol-gifts .jol-stamp { position: absolute; top: 50%; right: var(--spacing-l); width: 120px; transform: translateY(-50%); color: var(--jol-spruce); }
+html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-l); background: var(--jol-card); border: 0; border-top: 4px solid var(--jol-red); outline: 1px solid var(--jol-gold); outline-offset: -7px; }
 @media (hover: hover) and (pointer: fine) {
   html.is-jol .occasion-card--jol .btn-fill:hover { background: var(--jol-red-deep); }
   html.is-jol .occasion-card--aramot .btn-fill:hover { background: var(--jol-cream); border-color: var(--jol-gold); }
 }
 @media (max-width: 47.999rem) {
-  html.is-jol .season--jol .jol-stamp { display: none; }
   html.is-jol .jol-head__inner { grid-template-columns: minmax(0,1fr); }
-  html.is-jol .jol-head .jol-stamp { grid-area: auto; width: 120px; }
+  html.is-jol .jol-count { grid-column: 1; grid-row: auto; justify-items: start; text-align: left; order: -1; }
   html.is-jol .occasion-card { padding: var(--spacing-m); }
   html.is-jol .jol-gifts .gift-boxes { padding: var(--spacing-m); }
-  html.is-jol .jol-gifts .jol-stamp { position: static; transform: none; margin-bottom: var(--spacing-s); }
 }
 /* Motion additions: opacity only under reduced motion; no theme transition. */
 @media (prefers-reduced-motion: reduce) {
   .navdrop__panel { transform: none; transition: opacity .12s linear,visibility 0s .12s; }
   .navdrop.is-open .navdrop__panel { transform: none; transition-duration: .12s,0s; transition-delay: 0s; }
   .navdrop__toggle svg,
-  .navdrop.is-open .navdrop__toggle svg,
-  .navdrop__card:is(:hover,:focus-within) > .jol-snowflake,
-  .navdrop__card:is(:hover,:focus-within) .navdrop__arrow { transform: none; transition: none; }
-  .navdrop__title::after { transform: none; opacity: 0; transition: none; }
-  .navdrop__card:is(:hover,:focus-within) .navdrop__title::after { opacity: 1; }
+  .navdrop.is-open .navdrop__toggle svg { transform: none; transition: none; }
+  .navdrop__row::before, .navdrop__go, .navdrop__all { transition: none; }
+  .navdrop__go { transform: none; }
   html.is-jol .btn:active:not(:disabled) { transform: none; }
   html.is-jol .btn-fill:is(:hover,:active)::after { transform: none; }
 }
