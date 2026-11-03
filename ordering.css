@@ -2836,3 +2836,18 @@ html.is-jol .slip__head .jol-spray {
   flex: 0 0 auto;
   margin-right: 0.5rem;
 }
+
+/* The order's main button holds two words and nothing else: no arrow, calmer tracking
+   (Sindri 11-03: "too much inside this button"). */
+[data-basket-actions] > .btn {
+  padding-inline: 1rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+[data-basket-actions] > .btn::after {
+  display: none;
+}
+.slip__pickup[hidden] {
+  display: none;
+}
+

@@ -270,7 +270,7 @@
     var button = document.querySelector('[data-panel="basket"] [data-basket-actions] > .btn');
     if (!button || document.body.dataset.page !== 'order') return;
     var step = !stepDone(2) ? 2 : !stepDone(3) ? 3 : 4;
-    button.textContent = step === 2 ? 'Velja dag og tíma' : step === 3 ? 'Fylla inn upplýsingar' : 'Senda pöntun';
+    button.textContent = step === 2 ? 'Veldu tíma' : step === 3 ? 'Þínar upplýsingar' : 'Senda pöntun';
     button.setAttribute('href', step === 2 ? '#afhending' : '#thu');
     button.setAttribute('data-modal-close', '');
     button.toggleAttribute('data-sheet-submit', step === 4);

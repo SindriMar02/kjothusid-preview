@@ -215,9 +215,9 @@
     button.textContent = !lines.length
       ? 'Veldu vörur'
       : !pickup
-        ? 'Velja dag og tíma'
+        ? 'Veldu tíma'
         : !contact
-          ? 'Fylla inn upplýsingar'
+          ? 'Þínar upplýsingar'
           : 'Senda pöntun';
     button.type = lines.length && pickup && contact ? 'submit' : 'button';
     button.setAttribute('form', 'pontun');
@@ -253,10 +253,11 @@
         value('time') +
         '</a>';
     }
+    // Before a choice the main button is the one way to pick a time (Sindri 11-03: two
+    // "Veldu dag og tíma" in one slip); once chosen, this row shows the day and time.
     document.querySelectorAll('[data-slip-pickup]').forEach(function (el) {
-      el.innerHTML = pickup
-        ? sentence.innerHTML
-        : '<a href="#afhending">' + icon('calendar') + 'Veldu dag og tíma</a>';
+      el.hidden = !pickup;
+      if (pickup) el.innerHTML = sentence.innerHTML;
     });
     var completed = KJOrdering.done(
       lines,
