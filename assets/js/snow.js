@@ -9,7 +9,7 @@
 
   function start() {
     if (reduced.matches || layer.hidden) return;
-    var hero = layer.closest('.hero');
+    var band = layer.parentElement;
     var canvas = document.createElement('canvas');
     canvas.setAttribute('aria-hidden', 'true');
     layer.appendChild(canvas);
@@ -51,13 +51,13 @@
 
     function resize() {
       var oldWidth = width, oldHeight = height;
-      width = hero.clientWidth;
-      height = hero.clientHeight;
+      width = band.clientWidth;
+      height = band.clientHeight;
       dpr = Math.min(devicePixelRatio || 1, 2);
       canvas.width = Math.ceil(width * dpr);
       canvas.height = Math.ceil(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var count = Math.min(matchMedia('(max-width: 47.999rem)').matches ? 40 : 90, Math.round(width * height / 9000));
+      var count = Math.min(matchMedia('(max-width: 47.999rem)').matches ? Number(layer.dataset.snowPhone || 40) : Number(layer.dataset.snowDesktop || 90), Math.round(width * height / 9000));
       // Preserve existing trajectories; populate only the newly exposed strips.
       flakes = flakes.filter(function (f) { return f.x <= width + 30 && f.y <= height + 5; });
       flakes.length = Math.min(flakes.length, count);
@@ -115,7 +115,7 @@
       canvas.remove();
     }
     resize();
-    observer.observe(hero);
+    observer.observe(band);
     window.addEventListener('resize', resize, { passive: true });
     document.addEventListener('visibilitychange', sync);
     reduced.addEventListener('change', stop);
@@ -123,6 +123,6 @@
     // resumes on return (dt is clamped), so the snow is still there.
   }
 
-  if (window.kjHeroReady || typeof gsap === 'undefined') start();
+  if (!layer.closest('.hero') || window.kjHeroReady || typeof gsap === 'undefined') start();
   else document.addEventListener('kj:hero-ready', start, { once: true });
 })();

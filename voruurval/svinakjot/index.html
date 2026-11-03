@@ -1,8 +1,28 @@
 <!doctype html>
-<html lang="is">
+<html lang="is" data-jol-from="12-01" data-jol-to="12-31">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script data-jol-gate>(function(){function inWindow(from, to, today, search) {
+    var override = new URLSearchParams(search || '').get('jol');
+    if (override === '1') return true;
+    if (override === '0') return false;
+    if (!from || !to) return false;
+    var day = (today || new Date().toISOString().slice(0, 10)).slice(5, 10);
+    return from <= to ? day >= from && day <= to : day >= from || day <= to;
+  };function overrideSearch(root) {
+    var search = root.location.search;
+    try {
+      var asked = new URLSearchParams(search).get('jol');
+      if (asked === '1' || asked === '0') root.sessionStorage.setItem('kj-jol', asked);
+      else if (root.sessionStorage.getItem('kj-jol')) search = '?jol=' + root.sessionStorage.getItem('kj-jol');
+    } catch (e) {}
+    return search;
+  };function applyTheme(root, from, to, always) {
+    var search = overrideSearch(root);
+    var on = always || inWindow(from, to, null, search);
+    root.document.documentElement.classList.toggle('is-jol', on);
+  };applyTheme(window,"12-01","12-31",false);})();</script>
 <script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-done')},1800)</script>
 <title>Svínakjöt | Vöruúrval | Kjöthúsið</title>
 <meta name="description" content="Svínakjöt frá Kjöthúsinu í Kópavogi. Hnakki, kótilettur, snitsel, hamborgarhryggur og fleiri bitar úr svíninu.">
@@ -20,18 +40,18 @@
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/Marcellus-Regular.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/NimbusSans-Regular.woff2" crossorigin>
 
-<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=1927bd5b">
-<link rel="stylesheet" href="/kjothusid-preview/site.css?v=1927bd5b">
-<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=1927bd5b">
-<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=1927bd5b">
-<link rel="stylesheet" href="/kjothusid-preview/booklet.css?v=1927bd5b">
+<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=d14d65ff">
+<link rel="stylesheet" href="/kjothusid-preview/site.css?v=d14d65ff">
+<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=d14d65ff">
+<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=d14d65ff">
+<link rel="stylesheet" href="/kjothusid-preview/booklet.css?v=d14d65ff">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Forsíða","item":"https://kjothusid.is/"},{"@type":"ListItem","position":2,"name":"Vöruúrval","item":"https://kjothusid.is/voruurval/"},{"@type":"ListItem","position":3,"name":"Svínakjöt","item":"https://kjothusid.is/voruurval/svinakjot/"}]}</script>
 </head>
 <body class="is-subpage is-preview" data-page="cat-svinakjot">
 <a class="sr-only" href="#main">Fara í efni</a>
 <header class="site-header" data-site-header>
 <div class="notice" data-notice="announcement-example-banner" data-start="2026-10-01T00:00:00Z" data-end="2026-12-31T23:59:00Z" role="region" aria-label="Tilkynning">
-  <p class="notice__text type-small"><strong>Lokað á aðfangadag og jóladag</strong> <span>Jólapantanir þarf að sækja fyrir hádegi á Þorláksmessu. Verslunin opnar aftur 27. desember.</span> <span class="link"><a href="/kjothusid-preview/pantanir/" class="link__anchor type-small"><span class="link__text">Panta fyrir jólin</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span><span class="pending" tabindex="0" role="note" aria-label="Sýnidæmi: Svona gæti tilkynning litið út. Þið setjið inn ykkar eigin í vefumsjóninni, með dagsetningum, og hún birtist og hverfur sjálf." data-note="Svona gæti tilkynning litið út. Þið setjið inn ykkar eigin í vefumsjóninni, með dagsetningum, og hún birtist og hverfur sjálf.">Sýnidæmi</span></p>
+  <p class="notice__text type-small"><span class="notice__flake"><svg class="jol-snowflake" viewBox="-28 -28 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.25" vector-effect="non-scaling-stroke"><path vector-effect="non-scaling-stroke" transform="rotate(0)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(60)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(120)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(180)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(240)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(300)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/></g></svg></span><strong>Lokað á aðfangadag og jóladag</strong> <span>Jólapantanir þarf að sækja fyrir hádegi á Þorláksmessu. Verslunin opnar aftur 27. desember.</span> <span class="link"><a href="/kjothusid-preview/pantanir/" class="link__anchor type-small"><span class="link__text">Panta fyrir jólin</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span><span class="pending" tabindex="0" role="note" aria-label="Sýnidæmi: Svona gæti tilkynning litið út. Þið setjið inn ykkar eigin í vefumsjóninni, með dagsetningum, og hún birtist og hverfur sjálf." data-note="Svona gæti tilkynning litið út. Þið setjið inn ykkar eigin í vefumsjóninni, með dagsetningum, og hún birtist og hverfur sjálf.">Sýnidæmi</span></p>
   <button type="button" class="notice__close" data-notice-close aria-label="Loka tilkynningu"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.2"/></svg></button>
 </div>
 <div class="navbar" data-nav-theme="light" data-nav-solid="on">
@@ -59,8 +79,23 @@
     <div class="navbar__right">
       <span class="navbar__right-extra"><span class="link"><a href="/kjothusid-preview/kjarnhiti/" class="link__anchor type-small"><span class="link__text">Kjarnhiti</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span></span>
       <span class="navbar__right-extra"><span class="link"><a href="/kjothusid-preview/hafa-samband/" class="link__anchor type-small"><span class="link__text">Hafa samband</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span></span>
-      <span class="link"><a href="/kjothusid-preview/pantanir/" class="link__anchor type-small"><span class="link__text">Pantanir</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
-      <span data-christmas data-from="11-15" data-to="12-31" hidden class="navbar__right-extra"><span class="link"><a href="/kjothusid-preview/jolapantanir/" class="link__anchor type-small"><span class="link__text">Jólapantanir</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span></span>
+      <div class="orders-nav">
+    <span class="link"><a href="/kjothusid-preview/pantanir/" class="link__anchor type-small"><span class="link__text">Pantanir</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
+    <div data-christmas data-from="11-15" data-to="12-31" hidden class="navdrop" data-navdrop>
+      <button class="navdrop__toggle" type="button" aria-label="Opna pöntunarvalmynd" aria-expanded="false" aria-controls="orders-dropdown"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
+      <div class="navdrop__panel" id="orders-dropdown" inert aria-label="Pantanir">
+        <a class="navdrop__ordinary" href="/kjothusid-preview/pantanir/"><span>Panta og sækja</span><small>Dags fyrirvari, þú velur dag og tíma</small></a>
+        <div class="navdrop__card">
+          <svg class="jol-snowflake" viewBox="-28 -28 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.25" vector-effect="non-scaling-stroke"><path vector-effect="non-scaling-stroke" transform="rotate(0)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(60)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(120)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(180)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(240)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(300)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/></g></svg>
+          <div class="navdrop__copy">
+            <a class="navdrop__title" href="/kjothusid-preview/jolapantanir/">Jólapantanir <span class="navdrop__arrow" aria-hidden="true">→</span></a>
+            <p>Jólin og áramótin</p>
+            <div class="navdrop__chips"><a href="/kjothusid-preview/pantanir/?pontun=jol"><span>Jólin</span><small>21. til 23. des.</small></a><a href="/kjothusid-preview/pantanir/?pontun=aramot"><span>Áramótin</span><small>28. til 31. des.</small></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
     </div>
   </nav>
 </div>
@@ -283,7 +318,7 @@
           <p class="type-small mega__section-title mega__section-title--later" data-mega-split>Kjöthúsið</p>
           <div class="mega__list">
             <span class="link"><a href="/kjothusid-preview/pantanir/" class="link__anchor type-small" data-modal-close data-mega-link><span class="link__text">Pantanir</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
-            <span data-christmas data-from="11-15" data-to="12-31" hidden class="link"><a href="/kjothusid-preview/jolapantanir/" class="link__anchor type-small" data-modal-close data-mega-link><span class="link__text">Jólapantanir</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
+            <span data-christmas data-from="11-15" data-to="12-31" hidden class="link"><a href="/kjothusid-preview/jolapantanir/" class="link__anchor type-small" data-modal-close data-mega-link><span class="link__text"><svg class="jol-snowflake" viewBox="-28 -28 56 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.25" vector-effect="non-scaling-stroke"><path vector-effect="non-scaling-stroke" transform="rotate(0)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(60)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(120)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(180)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(240)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/><path vector-effect="non-scaling-stroke" transform="rotate(300)" d="M0 0V-24M0-16L-5-21M0-16L5-21M0-12L-4-16M0-12L4-16"/></g></svg>Jólapantanir <span class="jol-tag">JÓL</span></span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
             <span class="link"><a href="/kjothusid-preview/kjarnhiti/" class="link__anchor type-small" data-modal-close data-mega-link><span class="link__text">Kjarnhiti</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
             <span class="link"><a href="/kjothusid-preview/uppskriftir/" class="link__anchor type-small" data-modal-close data-mega-link><span class="link__text">Uppskriftir</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
             <span class="link"><a href="/kjothusid-preview/baeklingar/" class="link__anchor type-small" data-modal-close data-mega-link><span class="link__text">Bæklingar</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span>
@@ -343,12 +378,13 @@
 <script src="/kjothusid-preview/assets/vendor/lenis.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/gsap.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/ScrollTrigger.min.js" defer></script>
-<script src="/kjothusid-preview/assets/js/christmas.js?v=1927bd5b" defer></script>
-<script src="/kjothusid-preview/assets/js/motion.js?v=1927bd5b" defer></script>
-<script src="/kjothusid-preview/assets/js/site.js?v=1927bd5b" defer></script>
-<script src="/kjothusid-preview/assets/js/calendar.js?v=1927bd5b" defer></script>
-<script src="/kjothusid-preview/assets/js/extras.js?v=1927bd5b" defer></script>
-<script src="/kjothusid-preview/assets/js/doneness.js?v=1927bd5b" defer></script>
+<script src="/kjothusid-preview/assets/js/christmas.js?v=d14d65ff" defer></script>
+<script src="/kjothusid-preview/assets/js/motion.js?v=d14d65ff" defer></script>
+<script src="/kjothusid-preview/assets/js/navdrop.js?v=d14d65ff" defer></script>
+<script src="/kjothusid-preview/assets/js/site.js?v=d14d65ff" defer></script>
+<script src="/kjothusid-preview/assets/js/calendar.js?v=d14d65ff" defer></script>
+<script src="/kjothusid-preview/assets/js/extras.js?v=d14d65ff" defer></script>
+<script src="/kjothusid-preview/assets/js/doneness.js?v=d14d65ff" defer></script>
 
 </body>
 </html>
