@@ -351,3 +351,41 @@
   setInterval(updateDays, 60000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) updateDays(); });
 })();
+
+/* ── page titles never cut a word ──
+   Icelandic compounds are long ("HUNANGSRAUÐVÍNSSÓSU" did not fit 375 px). If the longest word
+   of a page title is wider than its column, the title is scaled down just enough to fit;
+   titles that already fit are untouched. Re-measured after fonts load and on resize. */
+(function () {
+  'use strict';
+  var heads = document.querySelectorAll('main h1');
+  if (!heads.length) return;
+  var probe = document.createElement('span');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap';
+  document.body.appendChild(probe);
+  function fit() {
+    heads.forEach(function (h) {
+      h.style.fontSize = '';
+      // a grid item grows to its longest word, so measure the column it sits in, not itself
+      var parent = h.parentElement, ps = getComputedStyle(parent);
+      var avail = Math.min(h.clientWidth, parent.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight));
+      if (!(avail > 0)) return;
+      var cs = getComputedStyle(h);
+      ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'textTransform'].forEach(function (k) {
+        probe.style[k] = cs[k];
+      });
+      var widest = 0;
+      h.textContent.split(/\s+/).forEach(function (word) {
+        if (!word) return;
+        probe.textContent = word;
+        widest = Math.max(widest, probe.getBoundingClientRect().width);
+      });
+      if (widest > avail) h.style.fontSize = (parseFloat(cs.fontSize) * avail / widest) * 0.98 + 'px';
+    });
+  }
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  var timer;
+  window.addEventListener('resize', function () { clearTimeout(timer); timer = setTimeout(fit, 150); }, { passive: true });
+})();

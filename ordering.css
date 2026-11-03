@@ -2924,3 +2924,30 @@ html.is-jol .slip__head .jol-spray {
   }
 }
 
+/* Cream page heads in Christmas mode: the cut-out garland hangs from under the header, the head
+   keeps its own spacing below it (Round 4, Sindri 11-04 "perfect on everything"). */
+html.is-jol .jol-surface.jol-surface--cream {
+  --garland-depth: 120px;
+  padding-top: calc(var(--garland-depth) + var(--cream-head-gap, 3.5rem));
+}
+html.is-jol .jol-surface--cream .jol-decor {
+  top: var(--cream-decor-top, 0px);
+}
+html.is-jol .jol-surface--cream .jol-garland {
+  transform: translate(-50%, -18%);
+}
+html.is-jol .jol-surface--cream .jol-bulb__glow {
+  opacity: 0.35;
+}
+@media (max-width: 1000px) {
+  html.is-jol .jol-surface.jol-surface--cream {
+    --garland-depth: 96px;
+  }
+}
+@media (max-width: 767px) {
+  html.is-jol .jol-surface.jol-surface--cream {
+    --garland-depth: 64px;
+    --cream-head-gap: 1.25rem;
+  }
+}
+

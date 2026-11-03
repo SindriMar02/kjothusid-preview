@@ -722,4 +722,18 @@
   }
 
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+
+  // The page can change height after load (lists that build, filters, the return card, fonts).
+  // Keep every trigger's start/end true, or the footer reveal stops short and leaves a strip of
+  // page under the footer (Mánaðartilboð, Vöruúrval: 60 to 100 px).
+  if (window.ResizeObserver) {
+    var lastHeight = 0, heightTimer;
+    new ResizeObserver(function () {
+      var h = document.documentElement.scrollHeight;
+      if (Math.abs(h - lastHeight) < 2) return;
+      lastHeight = h;
+      clearTimeout(heightTimer);
+      heightTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 200);
+    }).observe(document.getElementById('page') || document.body);
+  }
 })();

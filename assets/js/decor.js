@@ -45,23 +45,28 @@
     .forEach(function (node) {
       node.remove();
     });
+  // Spruce surfaces carry the garland photographed on spruce; the cream page heads of every
+  // other page carry the cut-out garland with its bulbs (no baubles, they would meet text),
+  // so the season reads on every page, not only on the three spruce ones (Sindri 11-04).
   var surfaces = document.querySelectorAll(
-    '.hero,.season--jol,.jol-head,.jol-gifts,.order-head--occasion,.footer',
+    '.hero,.season--jol,.jol-head,.jol-gifts,.order-head--occasion,.footer,.page-head,.order-head:not(.order-head--occasion)',
   );
   surfaces.forEach(function (surface, index) {
+    var cream = surface.matches('.page-head,.order-head:not(.order-head--occasion)');
     surface.classList.add('jol-surface');
+    if (cream) surface.classList.add('jol-surface--cream');
     var layer = document.createElement('div');
     layer.className = 'jol-decor';
     layer.setAttribute('aria-hidden', 'true');
-    var garland = image('garland', surface);
+    var garland = image(cream ? 'garland-cream' : 'garland', surface);
     garland.className = 'jol-garland';
     var picture = document.createElement('picture');
     var phoneSource = document.createElement('source');
     phoneSource.media = '(max-width: 767px)';
-    phoneSource.srcset = base + 'assets/img/jol/garland-800.webp';
+    phoneSource.srcset = base + 'assets/img/jol/' + (cream ? 'garland-cream-800' : 'garland-800') + '.webp';
     picture.append(phoneSource, garland);
     garland.width = 1344;
-    garland.height = 315;
+    garland.height = cream ? 371 : 315;
     garland.loading =
       index === 0 && surface.getBoundingClientRect().top < innerHeight
         ? 'eager'
@@ -76,7 +81,8 @@
       : surface.matches('.hero')
         ? '72:20:red,92:24:gold'
         : '6:20:red,94:24:gold';
-    layer.append(picture, light, bauble);
+    if (cream) layer.append(picture, light);
+    else layer.append(picture, light, bauble);
     surface.prepend(layer);
   });
   document
@@ -96,7 +102,9 @@
       light.setAttribute('aria-hidden', 'true');
       surface.prepend(light);
     });
-  function depth() {
+  function depth(host) {
+    if (host && host.closest('.jol-surface--cream'))
+      return innerWidth < 768 ? 64 : innerWidth <= 1000 ? 96 : 120;
     return innerWidth < 768 ? 110 : innerWidth <= 1000 ? 150 : 220;
   }
   function lights(host) {
@@ -104,8 +112,8 @@
     if (!width) return;
     host.replaceChildren();
     var short = host.dataset.jolLights === 'short';
-    var n = short ? 8 : innerWidth < 768 ? 8 : innerWidth <= 1000 ? 12 : 20;
-    var d = short ? 32 : depth();
+    var n = short ? 8 : innerWidth < 768 ? 8 : innerWidth <= 1000 ? 12 : host.closest('.jol-surface--cream') ? 16 : 20;
+    var d = short ? 32 : depth(host);
     function y(x) {
       return (
         d * (0.62 + 0.16 * Math.pow(Math.sin((x / width) * Math.PI * 2), 2))
