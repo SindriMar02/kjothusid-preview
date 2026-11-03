@@ -95,6 +95,49 @@
       if (note) note.hidden = !noteOpen;
     });
   });
+  // One ticket line at a time shows its − / + box; the rest show only the amount chip.
+  var editKey = null;
+  function amountText(line) {
+    return String(line.q).replace('.', ',') + ' ' + (line.u === 'stk' ? 'stk.' : line.u);
+  }
+  function setEdit(key) {
+    editKey = key;
+    document.querySelectorAll('[data-order-line]').forEach(function (row) {
+      var on = row.dataset.orderLine === editKey;
+      row.classList.toggle('is-editing', on);
+      var area = row.querySelector('.order-line__edit');
+      if (area) area.inert = !on;
+      var chip = row.querySelector('[data-line-edit]');
+      if (chip) chip.setAttribute('aria-expanded', String(on));
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var chip = e.target.closest('[data-line-edit]');
+    if (chip) {
+      var row = chip.closest('[data-order-line]');
+      setEdit(editKey === row.dataset.orderLine ? null : row.dataset.orderLine);
+      // keyboard opens go straight to the amount; a tap or click moves no focus
+      if (editKey && e.detail === 0) {
+        var input = row.querySelector('[data-line-amount]');
+        if (input) input.focus();
+      }
+      return;
+    }
+    if (editKey && !e.target.closest('[data-order-line]')) setEdit(null);
+  });
+  // Esc folds an open line first (capture, so the drawer/sheet stays open for that press).
+  window.addEventListener(
+    'keydown',
+    function (e) {
+      if (e.key !== 'Escape' || !editKey) return;
+      var open = document.activeElement && document.activeElement.closest('[data-order-line]');
+      e.stopPropagation();
+      setEdit(null);
+      var chip = open && open.querySelector('[data-line-edit]');
+      if (chip) chip.focus();
+    },
+    true,
+  );
   function renderLine(line, surface) {
     var item = byKey[line.k] || { n: line.n, l: '', u: line.u };
     var price = linePrice(line);
@@ -103,12 +146,29 @@
     var key = esc(line.k),
       name = esc(item.n);
     return (
-      '<li class="order-line" data-order-line="' +
+      '<li class="order-line' +
+      (editKey === line.k ? ' is-editing' : '') +
+      '" data-order-line="' +
       key +
       '"><div class="order-line__inner">' +
       '<div class="order-line__top"><p class="order-line__name">' +
       name +
       '</p>' +
+      // the amount as a small chip; a tap opens the − / + box under the line (Sindri 11-03)
+      '<button type="button" class="line-amount" data-line-edit aria-expanded="' +
+      (editKey === line.k) +
+      '" aria-controls="edit-' +
+      surface +
+      '-' +
+      key +
+      '" aria-label="Breyta magni af ' +
+      name +
+      ', núna ' +
+      amountText(line) +
+      '" title="Breyta magni">' +
+      amountText(line) +
+      icon('chevron-down') +
+      '</button>' +
       '<span class="order-line__price type-xsmall">' +
       (price === null ? 'Verð í síma' : '≈ ' + fmt(price) + ' kr.') +
       '</span>' +
@@ -117,7 +177,13 @@
       ' úr pöntuninni" title="Fjarlægja">' +
       bin +
       '</button></div>' +
-      '<div class="order-line__bottom"><div class="order-line__qty">' +
+      '<div class="order-line__edit" id="edit-' +
+      surface +
+      '-' +
+      key +
+      '"' +
+      (editKey === line.k ? '' : ' inert') +
+      '><div class="order-line__bottom"><div class="order-line__qty">' +
       '<button type="button" data-line-minus aria-label="Minna af ' +
       name +
       '" title="Minnka magn"' +
@@ -156,7 +222,7 @@
       !!wishOpen[line.k] +
       '">' +
       icon('pencil') +
-      '</button></div>' +
+      '</button></div></div>' +
       '<p class="order-line__wish type-xsmall">' +
       esc(line.w || '') +
       '</p>' +

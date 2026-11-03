@@ -2851,3 +2851,76 @@ html.is-jol .slip__head .jol-spray {
   display: none;
 }
 
+/* Ticket lines are one compact row: name · amount chip · price · trash. The − / + box and the
+   wish pencil open under a line from its chip (Sindri 11-03: "save space where you can"). */
+.order-line__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto 36px;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+.order-line__name {
+  padding-right: 0;
+}
+.line-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 30px;
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--rule);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: border-color 160ms var(--order-ease);
+}
+.line-amount .i {
+  width: 14px;
+  height: 14px;
+  transition: transform 200ms var(--order-ease);
+}
+.is-editing .line-amount {
+  border-color: currentColor;
+}
+.is-editing .line-amount .i {
+  transform: rotate(180deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .line-amount:hover {
+    border-color: currentColor;
+  }
+}
+@media (pointer: coarse) {
+  .line-amount {
+    min-height: 44px;
+  }
+}
+.order-line__edit {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms var(--order-ease);
+}
+.order-line__edit > .order-line__bottom {
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.is-editing .order-line__edit {
+  grid-template-rows: 1fr;
+}
+.is-editing .order-line__edit > .order-line__bottom {
+  padding-top: 0.6rem;
+}
+.order-line .wish-button {
+  position: static;
+}
+@media (prefers-reduced-motion: reduce) {
+  .order-line__edit,
+  .line-amount .i {
+    transition: none;
+  }
+}
+
