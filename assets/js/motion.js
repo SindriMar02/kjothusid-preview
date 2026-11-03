@@ -146,6 +146,7 @@
   var isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   if (!reduce && !isTouch && typeof Lenis !== 'undefined') {
     lenis = new Lenis({ lerp: .1, smoothWheel: true });
+    window.kjLenis = lenis;
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
     gsap.ticker.lagSmoothing(0);
@@ -491,6 +492,44 @@
 
     function panelFor(id) { return document.querySelector('[data-panel="' + id + '"]'); }
 
+    /* Phones: the basket is a sheet that grows out of the order bar and retracts into it
+       (Sindri 11-03). One clip-path tween owns the shape, so a tap mid-way reverses from
+       wherever it is; the page is never shoved. */
+    var sheetQuery = window.matchMedia('(max-width: 47.999rem)');
+    var openAxis = null;
+    function axisFor(panel) {
+      return panel.id === 'basket' && sheetQuery.matches ? 'sheet' : (panel.getAttribute('data-axis') || 'x');
+    }
+    function barInset(panel) {
+      var bar = document.querySelector('.order-bar');
+      var h = panel.getBoundingClientRect().height;
+      var barH = bar && !bar.hidden ? bar.getBoundingClientRect().height : 0;
+      return 'inset(' + Math.max(0, Math.round(h - barH)) + 'px 0px 0px 0px)';
+    }
+    function sheetParts(panel) { return panel.querySelectorAll(':scope > :not(.sheet-handle)'); }
+    function openSheet(panel) {
+      var bar = document.querySelector('.order-bar');
+      var d = reduce ? 0 : .42;
+      gsap.set(panel, { x: 0 });
+      if (!gsap.isTweening(panel)) {
+        gsap.set(panel, { clipPath: barInset(panel) });
+        gsap.set(sheetParts(panel), { opacity: 0 });
+      }
+      gsap.to(panel, { clipPath: 'inset(0px 0px 0px 0px)', duration: d, ease: UI.DRAWER, overwrite: true });
+      gsap.to(sheetParts(panel), { opacity: 1, duration: reduce ? 0 : .18, delay: reduce ? 0 : .12, overwrite: true });
+      if (bar) gsap.to(bar, { opacity: 0, duration: reduce ? 0 : .15, overwrite: true });
+    }
+    function closeSheet(panel) {
+      var bar = document.querySelector('.order-bar');
+      var d = reduce ? 0 : .36;
+      gsap.to(sheetParts(panel), { opacity: 0, duration: reduce ? 0 : .12, overwrite: true });
+      gsap.to(panel, {
+        clipPath: barInset(panel), duration: d, ease: UI.DRAWER, overwrite: true,
+        onComplete: function () { if (openId !== 'basket') gsap.set(panel, { clipPath: 'inset(100% 0px 0px 0px)' }); }
+      });
+      if (bar) gsap.to(bar, { opacity: 1, duration: reduce ? 0 : .15, delay: reduce ? 0 : d - .08, overwrite: true });
+    }
+
     function open(id, keyboard) {
       if (!id || openId === id) return;
       var panel = panelFor(id);
@@ -499,16 +538,21 @@
       openId = id; lastFocus = document.activeElement; openedAt = performance.now();
       document.body.classList.add('is-modal-open');
       if (overlay) overlay.classList.add('is-active');
-      var axis = panel.getAttribute('data-axis') || 'x';
+      var axis = axisFor(panel);
+      openAxis = axis;
       root.dataset.modal = id; root.dataset.modalAxis = axis;
       if (lenis) lenis.stop();
 
-      var r = panel.getBoundingClientRect();
-      var to = axis === 'y' ? { y: r.height } : { x: -r.width };
       var d = reduce ? 0 : UI.PANEL, ez = UI.DRAWER;
-      gsap.to(page, Object.assign({}, to, { duration: d, ease: ez, overwrite: true }));
-      gsap.to(panel, axis === 'y' ? { y: 0, duration: d, ease: ez, overwrite: true } : { x: 0, duration: d, ease: ez, overwrite: true });
-      if (navbar && axis === 'x') gsap.to(navbar, { x: -r.width, duration: d, ease: ez, overwrite: true });
+      if (axis === 'sheet') openSheet(panel);
+      else {
+        if (panel.id === 'basket') gsap.set(panel, { clipPath: 'none' });
+        var r = panel.getBoundingClientRect();
+        var to = axis === 'y' ? { y: r.height } : { x: -r.width };
+        gsap.to(page, Object.assign({}, to, { duration: d, ease: ez, overwrite: true }));
+        gsap.to(panel, axis === 'y' ? { y: 0, duration: d, ease: ez, overwrite: true } : { x: 0, duration: d, ease: ez, overwrite: true });
+        if (navbar && axis === 'x') gsap.to(navbar, { x: -r.width, duration: d, ease: ez, overwrite: true });
+      }
       if (overlay) gsap.to(overlay, { opacity: 1, duration: d, ease: ez, overwrite: true });
       panel.setAttribute('aria-hidden', 'false');
       panel.inert = false;
@@ -523,9 +567,9 @@
       if (!openId || !page) return;
       var closedId = openId;
       var panel = panelFor(openId);
-      var axis = (panel && panel.getAttribute('data-axis')) || 'x';
+      var axis = openAxis || (panel && panel.getAttribute('data-axis')) || 'x';
       var d = reduce ? 0 : UI.PANEL, ez = UI.DRAWER;
-      openId = null;
+      openId = null; openAxis = null;
       gsap.to(page, {
         x: 0, y: 0, duration: d, ease: ez, overwrite: true,
         onComplete: function () {
@@ -535,7 +579,8 @@
         }
       });
       if (navbar) gsap.to(navbar, { x: 0, duration: d, ease: ez, overwrite: true });
-      if (panel) gsap.to(panel, axis === 'y' ? { y: '-100%', duration: d, ease: ez, overwrite: true } : { x: '100%', duration: d, ease: ez, overwrite: true });
+      if (panel && axis === 'sheet') closeSheet(panel);
+      else if (panel) gsap.to(panel, axis === 'y' ? { y: '-100%', duration: d, ease: ez, overwrite: true } : { x: '100%', duration: d, ease: ez, overwrite: true });
       if (overlay) gsap.to(overlay, {
         opacity: 0, duration: d, ease: ez, overwrite: true,
         onComplete: function () { if (!openId) overlay.classList.remove('is-active'); }
@@ -595,6 +640,34 @@
       if (Math.abs(e.deltaY) < 4) return;
       if (window.matchMedia('(min-width: 64rem)').matches) close();
     }, { passive: true });
+
+    // Drag the sheet's handle or head down to retract it; a short or slow drag springs back.
+    (function sheetDrag() {
+      var panel = panelFor('basket');
+      if (!panel) return;
+      var startY = null, startT = 0, h = 0, dy = 0;
+      panel.addEventListener('pointerdown', function (e) {
+        if (openAxis !== 'sheet' || !e.target.closest('.sheet-handle, .basket-panel__head')) return;
+        if (e.target.closest('button, a, input')) return;
+        startY = e.clientY; startT = performance.now(); dy = 0;
+        h = panel.getBoundingClientRect().height;
+        panel.setPointerCapture(e.pointerId);
+      });
+      panel.addEventListener('pointermove', function (e) {
+        if (startY === null) return;
+        dy = Math.max(0, e.clientY - startY);
+        gsap.set(panel, { clipPath: 'inset(' + Math.round(dy) + 'px 0px 0px 0px)', overwrite: true });
+      });
+      function release() {
+        if (startY === null) return;
+        var fast = dy / Math.max(1, performance.now() - startT) > 0.6;
+        startY = null;
+        if (dy > h * 0.3 || (fast && dy > 24)) close();
+        else gsap.to(panel, { clipPath: 'inset(0px 0px 0px 0px)', duration: reduce ? 0 : .3, ease: EASE.LUXE, overwrite: true });
+      }
+      panel.addEventListener('pointerup', release);
+      panel.addEventListener('pointercancel', release);
+    })();
   })();
 
   /* Shared pen strokes and grouped arrivals. A finished draw keeps its final
@@ -610,11 +683,11 @@
       if (el.getBoundingClientRect().bottom < 0) { gsap.set(el, vars); done(); return; }
       var tween = gsap.to(el, Object.assign(vars, {
         // Frames trace like a pen (even speed, soft ends); hairlines and rings keep the site's ease.
-        paused: true, duration: el.closest('.step-marker') ? .8 : type === 'stroke' ? 1.4 : .9,
-        ease: type === 'stroke' && !el.closest('.step-marker') ? 'power2.inOut' : 'luxe', delay: Number(el.dataset.drawDelay) || 0, onComplete: done
+        paused: true, duration: type === 'stroke' ? 1.4 : .9,
+        ease: type === 'stroke' ? 'power2.inOut' : 'luxe', delay: Number(el.dataset.drawDelay) || 0, onComplete: done
       }));
       el.kjDrawTween = tween;
-      ScrollTrigger.create({ trigger: el.closest('.calendar-frame') || el, start: el.closest('.step-marker,.calendar-frame') ? 'top 75%' : 'top 88%',
+      ScrollTrigger.create({ trigger: el.closest('.calendar-frame') || el, start: el.closest('.calendar-frame') ? 'top 75%' : 'top 88%',
         onEnter: function () { tween.play(); }, onLeave: function () { tween.progress(1); }, once: true });
     });
     var build = Array.from(document.querySelectorAll('[data-build] > [data-build-item]'));
@@ -634,15 +707,6 @@
     }
     ScrollTrigger.batch(build, { start: 'top 90%', batchMax: 12, once: true, onEnter: settle,
       onLeave: function (batch) { gsap.killTweensOf(batch); gsap.set(batch, { opacity: 1, y: 0 }); batch.forEach(function (el) { el.classList.add('is-drawn'); }); } });
-    var thread = document.querySelector('.order-thread');
-    if (thread) {
-      thread.style.bottom = 'auto';
-      thread.style.height = document.getElementById('thu').offsetTop + 'px';
-    }
-    if (thread && matchMedia('(min-width: 64rem)').matches) gsap.fromTo(thread, { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#pontun', start: 'top 70%', endTrigger: '#thu', end: 'bottom 70%', scrub: .6, onRefreshInit: function () { thread.style.height = document.getElementById('thu').offsetTop + 'px'; } } });
-    document.querySelectorAll('.step-marker').forEach(function (marker) {
-      ScrollTrigger.create({ trigger: marker, start: 'top 75%', once: true, onEnter: function () { marker.classList.add('is-entered'); } });
-    });
   })();
 
   /* ================= scroll reveals ================= */

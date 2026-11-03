@@ -74,7 +74,7 @@
     var url = form.getAttribute('data-endpoint');
     if (url === 'demo') {
       status(form, 'demo', '<strong>Þetta er forskoðun og ekkert var sent.</strong> Á opnaða vefnum fer ' + (payload.kind === 'order' ? 'pöntunin' : 'fyrirspurnin') + ' beint til Kjöthússins í tölvupósti. Í síma ' + PHONE + ' er alltaf hægt að panta.');
-      return new Promise(function () {});
+      return payload.kind === 'order' ? Promise.resolve({ preview: true }) : new Promise(function () {});
     }
     var btn = form.querySelector('[type="submit"]');
     btn.disabled = true;
@@ -149,7 +149,8 @@
     try { occasions = JSON.parse(document.getElementById('kj-occasions').textContent); } catch (e) {}
     occasion = occasions.find(function (o) { return o.key === occasionKey; }) || null;
     if (occasion) {
-      document.documentElement.classList.add('is-jol');
+      if (new URLSearchParams(location.search).get('jol') !== '0') document.documentElement.classList.add('is-jol');
+      document.querySelector('.order-head').classList.toggle('order-head--aramot', occasionKey === 'aramot');
       var heading = document.querySelector('.page-head__title');
       heading.textContent = occasionKey === 'jol' ? 'Jólapöntun' : 'Áramótapöntun';
       document.title = heading.textContent + ' | Kjöthúsið';
@@ -171,7 +172,7 @@
     var saved = Basket ? Basket.all() : [];
     lines = saved.map(function (x) {
       var c = byKey[x.k];
-      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u) } : null;
+      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u), w: x.w || '' } : null;
     }).filter(Boolean);
     var params = new URLSearchParams(location.search);
     (loadedDeepLinks ? [] : params.getAll('v')).forEach(function (k) {
@@ -183,7 +184,7 @@
   // A price unit describes the price; the relay's quantity is kilograms or pieces.
   function orderUnit(u) { return u === 'flat' || u === 'pk' ? 'stk' : u === 'g' ? 'g' : (u || 'kg'); }
   function persist() {
-    if (Basket) Basket.set(lines.map(function (l) { return { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u }; }));
+    if (Basket) Basket.set(lines.map(function (l) { return { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u, w: l.w || '' }; }));
   }
 
   var linesErr = form.querySelector('[data-lines-error]');
@@ -207,6 +208,12 @@
   var date = radioGroup('date');
   var time = radioGroup('time');
   var occasionDates = [];
+  var banned = [];
+  try {
+    var dayData = JSON.parse(document.getElementById('kj-days').textContent);
+    var dayKey = new URLSearchParams(location.search).get('dagur');
+    banned = dayData[dayKey] ? dayData[dayKey].dates || [] : [];
+  } catch (error) {}
 
   var notice = Number(pickup.getAttribute('data-notice')) || 1;
   var weekdaysOnly = !occasion && pickup.getAttribute('data-weekdays') === '1';
@@ -239,10 +246,14 @@
     first = firstDay();
     occasionDates = occasion ? KjOccasions.pickupDays(occasion.pickupDays, iso(new Date()), first, false) : [];
     var selected = date.value || preselected;
-    tiles = KJOrdering.dayTiles({ today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, occasionDays: occasion ? occasionDates : null, selected: selected });
+    tiles = KJOrdering.dayTiles({ today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, occasionDays: occasion ? occasionDates : null, banned: banned, selected: selected });
     var host = form.querySelector('[data-day-tiles]');
     var old = Array.from(host.querySelectorAll('input')).map(function (input) { return input.value; }).join(',');
     var shown = occasion ? tiles : tiles.slice(0, visibleDays);
+    var tomorrow = new Date(); tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    var tomorrowHint = form.querySelector('[data-tomorrow]');
+    if (!tomorrowHint) { tomorrowHint = document.createElement('p'); tomorrowHint.dataset.tomorrow = ''; tomorrowHint.className = 'type-xsmall text-mid-gray'; host.before(tomorrowHint); }
+    tomorrowHint.textContent = shown[0] && shown[0].value === iso(tomorrow) ? 'Á morgun' : '';
     if (old !== shown.map(function (day) { return day.value; }).join(',')) {
       host.innerHTML = shown.map(function (day) {
         return '<label class="day-tile is-drawn"><input type="radio" required name="date" value="' + day.value + '" aria-describedby="order-date-hint order-date-err"' + (day.selected ? ' checked' : '') + '><span><small>' + day.weekday + '</small><strong>' + day.date + '</strong><small>' + day.month + '</small></span></label>';
@@ -298,10 +309,23 @@
     var notes = form.querySelector('[name="notes"]');
     if (notes && !notes.value && d.note) notes.value = d.note;
   })();
+  window.KJPickup = {
+    options: function () { return { today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, banned: banned, occasionDays: occasion ? occasionDates : null, times: Array.from(form.querySelectorAll('[name="time"]')).map(function (input) { return input.value; }) }; },
+    select: function (slot) {
+      if (!KJOrdering.dayTiles(this.options()).some(function (day) { return day.value === slot.date; })) return;
+      visibleDays = 60;
+      refreshFirstDay();
+      date.value = slot.date;
+      time.value = slot.time;
+      date.dispatchEvent(new Event('change', { bubbles: true }));
+      time.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  };
   document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshFirstDay(); });
   function checkDate() {
     refreshFirstDay();
     if (!date.value) { setError(date, 'Veldu dag.'); return false; }
+    if (banned.indexOf(date.value) >= 0) { setError(date, 'Veldu annan afhendingardag.'); return false; }
     var d = new Date(date.value + 'T12:00:00Z');
     if (isNaN(d)) { setError(date, 'Veldu dag.'); return false; }
     if (occasion && occasionDates.indexOf(date.value) < 0) { setError(date, 'Veldu afhendingardag fyrir þessa hátíð.'); return false; }
@@ -338,6 +362,9 @@
 
     ref = ref || makeRef();
     var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
+    var notes;
+    try { notes = KJOrdering.mergeNotes(lines.map(function (l) { return { n: byKey[l.k].n, w: l.w }; }), v('notes')); }
+    catch (error) { status(form, 'error', 'Óskirnar eru of langar fyrir eina pöntun. Hringdu í ' + PHONE + ' og við hjálpum þér.'); return; }
     var payload = {
       kind: 'order',
       ref: ref,
@@ -354,12 +381,27 @@
           bcItemNo: c.b || null
         };
       }),
-      notes: v('notes'),
+      notes: notes,
       website: v('website'),
       page: location.pathname
     };
     if (occasion) payload.occasion = occasion.key;
-    send(form, payload).then(function () {
+    var rememberedLines = Basket.all();
+    var rememberChecked = !!(form.querySelector('[data-remember]') && form.querySelector('[data-remember]').checked);
+    var rememberedCompany = form.querySelector('[data-company-toggle]').checked;
+    send(form, payload).then(function (result) {
+      // Device memory receives its own local event, separate from the relay payload.
+      document.dispatchEvent(new CustomEvent('kj:order-sent', {
+        detail: {
+          ref: ref,
+          contact: Object.assign({}, payload.customer, { isCompany: rememberedCompany }),
+          order: {
+            ref: ref, occasion: occasion ? occasion.key : null,
+            date: date.value, time: time.value, lines: rememberedLines
+          },
+          remember: rememberChecked
+        }
+      }));
       if (Basket) Basket.clear();
       var summary = payload.lines.map(function (l) { return '<li>' + esc(l.name) + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg (um það bil)' : l.unit === 'g' ? 'g (um það bil)' : 'stk.') + '</li>'; }).join('');
       form.classList.add('is-sent');
@@ -368,8 +410,8 @@
       form.innerHTML = '<div class="sent">' +
         '<div class="slip slip--sent"><span class="stamp" aria-hidden="true">Móttekið</span>' +
         '<p class="slip__head"><img src="' + BASE_PATH + 'assets/img/crest.svg" alt="" width="398" height="244" class="slip__crest"><span class="slip__title">Pöntunarmiði</span><span class="slip__sub type-xsmall">' + esc(ref) + '</span></p>' +
-        '<h2 class="type-header uppercase text-black sent__title">Takk fyrir pöntunina</h2>' +
-        '<p class="type-medium">Pöntunin er komin til okkar. Þú vildir sækja hana ' + esc(when) + '. Við höfum samband í síma ' + esc(payload.customer.phone) + ' til að staðfesta.</p>' +
+        KJOrdering.icon('circle-check') + '<h2 class="type-header uppercase text-black sent__title">Pöntunin er komin til okkar</h2>' +
+        (result && result.preview ? '<p class="type-small"><strong>Þetta er forskoðun og ekkert var sent.</strong> Á opnaða vefnum fer pöntunin beint til Kjöthússins í tölvupósti. Í síma ' + PHONE + ' er alltaf hægt að panta.</p>' : '') + '<p class="type-medium">Við hringjum og staðfestum. Þú vildir sækja hana ' + esc(when) + '. Við höfum samband í síma ' + esc(payload.customer.phone) + ' til að staðfesta.</p>' +
         '<ul class="slip__lines type-small">' + summary + '</ul>' +
         '<div class="sent__actions"><button type="button" class="chip chip--fill" data-pickup-remind aria-label="Setja afhendinguna í dagatalið"' + (window.KjRemind ? '' : ' hidden') + ' aria-expanded="false"><svg class="chip__icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.2"/></svg>Í dagatalið</button></div>' +
         '<p class="type-small">Spurningar? Hringdu í <a href="tel:+3545578833">' + PHONE + '</a>.</p></div></div>';

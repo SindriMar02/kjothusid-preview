@@ -103,11 +103,8 @@ main{position:relative;z-index:1;background:var(--color-white)}
   transition:color .16s ease,border-color .16s ease,background-color .16s ease,transform .16s cubic-bezier(.23,1,.32,1);
 }
 .prices__add svg{grid-area:1/1;width:.875rem;height:.875rem;transition:opacity .18s ease,transform .22s cubic-bezier(.23,1,.32,1),filter .18s ease}
-.prices__add-check{opacity:0;transform:scale(.7);filter:blur(2px)}
 .prices__add:active{transform:scale(.95)}
 .prices__add.is-added{color:var(--color-white);background:var(--color-black);border-color:var(--color-black)}
-.prices__add.is-added .prices__add-plus{opacity:0;transform:rotate(45deg) scale(.7);filter:blur(2px)}
-.prices__add.is-added .prices__add-check{opacity:1;transform:none;filter:none}
 .prices__add:focus-visible{outline:1px solid var(--color-black);outline-offset:2px}
 @media (hover:hover) and (pointer:fine){
   .prices__row:hover .prices__add:not(.is-added){color:var(--color-black);border-color:var(--color-light-gray)}
@@ -123,7 +120,6 @@ main{position:relative;z-index:1;background:var(--color-white)}
 .buy__q{width:3.25rem;text-align:center;font:inherit;font-size:.875rem;font-variant-numeric:tabular-nums;color:var(--color-black);background:transparent;border:0;border-left:1px solid var(--color-light-gray);-moz-appearance:textfield}
 .buy__q::-webkit-inner-spin-button,.buy__q::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .buy__unit{display:grid;place-items:center;padding:0 .45rem;font:inherit;font-size:.75rem;letter-spacing:.04em;color:var(--color-mid-gray);background:transparent;border:0;border-right:1px solid var(--color-light-gray);cursor:pointer}
-.buy__unit:not(.buy__unit--fixed):hover{color:var(--color-black)}
 .buy__unit--fixed{cursor:default}
 .buy__step:focus-visible,.buy__q:focus-visible,.buy__unit:focus-visible{outline:1px solid var(--color-black);outline-offset:-2px}
 @keyframes buy-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
@@ -778,6 +774,3 @@ html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-
 }
 /* ==================== JÓL DECORATIONS: lights, baubles, ribbon, red ==================== */
 /* Decoration geometry and draw states live in ordering.css. */
-html.is-jol .jol-ribbon { display:block; position:absolute; top:0; bottom:0; left:1.5rem; width:2px; background:var(--jol-red); transform-origin:top; }
-html.motion-draw .jol-ribbon:not(.is-drawn) { transform:scaleY(0); }
-html.motion-draw .jol-ribbon { transition:transform 1.1s cubic-bezier(.16,1,.3,1) .2s; }

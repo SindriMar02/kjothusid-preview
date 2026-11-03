@@ -58,9 +58,9 @@ html.is-jol {
   position: absolute;
   right: 0;
   top: calc(100% + 14px);
-  width: 44rem;
+  width: 20rem;
   max-width: calc(100vw - 2rem);
-  padding: 1.75rem 2rem 2rem;
+  padding: 0.5rem;
   background: var(--slip-paper);
   color: #141414;
   box-shadow: 0 18px 40px -18px rgba(20, 20, 20, 0.45);
@@ -91,120 +91,6 @@ html.is-jol .navdrop__panel {
   background: var(--jol-spruce);
   color: var(--jol-cream);
   --rule: var(--rule-on-dark);
-}
-.navdrop__columns {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2rem;
-}
-.navdrop__column {
-  position: relative;
-  min-width: 0;
-  opacity: 0;
-  transform: translateY(6px);
-  transition:
-    opacity 0.26s var(--order-ease),
-    transform 0.26s var(--order-ease);
-}
-.navdrop.is-open .navdrop__column {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: calc(var(--col, 0) * 0.04s);
-}
-.navdrop__column:nth-child(2) {
-  --col: 1;
-}
-.navdrop__column:nth-child(3) {
-  --col: 2;
-}
-.navdrop__column + .navdrop__column::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -1rem;
-  width: 1px;
-  background: var(--rule);
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 0.32s var(--order-luxe) calc(0.06s + var(--col) * 0.05s);
-}
-.navdrop.is-open .navdrop__column::before {
-  transform: scaleY(1);
-}
-.navdrop__label {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-html.is-jol .navdrop__label {
-  color: var(--jol-gold-text);
-}
-.navdrop__column ol {
-  list-style: decimal;
-  padding-left: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 0.75rem;
-}
-.navdrop__link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.4rem;
-  width: 100%;
-  min-height: 44px;
-  text-align: left;
-  font-size: 0.8125rem;
-  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px
-    no-repeat;
-  transition: background-size 0.2s var(--order-ease);
-}
-.navdrop__link > span:last-child {
-  transition: transform 0.2s var(--order-ease);
-}
-.navdrop__link:focus-visible {
-  background-size: 100% 1px;
-}
-.navdrop__link:focus-visible > span:last-child {
-  transform: translateX(4px);
-}
-.navdrop__holiday {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0 1rem;
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-.navdrop__holiday[hidden] {
-  display: none;
-}
-.navdrop__holiday > div {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 2rem;
-}
-.navdrop__holiday > [data-jol-countdown] {
-  font-size: 0.75rem;
-}
-.navdrop__rule {
-  position: absolute;
-  bottom: 0;
-  inset-inline: 0;
-  height: 1px;
-  background: var(--rule);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.32s var(--order-luxe) 0.06s;
-}
-.navdrop.is-open .navdrop__rule {
-  transform: scaleX(1);
-}
-[data-basket-preview] ul {
-  display: grid;
-  gap: 0.35rem;
-  margin: 0.75rem 0;
 }
 
 .order-head {
@@ -264,7 +150,7 @@ html.is-jol .navdrop__label {
 }
 .order-rail__sticky {
   position: sticky;
-  top: calc(var(--top-chrome) + 1.5rem);
+  top: calc(var(--top-chrome) + var(--stepper-height) + 1.5rem);
 }
 .order-rail__links {
   position: relative;
@@ -306,7 +192,7 @@ html.is-jol .navdrop__label {
 }
 .counter-search {
   position: sticky;
-  top: calc(var(--top-chrome) + 1.5rem);
+  top: calc(var(--top-chrome) + var(--stepper-height) + 1.5rem);
   z-index: 4;
   display: flex;
   height: 48px;
@@ -349,7 +235,7 @@ html.is-jol .navdrop__label {
   display: none;
 }
 .counter-category {
-  scroll-margin-top: calc(var(--top-chrome) + 7rem);
+  scroll-margin-top: calc(var(--top-chrome) + var(--stepper-height) + 7rem);
   margin-bottom: 2.5rem;
 }
 .counter-category__head {
@@ -433,8 +319,8 @@ html.is-jol .navdrop__label {
 }
 .order-slip > .slip {
   position: sticky;
-  top: calc(var(--top-chrome) + 1.5rem);
-  max-height: calc(100svh - var(--top-chrome) - 3rem);
+  top: calc(var(--top-chrome) + var(--stepper-height) + 1.5rem);
+  max-height: calc(100svh - var(--top-chrome) - var(--stepper-height) - 3rem);
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
@@ -639,74 +525,13 @@ html.is-jol .navdrop__label {
   display: grid;
   grid-template-columns: 12.5rem minmax(0, 1fr);
   gap: 3rem;
-  scroll-margin-top: calc(var(--top-chrome) + 2rem);
+  scroll-margin-top: calc(var(--top-chrome) + var(--stepper-height) + 2rem);
 }
 .order-step__content {
   min-width: 0;
   max-width: 46rem;
   display: grid;
   gap: 2rem;
-}
-.step-marker {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.3;
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 1;
-}
-.step-marker__circle {
-  position: relative;
-  display: grid;
-  flex: 0 0 36px;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  font-family: var(--font-display);
-  background: var(--color-white);
-  border-radius: 50%;
-  transition:
-    background-color 0.24s var(--order-ease),
-    color 0.24s var(--order-ease);
-}
-.step-marker svg {
-  position: absolute;
-  inset: 0;
-  width: 36px;
-  height: 36px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1;
-}
-.step-marker__number,
-.step-marker__check {
-  grid-area: 1 / 1;
-  transition: opacity 0.24s var(--order-ease);
-}
-.step-marker__check {
-  opacity: 0;
-}
-.is-complete .step-marker__circle {
-  background: #141414;
-  color: var(--slip-paper);
-}
-.is-complete .step-marker__number {
-  opacity: 0;
-}
-.is-complete .step-marker__check {
-  opacity: 1;
-}
-.order-thread {
-  position: absolute;
-  left: 18px;
-  top: 18px;
-  bottom: 15rem;
-  width: 1px;
-  background: var(--rule);
-  transform-origin: top;
 }
 .tile-field {
   border: 0;
@@ -811,9 +636,7 @@ html.is-jol .time-chip input:checked + span {
     display: none;
   }
 }
-.order-chips,
-.phone-order-bar,
-.phone-summary {
+.order-chips {
   display: none;
 }
 
@@ -989,12 +812,6 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .navdrop__link:hover {
-    background-size: 100% 1px;
-  }
-  .navdrop__link:hover > span:last-child {
-    transform: translateX(4px);
-  }
   .order-line__qty button:hover {
     background: rgba(20, 20, 20, 0.07);
   }
@@ -1041,8 +858,7 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
     grid-template-columns: minmax(0, 1fr) 20rem;
     gap: 2rem;
   }
-  .order-rail,
-  .order-thread {
+  .order-rail {
     display: none;
   }
   .order-counter {
@@ -1063,7 +879,7 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
   }
   .order-chips {
     position: sticky;
-    top: var(--top-chrome);
+    top: calc(var(--top-chrome) + var(--stepper-height));
     z-index: 8;
     display: flex;
     grid-column: 1 / -1;
@@ -1105,8 +921,8 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
   }
   .search-open .counter-search {
     display: flex;
-    position: fixed;
-    top: var(--top-chrome);
+    position: sticky;
+    top: calc(var(--top-chrome) + var(--stepper-height) + 52px);
     left: var(--spacing-m);
     right: var(--spacing-m);
     z-index: 9;
@@ -1144,52 +960,7 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
   .order-chips {
     grid-column: 1;
   }
-  .phone-summary {
-    display: grid;
-    gap: 1rem;
-    padding-block: 1rem;
-    border-block: 1px solid var(--rule);
-  }
-  .phone-summary ul {
-    display: grid;
-    gap: 0.5rem;
-  }
-  .phone-summary button {
-    justify-self: start;
-    min-height: 44px;
-  }
-  .phone-order-bar {
-    position: fixed;
-    bottom: 0;
-    inset-inline: 0;
-    z-index: 40;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    min-height: 56px;
-    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-    background: #141414;
-    color: #f4eee2;
-    font-size: 0.75rem;
-    transition:
-      transform 0.28s var(--order-ease),
-      opacity 0.28s var(--order-ease);
-  }
-  .phone-order-bar[hidden] {
-    display: none;
-  }
-  .phone-order-bar.is-covered {
-    transform: translateY(100%);
-    opacity: 0;
-    pointer-events: none;
-  }
-  @starting-style {
-    .phone-order-bar {
-      transform: translateY(100%);
-    }
-  }
-  .basket-panel {
+    .basket-panel {
     padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
   }
   .basket__estimate {
@@ -1250,23 +1021,15 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
       opacity 0.12s linear,
       visibility 0s 0.12s;
   }
-  .navdrop__column,
-  .navdrop__column::before,
-  .navdrop__rule,
-  .navdrop__toggle svg,
-  .navdrop__link > span:last-child {
+  .navdrop__toggle svg {
     transform: none !important;
     opacity: 1;
     transition: none;
   }
   .order-rail__bar,
   .order-chips a,
-  .step-marker__circle,
-  .step-marker__number,
-  .step-marker__check,
   .day-tile > span,
-  .time-chip > span,
-  .phone-order-bar {
+  .time-chip > span {
     transition: none;
   }
   .day-tile:active > span,
@@ -1341,7 +1104,7 @@ html.is-jol .jol-lights {
   background: radial-gradient(circle, var(--glow), transparent 70%);
   filter: blur(6px);
 }
-.is-drawn .jol-bulb__glow::before {
+html.motion-draw .is-drawn .jol-bulb__glow::before {
   animation: glass-twinkle var(--period) ease-in-out var(--phase) infinite
     alternate;
 }
@@ -1397,7 +1160,7 @@ html.is-jol .jol-baubles {
 html.motion-draw .jol-lights__wire {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1.4s var(--order-luxe);
+  transition: stroke-dashoffset 1.4s var(--order-luxe) 0.5s;
 }
 html.motion-draw .is-drawn .jol-lights__wire {
   stroke-dashoffset: 0;
@@ -1507,27 +1270,11 @@ html.is-jol .jol-gifts .gift-boxes {
   border: 0;
   padding-inline: clamp(2rem, 7vw, 7rem);
 }
-html.motion-draw .step-marker:not(.is-entered) .step-marker__number {
-  opacity: 0;
-}
-html.motion-draw .step-marker.is-entered .step-marker__number {
-  transition-delay: 0.6s;
-}
-html.motion-draw .step-marker.is-complete .step-marker__number {
-  opacity: 0;
-  transition-delay: 0s;
-}
 @media (prefers-reduced-motion: reduce) {
-  html.motion-draw .step-marker:not(.is-entered) .step-marker__number {
-    opacity: 1;
-  }
-}
-.step-marker {
-  align-self: start;
 }
 .order-slip > .slip {
   max-height: min(
-    calc(100svh - var(--top-chrome) - 3rem),
+    calc(100svh - var(--top-chrome) - var(--stepper-height) - 3rem),
     var(--slip-available, 100svh)
   );
 }
@@ -1568,17 +1315,11 @@ html.is-jol :is(.jol-head, .jol-gifts) .btn-outline {
   display: grid;
   place-items: center;
 }
-.order-counter__marker {
-  display: none;
-}
 .order-head:has(.order-holidays:not([hidden])) {
   padding-top: 1.5rem;
   padding-bottom: 1rem;
 }
 @media (max-width: 63.999rem) {
-  .order-counter__marker {
-    display: block;
-  }
 }
 
 .basket-foot [data-modal-close] {
@@ -1589,4 +1330,1509 @@ html.is-jol :is(.jol-head, .jol-gifts) .btn-outline {
 }
 .basket-foot {
   position: relative;
+}
+
+/* Round 2: one path from the counter to pickup, contact and confirmation. */
+:root {
+  --stepper-height: 72px;
+}
+.i {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: inline-block;
+  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.navdrop[hidden],
+.navdrop__row[hidden] {
+  display: none;
+}
+.navdrop__row {
+  width: 100%;
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  opacity: 0;
+  transition:
+    background-color 0.16s var(--order-ease),
+    opacity 0.2s var(--order-ease);
+}
+.navdrop__row small {
+  display: block;
+  color: #626262;
+  font-size: 0.6875rem;
+  margin-top: 0.2rem;
+}
+html.is-jol .navdrop__row small {
+  color: #d0d9d2;
+}
+.navdrop__icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+}
+.navdrop.is-open .navdrop__row {
+  opacity: 1;
+  transition-delay: 0s, calc(var(--row, 0) * 0.03s);
+}
+.navdrop__row:nth-child(2) {
+  --row: 1;
+}
+.navdrop__row:nth-child(3) {
+  --row: 2;
+}
+.navdrop__row:nth-child(4) {
+  --row: 3;
+}
+.navdrop__row > .i {
+  transition: transform 0.16s var(--order-ease);
+}
+.navdrop__row:focus-visible {
+  background: rgba(20, 20, 20, 0.05);
+  outline: 1px solid currentColor;
+}
+.order-facts {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.order-facts > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+.order-details summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.order-details summary::before {
+  content: '+';
+}
+.order-details[open] summary::before {
+  content: '−';
+}
+.order-details p {
+  margin-block: 0.5rem;
+  max-width: 65ch;
+}
+.order-progress {
+  position: sticky;
+  top: var(--top-chrome);
+  z-index: 12;
+  height: var(--stepper-height);
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--color-white);
+  border-bottom: 1px solid var(--rule);
+}
+.order-progress__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 44px;
+  color: #6b6b6b;
+  transition: color 0.16s var(--order-ease);
+}
+.order-progress__step::before,
+.order-progress__step::after {
+  content: '';
+  position: absolute;
+  top: 26px;
+  left: calc(50% + 20px);
+  width: calc(100% - 40px);
+  height: 1px;
+  background: var(--rule);
+  transform-origin: left;
+}
+.order-progress__step::after {
+  background: #141414;
+  transform: scaleX(0);
+  transition: transform 0.48s var(--order-luxe);
+}
+.order-progress__step:last-child::before,
+.order-progress__step:last-child::after {
+  display: none;
+}
+.order-progress__step.is-joined::after {
+  transform: scaleX(1);
+}
+.order-progress__circle {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--color-white);
+  transition:
+    background-color 0.2s var(--order-ease),
+    border-color 0.16s var(--order-ease),
+    color 0.2s var(--order-ease);
+}
+.order-progress__circle .i {
+  grid-area: 1 / 1;
+  width: 24px;
+  height: 24px;
+  transition:
+    opacity 0.22s var(--order-ease),
+    transform 0.22s var(--order-ease);
+}
+.order-progress__circle .i:last-child {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.order-progress__label {
+  font-size: 0.75rem;
+  transition:
+    color 0.16s var(--order-ease),
+    opacity 0.16s var(--order-ease);
+}
+.order-progress__step.is-current {
+  color: #141414;
+}
+.is-current .order-progress__circle {
+  border-color: #141414;
+}
+.is-complete .order-progress__circle {
+  background: #141414;
+  color: var(--slip-paper);
+  border-color: #141414;
+}
+.is-complete .order-progress__circle .i:first-child {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.is-complete .order-progress__circle .i:last-child {
+  opacity: 1;
+  transform: scale(1);
+}
+html.motion-draw .order-progress__step::before {
+  animation: progress-line 0.9s var(--order-luxe) both;
+}
+@keyframes progress-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.order-step__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  text-transform: uppercase;
+}
+.prices__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding-inline: 0.7rem;
+  border: 1px solid #141414;
+  color: #141414;
+  transition:
+    color 0.16s var(--order-ease),
+    background-color 0.16s var(--order-ease);
+}
+.prices__add .i {
+  width: 20px;
+  height: 20px;
+  position: static;
+  transform: none;
+  opacity: 1;
+}
+.add-label {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.counter-row,
+.prices__row {
+  position: relative;
+}
+.counter-row::before,
+.prices__row::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: #141414;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.22s var(--order-ease);
+}
+.has-order::before {
+  transform: scaleY(1);
+}
+.counter-row__name > .i,
+.prices__label > .i {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.3rem;
+  opacity: 0;
+  transition: opacity 0.22s var(--order-ease);
+}
+.has-order :is(.counter-row__name, .prices__label) > .i {
+  opacity: 1;
+}
+.has-order > :first-child {
+  padding-left: 0.5rem;
+}
+.buy__ctl {
+  gap: 0;
+  height: 46px;
+}
+.buy__step,
+.buy__unit,
+.order-line__qty > button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.order-line__inner {
+  position: relative;
+}
+.order-line__name {
+  padding-right: 44px;
+}
+.wish-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+}
+.wish-button.has-wish .i {
+  fill: currentColor;
+  stroke: var(--slip-paper);
+}
+.order-line__wish {
+  color: #626262;
+  font-style: italic;
+  overflow-wrap: break-word;
+  padding-right: 44px;
+}
+.order-line__wish:empty {
+  display: none;
+}
+.wish-reveal,
+.company-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.22s var(--order-ease),
+    opacity 0.22s var(--order-ease),
+    visibility 0.22s;
+}
+.company-reveal {
+  transition-duration: 0.24s;
+}
+.wish-reveal.is-open,
+.company-reveal.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+.wish-reveal > div,
+.company-reveal > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.wish-reveal input {
+  width: 100%;
+  height: 44px;
+  padding: 0.5rem;
+  margin-block: 0.5rem;
+  border: 1px solid var(--rule);
+  background: transparent;
+  font-size: 0.8125rem;
+}
+.company-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+.company-toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: #141414;
+}
+.field__control {
+  display: block;
+  position: relative;
+}
+.field__control > .i {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.field__control input {
+  padding-left: 2.75rem;
+  padding-right: 2.75rem;
+}
+.field__control > .i:last-child {
+  left: auto;
+  right: 0.85rem;
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
+  transition:
+    opacity 0.16s var(--order-ease),
+    transform 0.16s var(--order-ease);
+}
+.field__control.is-valid > .i:last-child {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+.slip__pickup,
+.slip__pickup a,
+.basket-help {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.slip__pickup a {
+  min-height: 44px;
+}
+.basket-help {
+  min-height: 44px;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+[data-basket-empty] > .i,
+.slip--sent > .i {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin-block: 1rem;
+}
+.slip--sent > .i {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+}
+html.motion-draw .slip--sent > .i {
+  animation: sent-check 0.6s ease-in-out both;
+}
+html.motion-draw .sent__title {
+  animation: sent-text 0.3s 0.6s both;
+}
+@keyframes sent-check {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes sent-text {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.basket {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .navdrop__row:hover {
+    background: rgba(20, 20, 20, 0.05);
+  }
+  html.is-jol .navdrop__row:hover,
+  html.is-jol .navdrop__row:focus-visible {
+    background: var(--jol-spruce-2);
+  }
+  .navdrop__row:hover > .i {
+    transform: translateX(3px);
+  }
+  .prices__add:hover {
+    background: #141414;
+    color: var(--slip-paper);
+  }
+}
+@media (max-width: 63.999rem) {
+  .order-progress {
+    margin-bottom: 0;
+  }
+  .order-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .order-step__title {
+    margin-bottom: 1rem;
+  }
+}
+@media (max-width: 47.999rem) {
+  :root {
+    --stepper-height: 56px;
+  }
+  .order-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .order-progress {
+    grid-template-columns: repeat(4, 44px) minmax(0, 1fr);
+    gap: 6px;
+    padding-block: 6px;
+  }
+  .order-progress__step {
+    min-height: 44px;
+  }
+  .order-progress__step::before,
+  .order-progress__step::after {
+    top: 22px;
+    width: 10px;
+  }
+  .order-progress__label {
+    position: absolute;
+    left: 200px;
+    width: calc(100vw - 232px);
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .order-progress__step:nth-child(2) .order-progress__label {
+    left: 150px;
+  }
+  .order-progress__step:nth-child(3) .order-progress__label {
+    left: 100px;
+  }
+  .order-progress__step:nth-child(4) .order-progress__label {
+    left: 50px;
+  }
+  .order-progress__step.is-current .order-progress__label {
+    opacity: 1;
+  }
+  .order-progress__circle .i {
+    width: 24px;
+    height: 24px;
+  }
+  .add-label {
+    display: none;
+  }
+  .prices__add {
+    width: 44px;
+    padding: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .order-progress *,
+  .order-progress *::before,
+  .order-progress *::after,
+  .wish-reveal,
+  .company-reveal,
+  .field__control > .i,
+  .counter-row::before,
+  .prices__row::before,
+  .counter-row__name > .i,
+  .prices__label > .i {
+    transition: none !important;
+    animation: none !important;
+  }
+  html.motion-draw .slip--sent > .i,
+  html.motion-draw .sent__title {
+    animation: none;
+  }
+  .navdrop__row,
+  .navdrop__row > .i {
+    transition: opacity 0.12s;
+    transform: none !important;
+  }
+}
+
+.company-toggle input {
+  appearance: auto;
+}
+.slip__edit {
+  min-width: 44px;
+  min-height: 44px;
+}
+html.motion-draw .slip--sent > p,
+html.motion-draw .slip--sent > ul {
+  animation: sent-text 0.3s 0.6s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-draw .slip--sent > p,
+  html.motion-draw .slip--sent > ul {
+    animation: none;
+  }
+}
+
+.icon-sprite {
+  display: none;
+}
+
+@media (max-width: 47.999rem) {
+  .order-facts > div {
+    font-size: 0.75rem;
+    gap: 0.375rem;
+  }
+}
+
+.tile-field legend > .i,
+.field__label > .i {
+  margin-right: 0.4rem;
+}
+
+/* A selected price-list row gives its full name a line before the wider control. */
+.prices__row.has-order {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+.prices__row.has-order .prices__name,
+.prices__row.has-order .prices__end {
+  flex-basis: 100%;
+  min-width: 0;
+}
+.prices__row.has-order .prices__end {
+  justify-content: space-between;
+}
+
+/* Round 3: compact receipt controls and a rail with its own scroll boundary. */
+.order-rail__sticky {
+  max-height: min(
+    32rem,
+    calc(100svh - var(--top-chrome) - var(--stepper-height) - 3rem)
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.counter-search {
+  top: calc(var(--top-chrome) + var(--stepper-height));
+}
+.counter-category {
+  scroll-margin-top: var(--category-offset);
+}
+.buy__ctl {
+  border: 0;
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.buy__amount,
+.order-line__qty {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+}
+.buy__q {
+  width: 3.5ch;
+  min-width: 3.5ch;
+  border: 0;
+  padding: 0;
+  text-align: center;
+}
+.buy__unit-word {
+  font-size: 0.6875rem;
+  padding-right: 4px;
+}
+.amount-value {
+  display: flex;
+  align-items: center;
+  font-size: 0.6875rem;
+}
+.amount-value input {
+  width: 3.5ch;
+  min-width: 3.5ch;
+  padding: 0;
+  border: 0;
+  text-align: center;
+}
+.order-line__qty .amount-value span {
+  padding-right: 4px;
+}
+.prices__add {
+  width: 44px;
+  padding: 0;
+  transition:
+    transform 160ms var(--order-ease),
+    background-color 160ms var(--order-ease),
+    color 160ms var(--order-ease);
+}
+.prices__add:active {
+  transform: scale(0.96);
+}
+.counter-row > :first-child,
+.prices__name {
+  padding-left: 0;
+}
+.counter-row__name,
+.prices__label {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: start;
+}
+.counter-row__name > .i,
+.prices__label > .i {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+}
+.counter-row__meta,
+.prices__name > .tags {
+  margin-left: 20px;
+}
+.slip__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.order-slip .slip__crest {
+  width: 32px;
+  height: auto;
+  margin: 0;
+}
+.slip__title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+.slip__edit {
+  margin-left: auto;
+}
+.slip__pickup {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 12px;
+}
+[data-basket-empty] {
+  text-align: center;
+  padding: 24px;
+}
+[data-basket-empty] > .i {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+}
+[data-basket-empty] strong,
+[data-basket-empty] > span {
+  display: block;
+}
+[data-basket-empty] strong {
+  font-weight: 400;
+}
+[data-basket-empty] > span {
+  font-size: 0.75rem;
+  color: #626262;
+  margin-top: 8px;
+}
+.order-line__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 44px;
+  gap: 8px;
+  align-items: center;
+}
+.order-line__name {
+  padding: 0;
+  font-weight: 500;
+}
+.order-line__price {
+  color: #626262;
+  white-space: nowrap;
+}
+.order-line__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  align-items: center;
+}
+.order-line .wish-button {
+  position: static;
+  flex: 0 0 44px;
+}
+.line-remove {
+  width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+}
+.order-line__wish {
+  padding: 0;
+  margin-top: 8px;
+}
+.order-line__qty button:disabled {
+  opacity: 0.35;
+}
+.drawer-receipt-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.drawer-receipt-head p {
+  flex: 1 0 100%;
+  color: #626262;
+}
+@media (hover: hover) and (pointer: fine) {
+  .order-rail__sticky {
+    scrollbar-width: thin;
+  }
+  .order-rail__links a {
+    min-height: 40px;
+  }
+  .line-remove {
+    width: 36px;
+    min-height: 36px;
+  }
+  .prices__add {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/* Christmas signature. Only the decoration layer clips; copy keeps its flow. */
+html.is-jol {
+  --garland-depth: 220px;
+}
+html.is-jol .jol-surface {
+  position: relative;
+  padding-top: calc(var(--garland-depth) + 48px);
+}
+html.is-jol .jol-decor {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--garland-depth);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 23;
+}
+html.is-jol .jol-garland {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: max(100%, 1344px);
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -25%);
+}
+html.is-jol .jol-decor .jol-lights,
+html.is-jol .jol-decor .jol-baubles {
+  height: var(--garland-depth);
+}
+html.is-jol .jol-lights__wire {
+  stroke-width: 0.6;
+  stroke-opacity: 1;
+}
+html.is-jol .hero.jol-surface {
+  padding-top: calc(var(--top-chrome) + var(--garland-depth) + 32px);
+  min-height: max(100svh, 850px);
+}
+html.is-jol .hero .jol-decor {
+  top: var(--top-chrome);
+}
+html.is-jol .footer {
+  border-top: 0;
+}
+html.is-jol .jol-gifts {
+  overflow: visible;
+}
+html.is-jol .order-head--occasion {
+  background: var(--jol-spruce);
+  color: var(--jol-cream);
+  max-width: none;
+}
+html.is-jol .order-head--occasion :is(h1, a, .text-mid-gray) {
+  color: var(--jol-cream);
+}
+html.is-jol .order-head--occasion :is(.jol-kicker, [data-order-lede]) {
+  color: var(--jol-gold-text);
+}
+html.is-jol .order-head--occasion > :not(.jol-decor, .hero__snow-layer) {
+  position: relative;
+  z-index: 22;
+}
+html.is-jol .order-holidays {
+  position: relative;
+  padding-top: 48px;
+}
+html.is-jol .order-holidays .jol-lights {
+  height: 44px;
+}
+html.is-jol .jol-spray-host {
+  position: relative;
+  overflow: hidden;
+  padding-top: 124px;
+}
+html.is-jol .jol-spray {
+  position: absolute;
+  width: 110px;
+  height: auto;
+  top: -14px;
+  right: -14px;
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+html.is-jol .basket-panel__head.jol-spray-host {
+  padding-top: 148px;
+}
+html.is-jol .basket-panel__head .jol-spray {
+  width: 130px;
+}
+html.is-jol .occasion-card--jol.jol-spray-host {
+  padding-top: 172px;
+}
+html.is-jol .occasion-card--jol .jol-spray {
+  width: 150px;
+}
+html.is-jol
+  :is(
+    .section-kicker,
+    .eyebrow,
+    .order-step__title,
+    .order-head > p.uppercase
+  ) {
+  color: var(--jol-red);
+}
+html.is-jol .order-head--occasion > p.uppercase {
+  color: var(--jol-gold-text);
+}
+html.is-jol :is(.draw-rule, .counter-row, .prices__row, .slip__pickup) {
+  --rule: var(--jol-gold);
+}
+html.is-jol .is-complete .order-progress__circle {
+  background: var(--jol-spruce);
+  color: var(--jol-cream);
+  border-color: var(--jol-spruce);
+}
+html.is-jol .is-current .order-progress__circle {
+  border-color: var(--jol-red);
+}
+html.is-jol .order-progress__step::after {
+  background: var(--jol-spruce);
+}
+html.is-jol .prices__add {
+  border-color: var(--jol-spruce);
+  color: var(--jol-spruce);
+}
+html.is-jol .navdrop__row:has(use[href='#i-christmas-tree']) .navdrop__icon,
+html.is-jol .navdrop__row:has(use[href='#i-gift']) .navdrop__icon {
+  color: var(--jol-gold-text);
+}
+html.is-jol:has(.order-head--occasion) .day-tile span {
+  border-top: 2px solid var(--jol-red);
+}
+html.is-jol:has(.order-head--aramot) .day-tile span {
+  border-top-color: var(--jol-gold);
+}
+html.motion-draw .jol-decor {
+  clip-path: inset(0 50% 0 50%);
+  opacity: 0.6;
+  transition:
+    clip-path 1.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 1.1s;
+}
+html.motion-draw .jol-decor.is-drawn {
+  clip-path: inset(0);
+  opacity: 1;
+}
+html.motion-draw .jol-spray {
+  opacity: 0;
+  transform: rotate(-14deg);
+  transition:
+    opacity 600ms var(--order-luxe),
+    transform 600ms var(--order-luxe);
+}
+html.motion-draw .jol-spray.is-drawn,
+html.motion-draw .basket-panel.is-open .jol-spray {
+  opacity: 1;
+  transform: rotate(-8deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  html.is-jol .prices__add:hover {
+    background: var(--jol-spruce);
+    color: var(--jol-cream);
+  }
+}
+@media (min-width: 768px) and (max-width: 1000px) {
+  html.is-jol {
+    --garland-depth: 150px;
+  }
+}
+@media (max-width: 767px) {
+  html.is-jol {
+    --garland-depth: 110px;
+  }
+  html.is-jol .jol-garland {
+    width: max(100%, 800px);
+  }
+  html.is-jol .hero.jol-surface {
+    min-height: 100svh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-draw .jol-decor {
+    clip-path: none;
+    opacity: 1;
+    transition: none;
+  }
+  html.motion-draw .jol-spray {
+    opacity: 1;
+    transform: rotate(-8deg);
+    transition: none;
+  }
+}
+
+.remember-choice label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+}
+.remember-choice input {
+  appearance: auto;
+  width: 20px;
+  height: 20px;
+}
+.remember-choice button,
+.remember-actions > button,
+.remember-history button,
+.remember-toast button {
+  min-height: 44px;
+}
+.remember-choice [data-forget] {
+  text-decoration: underline;
+}
+.remember-card {
+  position: relative;
+  padding: 24px 48px 24px 24px;
+  margin-bottom: 32px;
+  background: var(--slip-paper);
+  scroll-margin-top: var(--category-offset);
+}
+.remember-card p {
+  margin-top: 8px;
+}
+.remember-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+}
+.remember-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.remember-history {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 240ms var(--order-luxe);
+}
+.remember-history.is-open {
+  grid-template-rows: 1fr;
+}
+.remember-history > ul {
+  overflow: hidden;
+  min-height: 0;
+}
+.remember-history li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.8125rem;
+}
+.remember-history button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.remember-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 12px 20px;
+  background: var(--color-white);
+  color: var(--color-black);
+  border: 1px solid var(--rule);
+  z-index: 1000;
+  box-shadow: 0 8px 24px #14141422;
+}
+.remember-toast button {
+  margin-left: 16px;
+  text-decoration: underline;
+}
+.same-slot {
+  margin-bottom: 16px;
+}
+html.motion-draw .remember-card {
+  animation: remember-in 420ms var(--order-luxe) both;
+}
+@keyframes remember-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-draw .remember-card {
+    animation: none;
+  }
+  .remember-history {
+    transition: none;
+  }
+}
+/* Keep the desktop rail usable on the narrower review viewport too. */
+@media (min-width: 900px) and (max-width: 1264px) {
+  .form--order {
+    grid-template-columns: 12.5rem minmax(0, 1fr) 18rem;
+    column-gap: 1rem;
+  }
+  .order-rail {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .order-chips {
+    display: none;
+  }
+  .order-counter {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .order-slip {
+    grid-column: 3;
+    grid-row: 1 / 6;
+  }
+  .order-step,
+  .form--order > .form__foot,
+  .form--order > .form__status {
+    grid-column: 1 / 3;
+  }
+  .counter-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .counter-row .buy {
+    grid-column: 2;
+  }
+  .counter-row__price {
+    grid-column: 1;
+    grid-row: 2;
+    padding-left: 20px;
+  }
+}
+html.motion-draw .basket-panel[aria-hidden='false'] .jol-spray {
+  opacity: 1;
+  transform: rotate(-8deg);
+}
+.order-line__qty .amount-value input {
+  width: 3.5ch;
+  min-width: 3.5ch;
+}
+@media (pointer: coarse) {
+  .buy__q {
+    font-size: 1rem;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+}
+
+@media (min-width: 900px) and (max-width: 1023px) {
+  .counter-search {
+    display: flex;
+  }
+}
+.prices__desc,
+.prices__name > .pending {
+  margin-left: 20px;
+}
+html.is-jol :is(.page-head__kicker, .bk-card__kicker) {
+  color: var(--jol-red);
+}
+html.is-jol .jol-head {
+  overflow: visible;
+}
+.basket-foot [data-basket-actions] > .btn-fill {
+  width: 100%;
+  justify-content: center;
+}
+.drawer-receipt-head {
+  flex: 1;
+  min-width: 0;
+}
+.drawer-receipt-head [data-basket-size] {
+  margin-left: auto;
+}
+.basket-panel__head > button {
+  flex: 0 0 44px;
+}
+[data-basket-empty] .slip__empty-phone {
+  display: none;
+}
+@media (max-width: 767px) {
+  [data-basket-empty] .slip__empty-desktop {
+    display: none;
+  }
+  [data-basket-empty] .slip__empty-phone {
+    display: block;
+  }
+}
+.counter-row__name > .row-name-text,
+.prices__label > .row-name-text {
+  grid-column: 2;
+}
+
+/* ── Round 4 (Claude): the amount box ──────────────────────────────────────────
+   One square box everywhere (rows, slip, drawer, sheet): [− or trash] [amount] [unit] [+].
+   The unit is a small button inside the box (kg ↔ g); fixed-unit rows show "stk.".
+   The number and the unit share one centred line, and the field fits grams ("12500"). */
+.buy__amount,
+.order-line__qty {
+  display: inline-flex;
+  align-items: stretch;
+  height: 44px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+}
+.buy__amount > *,
+.order-line__qty > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.buy__q,
+.order-line__qty .amount-value input {
+  width: 5.5ch;
+  min-width: 5.5ch;
+  padding: 0 2px;
+  border: 0;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  background: transparent;
+}
+.amount-value {
+  display: inline-flex;
+  align-items: center;
+}
+.unit-toggle,
+.unit-word {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 100%;
+  padding: 0 0.35rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--color-black);
+}
+.unit-toggle {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 0.3em;
+  transition: background-color 160ms var(--order-ease), text-decoration-color 160ms var(--order-ease);
+}
+.unit-word {
+  color: var(--color-dark-gray);
+}
+@media (hover: hover) and (pointer: fine) {
+  .unit-toggle:hover {
+    background: rgba(20, 20, 20, 0.06);
+    text-decoration-color: currentColor;
+  }
+}
+.unit-toggle:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -3px;
+}
+
+/* ── Round 4 (Claude): the order slip shows the products first ─────────────────
+   Head and pickup are one row each, the foot is one line + one row, the help line lives at
+   the end of the form. The lines get every pixel that is left (and scroll inside). */
+.order-slip > .slip {
+  gap: 0.75rem;
+}
+.order-slip .slip__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 32px;
+}
+.order-slip .slip__crest {
+  width: 28px;
+  height: auto;
+}
+.order-slip .slip__edit {
+  margin-left: auto;
+}
+.order-slip .slip__pickup {
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+.order-slip .slip__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.order-slip .basket-foot,
+.basket-panel .basket-foot {
+  display: grid;
+  gap: 0.6rem;
+}
+.total-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.total-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -6px 0;
+  color: var(--color-dark-gray);
+}
+.total-note {
+  display: block;
+  color: var(--color-dark-gray);
+}
+.total-note[hidden] {
+  display: none;
+}
+[data-basket-actions] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: stretch;
+}
+[data-basket-actions] > .btn {
+  grid-column: 1;
+  justify-content: center;
+}
+[data-basket-actions] > .empty-order {
+  grid-column: 2;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--rule);
+}
+[data-basket-actions] > .empty-order[hidden] {
+  display: none;
+}
+/* the text button ("Halda áfram að skoða"); the primary link may also close the sheet */
+[data-basket-actions] > button[data-modal-close] {
+  grid-column: 1 / -1;
+}
+.order-end .basket-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+/* ── Round 4 (Claude): phones = the flow + one smart bar that grows into the order ──── */
+.order-bar,
+.sheet-handle {
+  display: none;
+}
+@media (max-width: 47.999rem) {
+  .basket {
+    display: none !important;
+  }
+  body.has-order-bar {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  .order-bar:not([hidden]) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 60px;
+    padding: 0.7rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+    background: #141414;
+    color: #f4eee2;
+    text-align: left;
+    -webkit-mask: radial-gradient(circle at 7px 0, transparent 5px, #000 5.5px) 0 0 / 14px 100% repeat-x;
+    mask: radial-gradient(circle at 7px 0, transparent 5px, #000 5.5px) 0 0 / 14px 100% repeat-x;
+  }
+  html.is-jol .order-bar {
+    background: var(--jol-spruce);
+  }
+  .order-bar__icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+  }
+  .order-bar__icon .i {
+    width: 24px;
+    height: 24px;
+  }
+  .order-bar__n {
+    position: absolute;
+    top: -2px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: #f4eee2;
+    color: #141414;
+    font-size: 11px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .order-bar__text {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 2px;
+    line-height: 1.25;
+  }
+  .order-bar__title {
+    font-size: 0.875rem;
+  }
+  .order-bar__line {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    opacity: 0.78;
+    overflow-wrap: break-word;
+    transition: opacity 160ms var(--order-ease);
+  }
+  .order-bar__line.is-event {
+    opacity: 1;
+  }
+  .order-bar__line .i {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+  }
+  .order-bar__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    font-size: 0.875rem;
+    flex: 0 0 auto;
+  }
+  .order-bar__go .i {
+    width: 18px;
+    height: 18px;
+  }
+  /* The order sheet: grows out of the bar (clip-path, motion.js), perforated top edge.
+     Three-part selector: it must beat the drawer's [data-panel][data-axis="x"] placement. */
+  .basket-panel[data-panel][data-axis] {
+    top: max(12svh, calc(env(safe-area-inset-top, 0px) + 56px));
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    clip-path: inset(100% 0 0 0);
+    padding: 0.25rem 1rem calc(1rem + env(safe-area-inset-bottom));
+    -webkit-mask: radial-gradient(circle at 7px 0, transparent 6px, #000 6.5px) 0 0 / 14px 100% repeat-x;
+    mask: radial-gradient(circle at 7px 0, transparent 6px, #000 6.5px) 0 0 / 14px 100% repeat-x;
+  }
+  /* 4 px bar to see, a 24 × 116 px area to grab */
+  .sheet-handle {
+    display: block;
+    flex: 0 0 auto;
+    box-sizing: content-box;
+    width: 36px;
+    height: 4px;
+    margin: 0 auto;
+    padding: 10px 40px;
+    border-radius: 12px;
+    background: rgba(20, 20, 20, 0.22) content-box;
+    touch-action: none;
+  }
+  .basket-panel__head {
+    touch-action: none;
+  }
+}
+
+/* The fir sprig never costs the order a row: it tucks into the slip's corner and only the
+   head row keeps clear of it (Round 4). */
+html.is-jol .slip__head.jol-spray-host {
+  padding-top: 0;
+  padding-right: 64px;
+  overflow: visible;
+}
+html.is-jol .order-slip .slip {
+  overflow: hidden;
+}
+html.is-jol .slip__head .jol-spray {
+  width: 82px;
+  top: -30px;
+  right: -26px;
+}
+
+/* Icon + words in a button keep a constant gap (the gift icon touched "Panta fyrir áramótin"). */
+.btn > .i {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
 }

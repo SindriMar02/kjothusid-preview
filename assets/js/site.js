@@ -128,6 +128,7 @@
      in the row, with g/kg on weight rows. Minus below the minimum takes the
      product off again and the plus returns. Focus moves only on keyboard
      clicks (e.detail === 0): a tapped control must never paint a ring. */
+  var icon = KJOrdering.icon;
   var MIN = { kg: 0.1, g: 10, stk: 1 };
   var STEP = { kg: 0.5, g: 100, stk: 1 };
   function snap(u, v) {
@@ -155,18 +156,22 @@
   function renderBuy(wrap) {
     var k = wrap.getAttribute('data-buy'), n = wrap.getAttribute('data-buy-name');
     var item = find(k);
+    var row = wrap.closest('.counter-row,.prices__row');
+    if (row) {
+      row.classList.toggle('has-order', !!item);
+      var label = row.querySelector('.counter-row__name,.prices__label');
+      if (label && !label.querySelector('.i')) label.insertAdjacentHTML('afterbegin', icon('check'));
+    }
     var plus = wrap.querySelector('[data-order-add]');
     var ctl = wrap.querySelector('.buy__ctl');
     if (!item) { if (ctl) ctl.remove(); plus.hidden = false; plus.classList.remove('is-added'); wrap.classList.remove('is-on'); return; }
     plus.hidden = true; wrap.classList.add('is-on');
     var weight = wrap.getAttribute('data-buy-unit') === 'kg';
     var u = item.u === 'g' || item.u === 'kg' || item.u === 'stk' ? item.u : (weight ? 'kg' : 'stk');
-    var html = '<button type="button" class="buy__step" data-buy-step="-1" aria-label="Minna af ' + n + '">−</button>' +
+    var html = '<span class="buy__amount"><button type="button" class="buy__step" data-buy-step="-1" aria-label="' + (item.q <= MIN[u] ? 'Taka ' + n + ' úr pöntuninni' : 'Minna af ' + n) + '" title="' + (item.q <= MIN[u] ? 'Taka úr pöntun' : 'Minnka magn') + '">' + icon(item.q <= MIN[u] ? 'trash' : 'minus') + '</button>' +
       '<input class="buy__q" type="number" inputmode="' + (u === 'kg' ? 'decimal' : 'numeric') + '" min="' + MIN[u] + '" step="' + (u === 'kg' ? '0.1' : u === 'g' ? '10' : '1') + '" value="' + item.q + '" data-buy-q aria-label="Magn af ' + n + (u === 'kg' ? ' í kílóum' : u === 'g' ? ' í grömmum' : '') + '">' +
-      (weight
-        ? '<button type="button" class="buy__unit" data-buy-toggle aria-label="Skipta um einingu, núna ' + (u === 'kg' ? 'kíló' : 'grömm') + '">' + (u === 'kg' ? 'kg' : 'g') + '</button>'
-        : '<span class="buy__unit buy__unit--fixed">stk.</span>') +
-      '<button type="button" class="buy__step" data-buy-step="1" aria-label="Meira af ' + n + '">+</button>';
+      (weight ? KJOrdering.units(u, 'data-buy-toggle', n) : '<span class="unit-word">stk.</span>') +
+      '<button type="button" class="buy__step" data-buy-step="1" aria-label="Meira af ' + n + '" title="Auka magn">' + icon('plus') + '</button></span>';
     if (!ctl) { ctl = document.createElement('span'); ctl.className = 'buy__ctl'; wrap.appendChild(ctl); }
     ctl.innerHTML = html;
   }
@@ -199,7 +204,7 @@
       var it = find(wrap.getAttribute('data-buy'));
       if (!it) return;
       var dir = step.getAttribute('data-buy-step');
-      var next = snap(it.u, it.q + STEP[it.u] * +dir);
+      var next = it.q <= MIN[it.u] && +dir < 0 ? 0 : snap(it.u, it.q + STEP[it.u] * +dir);
       if (next < MIN[it.u]) {
         setItem(it.k, it.n, null);
         renderBuy(wrap);
@@ -217,6 +222,7 @@
     if (tog) {
       var cur = find(wrap.getAttribute('data-buy'));
       if (!cur) return;
+      if (cur.u === tog.dataset.buyToggle) return;
       // the amount survives the switch: 0,5 kg is 500 g and back
       if (cur.u === 'kg') setItem(cur.k, cur.n, Math.max(MIN.g, Math.round(cur.q * 1000)), 'g');
       else setItem(cur.k, cur.n, Math.max(MIN.kg, snap('kg', cur.q / 1000)), 'kg');

@@ -3,9 +3,12 @@
   'use strict';
   var form = document.querySelector('[data-form="order"]');
   if (!form) return;
+  var icon = KJOrdering.icon;
+  var progress = document.querySelector('.order-progress');
+  var sent = false;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var catalogue = JSON.parse(
-    document.getElementById('kj-catalogue').textContent
+    document.getElementById('kj-catalogue').textContent,
   );
   var byKey = {};
   catalogue.forEach(function (item) {
@@ -82,35 +85,31 @@
       form.classList.toggle('search-open');
       search.focus();
     });
-  var active = null;
-  function spy() {
-    var top =
+  var active = null,
+    jumping = false,
+    settleTimer;
+  function offset() {
+    var chrome =
       parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue(
-          '--top-chrome'
-        )
+          '--top-chrome',
+        ),
       ) || 100;
-    var slip = form.querySelector('[data-order-slip]');
-    if (slip && slip.getClientRects().length) {
-      // The height it has once pinned, so all lines show at the top of the page too
-      // (its foot may sit below the fold until the page scrolls).
-      var available = innerHeight - (top + 24) - 24;
-      slip.style.setProperty(
-        '--slip-available',
-        Math.max(240, available) + 'px'
-      );
-    }
-    var shown = categories.filter(function (category) {
-      return !category.hidden;
-    });
-    var current = shown[0];
-    shown.forEach(function (category) {
-      if (category.getBoundingClientRect().top <= top + 180) current = category;
-    });
-    if (!current || active === current.dataset.counterCategory) return;
-    active = current.dataset.counterCategory;
+    var searchHeight = form
+      .querySelector('.counter-search')
+      .getBoundingClientRect().height;
+    var space =
+      chrome + progress.getBoundingClientRect().height + searchHeight + 16;
+    document.documentElement.style.setProperty(
+      '--category-offset',
+      space + 'px',
+    );
+    return space;
+  }
+  function mark(slug) {
+    active = slug;
     links.forEach(function (link) {
-      var on = link.dataset.categoryLink === active;
+      var on = link.dataset.categoryLink === slug;
       link.classList.toggle('is-active', on);
       if (on) link.setAttribute('aria-current', 'true');
       else link.removeAttribute('aria-current');
@@ -118,74 +117,98 @@
         var bar = form.querySelector('.order-rail__bar');
         bar.style.height = link.offsetHeight + 'px';
         bar.style.transform = 'translateY(' + link.offsetTop + 'px)';
+        // Scroll only the rail. scrollIntoView would also move the document.
+        var rail = link.closest('.order-rail__sticky');
+        var r = rail.getBoundingClientRect(),
+          l = link.getBoundingClientRect();
+        if (l.top < r.top) rail.scrollTop += l.top - r.top;
+        if (l.bottom > r.bottom) rail.scrollTop += l.bottom - r.bottom;
       }
-      if (
-        on &&
-        link.closest('.order-chips') &&
-        matchMedia('(max-width: 63.999rem)').matches
-      ) {
+      if (on && link.closest('.order-chips')) {
         var host = link.parentElement;
         host.scrollTo({
           left: link.offsetLeft - host.offsetLeft - 44,
-          behavior: reduce ? 'auto' : 'smooth'
+          behavior: reduce ? 'auto' : 'smooth',
         });
       }
     });
   }
-  // Observe the reading line rather than running catalogue measurements on every frame.
-  var categoryObserver, headObserver;
-  function observeCategories() {
-    if (categoryObserver) categoryObserver.disconnect();
-    if (headObserver) headObserver.disconnect();
-    if (!('IntersectionObserver' in window)) return;
-    var chrome =
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          '--top-chrome'
-        )
-      ) || 100;
-    var readingLine = Math.min(innerHeight - 1, chrome + 180);
-    categoryObserver = new IntersectionObserver(spy, {
-      rootMargin:
-        '-' +
-        readingLine +
-        'px 0px -' +
-        Math.max(0, innerHeight - readingLine - 1) +
-        'px 0px'
+  function spy() {
+    if (sent) return;
+    var reading = offset();
+    updateCurrent();
+    if (jumping) return;
+    var shown = categories.filter(function (category) {
+      return !category.hidden;
     });
-    categories.forEach(function (category) {
-      categoryObserver.observe(category);
+    var current = shown[0];
+    shown.forEach(function (category) {
+      if (
+        category.querySelector('h2').getBoundingClientRect().top <=
+        reading + 1
+      )
+        current = category;
     });
-    headObserver = new IntersectionObserver(spy, {
-      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-    });
-    headObserver.observe(document.querySelector('.order-head'));
+    if (current && active !== current.dataset.counterCategory)
+      mark(current.dataset.counterCategory);
   }
-  observeCategories();
-  window.addEventListener(
-    'resize',
-    function () {
-      observeCategories();
-      spy();
-    },
-    { passive: true }
-  );
+  links.forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      var target = document.getElementById(link.hash.slice(1));
+      jumping = true;
+      mark(link.dataset.categoryLink);
+      var space = offset();
+      function settled() {
+        jumping = false;
+        spy();
+      }
+      clearTimeout(settleTimer);
+      if (window.kjLenis && !reduce) {
+        window.kjLenis.scrollTo(target, {
+          offset: -space,
+          onComplete: settled,
+        });
+      } else {
+        window.scrollTo({
+          top: scrollY + target.getBoundingClientRect().top - space,
+          behavior: reduce ? 'auto' : 'smooth',
+        });
+      }
+      settleTimer = setTimeout(settled, reduce ? 50 : 1600);
+    });
+  });
+  window.addEventListener('resize', spy, { passive: true });
+  if (window.ResizeObserver) {
+    var chromeObserver = new ResizeObserver(spy);
+    [
+      document.querySelector('header'),
+      progress,
+      form.querySelector('.counter-search'),
+    ]
+      .filter(Boolean)
+      .forEach(function (node) {
+        chromeObserver.observe(node);
+      });
+  }
   function value(name) {
     var el = form.querySelector(
       '[name="' +
         name +
         '"]' +
-        (name === 'date' || name === 'time' ? ':checked' : '')
+        (name === 'date' || name === 'time' ? ':checked' : ''),
     );
     return el ? el.value.trim() : '';
   }
   function state() {
+    if (sent) return;
     var lines = KJBasket.all();
     var pickup = value('date') && value('time');
     var contact =
       value('name') &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value('email')) &&
-      value('phone').replace(/\D/g, '').length >= 7;
+      value('phone').replace(/\D/g, '').length >= 7 &&
+      !/[^\d\s+()-]/.test(value('phone'));
     var button = form.querySelector('[data-slip-submit]');
     if (!button) return;
     button.disabled = !lines.length;
@@ -215,31 +238,57 @@
         'sep.',
         'okt.',
         'nóv.',
-        'des.'
+        'des.',
       ];
       sentence.innerHTML =
-        'Sótt <a href="#afhending">' +
+        '<a href="#afhending">' +
+        icon('calendar') +
         weekdays[date.getUTCDay()] +
         ' ' +
         date.getUTCDate() +
         '. ' +
         months[date.getUTCMonth()] +
-        '</a> kl. <a href="#order-time">' +
+        '</a> <a href="#afhending">' +
+        icon('clock') +
         value('time') +
         '</a>';
     }
-    form.querySelectorAll('[data-step]').forEach(function (marker) {
-      var complete =
-        marker.dataset.step === '1'
-          ? !!lines.length
-          : marker.dataset.step === '2'
-            ? !!pickup
-            : !!contact;
-      marker.classList.toggle('is-complete', complete);
-      marker.setAttribute(
-        'aria-label',
-        marker.textContent.replace('✓', '').trim() + (complete ? ', lokið' : '')
-      );
+    document.querySelectorAll('[data-slip-pickup]').forEach(function (el) {
+      el.innerHTML = pickup
+        ? sentence.innerHTML
+        : '<a href="#afhending">' + icon('calendar') + 'Veldu dag og tíma</a>';
+    });
+    var completed = KJOrdering.done(
+      lines,
+      value('date'),
+      value('time'),
+      value('name'),
+      value('email'),
+      value('phone'),
+      sent,
+    );
+    progress
+      .querySelectorAll('[data-progress]')
+      .forEach(function (step, index) {
+        step.classList.toggle('is-complete', completed[index]);
+        step.classList.toggle(
+          'is-joined',
+          !!(completed[index] && completed[index + 1]),
+        );
+        if (index === 0)
+          step.querySelector('.order-progress__label').textContent =
+            'Vörur' + (lines.length ? ' ' + lines.length : '');
+      });
+    ['name', 'email', 'phone'].forEach(function (name) {
+      var input = form.querySelector('[name="' + name + '"]');
+      var valid =
+        name === 'phone'
+          ? value(name).replace(/\D/g, '').length >= 7 &&
+            !/[^\d\s+()-]/.test(value(name))
+          : name === 'email'
+            ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value(name))
+            : !!value(name);
+      input.closest('.field__control').classList.toggle('is-valid', valid);
     });
   }
   form.addEventListener('click', function (e) {
@@ -248,13 +297,13 @@
     var target = document.getElementById(button.dataset.next);
     target.scrollIntoView({
       behavior: reduce ? 'auto' : 'smooth',
-      block: 'start'
+      block: 'start',
     });
     if (e.detail === 0) {
       var field =
         target.id === 'afhending'
           ? target.querySelector(
-              value('date') ? '[name="time"]' : '[name="date"]'
+              value('date') ? '[name="time"]' : '[name="date"]',
             )
           : target.querySelector('input');
       if (target.id === 'thu')
@@ -262,25 +311,82 @@
           Array.from(target.querySelectorAll('input[required]')).find(
             function (input) {
               return !input.value || !input.checkValidity();
-            }
+            },
           ) || field;
       if (field) field.focus({ preventScroll: true });
     }
   });
+  function updateCurrent() {
+    if (sent) return;
+    var line = progress.getBoundingClientRect().bottom + 120;
+    var current = 1;
+    ['afhending', 'thu'].forEach(function (id, index) {
+      if (document.getElementById(id).getBoundingClientRect().top <= line)
+        current = index + 2;
+    });
+    progress.querySelectorAll('[data-progress]').forEach(function (step) {
+      var on = Number(step.dataset.progress) === current;
+      step.classList.toggle('is-current', on);
+      if (on) step.setAttribute('aria-current', 'step');
+      else step.removeAttribute('aria-current');
+    });
+  }
+  var scrollQueued = false;
+  window.addEventListener(
+    'scroll',
+    function () {
+      if (scrollQueued) return;
+      scrollQueued = true;
+      requestAnimationFrame(function () {
+        scrollQueued = false;
+        spy();
+      });
+    },
+    { passive: true },
+  );
+  progress.addEventListener('click', function (event) {
+    var step = event.target.closest('[data-step-target]');
+    if (!step || sent) return;
+    var target = document.getElementById(step.dataset.stepTarget);
+    target.scrollIntoView({
+      behavior: reduce ? 'auto' : 'smooth',
+      block: 'start',
+    });
+    if (event.detail === 0) {
+      var first = Array.from(target.querySelectorAll('input,button')).find(
+        function (control) {
+          return control.getClientRects().length;
+        },
+      );
+      if (first) first.focus({ preventScroll: true });
+    }
+  });
+  var companyToggle = form.querySelector('[data-company-toggle]');
+  companyToggle.addEventListener('change', function () {
+    var fields = document.getElementById('company-fields');
+    fields.inert = !companyToggle.checked;
+    fields.classList.toggle('is-open', companyToggle.checked);
+    companyToggle.setAttribute('aria-expanded', String(companyToggle.checked));
+    fields.querySelectorAll('input').forEach(function (input) {
+      input.disabled = !companyToggle.checked;
+      if (!companyToggle.checked) input.value = '';
+    });
+  });
+  companyToggle.dispatchEvent(new Event('change'));
+  document.addEventListener('kj:order-sent', function () {
+    sent = true;
+    progress.querySelectorAll('[data-progress]').forEach(function (step) {
+      step.classList.add('is-complete');
+      step.classList.toggle('is-joined', step.dataset.progress !== '4');
+      step.classList.toggle('is-current', step.dataset.progress === '4');
+      if (step.dataset.progress === '4')
+        step.setAttribute('aria-current', 'step');
+      else step.removeAttribute('aria-current');
+    });
+  });
   form.addEventListener('input', state);
   form.addEventListener('change', state);
   document.addEventListener('kj:order-state', state);
-  var bar = document.querySelector('.phone-order-bar');
-  // Out of #page: the drawer shoves #page with a transform, and a transformed ancestor
-  // would pin this "fixed" bar to the end of the page instead of the screen.
-  if (bar && bar.parentNode !== document.body) document.body.appendChild(bar);
-  if (bar && 'IntersectionObserver' in window)
-    new IntersectionObserver(
-      function (entries) {
-        bar.classList.toggle('is-covered', entries[0].isIntersecting);
-      },
-      { threshold: 0.1 }
-    ).observe(form.querySelector('.order-end'));
   state();
   spy();
 })();
