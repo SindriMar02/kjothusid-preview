@@ -92,7 +92,9 @@
       if (e.target === d || e.target.closest('[data-popup-close]')) close();
     });
     d.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
-    setTimeout(function () { if (!document.querySelector('[data-panel][aria-hidden="false"]')) d.showModal(); }, reduce ? 0 : 1400);
+    // Chromium focuses the first focusable child on showModal (the preview "Sýnidæmi" marker,
+    // which then shows its tip); the dialog itself takes focus, so nothing is highlighted.
+    setTimeout(function () { if (!document.querySelector('[data-panel][aria-hidden="false"]')) { d.showModal(); d.focus({ preventScroll: true }); } }, reduce ? 0 : 1400);
   })();
 
   /* ── the order basket ── */
