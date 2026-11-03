@@ -114,22 +114,13 @@
     toastTimer = setTimeout(function () { toast.classList.remove('is-on'); }, 2600);
   }
   function renderPill() {
-    if (document.body.dataset.page === 'order') return;
-    if (!basket.length) { if (pill) pill.hidden = true; return; }
-    if (!pill) {
-      pill = document.createElement('a');
-      pill.className = 'basket';
-      pill.href = BASE + 'pantanir/';
-      document.body.appendChild(pill);
-    }
-    pill.hidden = false;
-    pill.innerHTML = '<span>Pöntun</span><span class="basket__n">' + basket.length + '</span>';
-    pill.setAttribute('aria-label', 'Pöntun, ' + basket.length + (basket.length === 1 ? ' vara' : ' vörur'));
+    document.dispatchEvent(new CustomEvent('kj:basket'));
   }
   window.KJBasket = {
-    all: function () { return basket.slice(); },
-    set: function (items) { basket = items.slice(); store(KEY, basket); renderPill(); },
-    clear: function () { basket = []; store(KEY, null); renderPill(); }
+    all: function () { return basket.map(function (line) { return Object.assign({}, line); }); },
+    set: function (items) { basket = items.map(function (line) { return Object.assign({}, line); }); store(KEY, basket); renderAllBuys(); renderPill(); },
+    clear: function () { basket = []; store(KEY, null); renderAllBuys(); renderPill(); },
+    say: say
   };
   /* ── the amount control in the row (Karen, 22 Oct) ──
      The plus puts the product on the order with its default amount (set per
@@ -159,7 +150,7 @@
     else basket.push({ k: k, n: n, q: q, u: u });
     store(KEY, basket.length ? basket : null);
     renderPill();
-    if (document.body.dataset.page === 'order') document.dispatchEvent(new CustomEvent('kj:basket'));
+
   }
   function renderBuy(wrap) {
     var k = wrap.getAttribute('data-buy'), n = wrap.getAttribute('data-buy-name');

@@ -23,7 +23,8 @@
 
   function applyTheme(root, from, to, always) {
     var search = overrideSearch(root);
-    var on = always || inWindow(from, to, null, search);
+    var occasion = new URLSearchParams(root.location.search).get('pontun');
+    var on = always || occasion === 'jol' || occasion === 'aramot' || inWindow(from, to, null, search);
     root.document.documentElement.classList.toggle('is-jol', on);
   }
 

@@ -100,7 +100,7 @@
   function focusFirstError(form) {
     var bad = form.querySelector('[aria-invalid="true"], [data-lines-error]:not([hidden])');
     if (bad) {
-      (bad.matches('input,textarea,select') ? bad : (form.querySelector('#picker-search') || bad)).focus();
+      (bad.matches('input,textarea,select') ? bad : (bad.querySelector('input') || form.querySelector('#picker-search') || bad)).focus();
       bad.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
     }
   }
@@ -149,6 +149,7 @@
     try { occasions = JSON.parse(document.getElementById('kj-occasions').textContent); } catch (e) {}
     occasion = occasions.find(function (o) { return o.key === occasionKey; }) || null;
     if (occasion) {
+      document.documentElement.classList.add('is-jol');
       var heading = document.querySelector('.page-head__title');
       heading.textContent = occasionKey === 'jol' ? 'Jólapöntun' : 'Áramótapöntun';
       document.title = heading.textContent + ' | Kjöthúsið';
@@ -165,6 +166,7 @@
   var lines = []; // { k, q, u }
   var justAdded = null;
   var Basket = window.KJBasket;
+  var loadedDeepLinks = false;
   function load() {
     var saved = Basket ? Basket.all() : [];
     lines = saved.map(function (x) {
@@ -172,9 +174,10 @@
       return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u) } : null;
     }).filter(Boolean);
     var params = new URLSearchParams(location.search);
-    params.getAll('v').forEach(function (k) {
+    (loadedDeepLinks ? [] : params.getAll('v')).forEach(function (k) {
       if (byKey[k] && !lines.some(function (l) { return l.k === k; })) lines.push({ k: k, q: defaultQty(byKey[k]), u: orderUnit((byKey[k].dq ? byKey[k].du : null) || byKey[k].u) });
     });
+    loadedDeepLinks = true;
   }
   function defaultQty(c) { return typeof c.dq === 'number' && c.dq > 0 ? c.dq : 1; }
   // A price unit describes the price; the relay's quantity is kilograms or pieces.
@@ -183,177 +186,26 @@
     if (Basket) Basket.set(lines.map(function (l) { return { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u }; }));
   }
 
-  var listEl = form.querySelector('[data-lines-list]');
-  var emptyEl = form.querySelector('[data-lines-empty]');
-  var totalEl = form.querySelector('[data-lines-total]');
   var linesErr = form.querySelector('[data-lines-error]');
-
-  function unitLabel(u) { return u === 'kg' ? 'kg' : u === 'g' ? 'g' : 'stk.'; }
-  // Karen, 22 Oct: they sell a lot under the kilo (300 g, 2 x 300 g, 4 x 500 g)
-  // and nobody will guess that 0,3 means 300 g. So a weight line is typed as
-  // an exact amount in g or kg: kilos to one decimal, grams in tens.
-  function snap(u, v) {
-    if (u === 'kg') return Math.max(0.1, Math.round(v * 10) / 10);
-    if (u === 'g') return Math.max(10, Math.round(v / 10) * 10);
-    return Math.max(1, Math.round(v));
-  }
-  function unitOptions(c, u) {
-    var fixedUnit = c.u === 'kg' || c.u === 'stk' || c.u === 'flat' || c.u === 'pk';
-    var opts = fixedUnit ? [['g', 'g'], ['kg', 'kg']] : [['g', 'g'], ['kg', 'kg'], ['stk', 'stk.']];
-    return opts.map(function (o) { return '<option value="' + o[0] + '"' + (u === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
-  }
   function render() {
-    emptyEl.hidden = lines.length > 0;
-    listEl.innerHTML = lines.map(function (l, i) {
-      var c = byKey[l.k];
-      var priced = typeof c.p === 'number';
-      var fixedUnit = c.u === 'kg' || c.u === 'stk' || c.u === 'flat' || c.u === 'pk';
-      var weight = c.u === 'kg' || !fixedUnit;
-      var unitCtl = !weight
-        ? '<span class="oline__unit">' + unitLabel(l.u) + '</span>'
-        : '<select class="oline__unit-select" data-line-unit="' + i + '" aria-label="Eining fyrir ' + esc(c.n) + ', grömm eða kíló">' + unitOptions(c, l.u) + '</select>';
-      var kgLine = l.u === 'kg', gLine = l.u === 'g';
-      return '<li class="oline' + (l.k === justAdded ? ' is-new' : '') + '">' +
-        '<div class="oline__name"><span class="type-small text-black">' + esc(c.n) + '</span>' +
-        '<span class="type-xsmall text-mid-gray">' + esc(c.l || '') + (priced ? ' · ' + fmt(c.p) + ' ' + UNIT[c.u] : ' · Verð í síma') + '</span></div>' +
-        '<div class="oline__qty">' +
-        '<button type="button" class="oline__step" data-line-step="' + i + '" data-d="-1" aria-label="Minna af ' + esc(c.n) + '">−</button>' +
-        '<input class="oline__input' + (gLine ? ' oline__input--g' : '') + '" type="number" inputmode="' + (kgLine ? 'decimal' : 'numeric') + '" min="' + (kgLine ? '0.1' : gLine ? '10' : '1') + '" step="' + (kgLine ? '0.1' : gLine ? '10' : '1') + '" value="' + l.q + '" data-line-q="' + i + '" aria-label="Magn af ' + esc(c.n) + (kgLine ? ' í kílóum' : gLine ? ' í grömmum' : '') + '">' +
-        '<button type="button" class="oline__step" data-line-step="' + i + '" data-d="1" aria-label="Meira af ' + esc(c.n) + '">+</button>' +
-        unitCtl +
-        '</div>' +
-        (kgLine || gLine ? '<p class="oline__approx type-xsmall text-mid-gray">Skrifaðu nákvæmt magn. Endanleg þyngd ræðst við vigtun.</p>' : '') +
-        '<button type="button" class="oline__remove type-xsmall" data-line-remove="' + i + '">Fjarlægja</button>' +
-        '</li>';
-    }).join('');
-    var est = 0, missing = 0;
-    lines.forEach(function (l) {
-      var c = byKey[l.k];
-      if (typeof c.p === 'number') est += c.p * (l.u === 'g' && c.u === 'kg' ? l.q / 1000 : l.q); else missing++;
-    });
-    if (lines.length && est) {
-      totalEl.hidden = false;
-      totalEl.innerHTML = 'Áætlað verð án vsk.: <strong>' + fmt(est) + ' kr.</strong>' +
-        (missing ? ' Án ' + missing + (missing === 1 ? ' vöru' : ' vara') + ' sem verð vantar fyrir.' : '') +
-        ' Endanlegt verð miðast við vigt og staðfestingu okkar.';
-    } else totalEl.hidden = true;
     if (lines.length) linesErr.hidden = true;
   }
-  function add(k) {
-    if (!byKey[k]) return;
-    if (lines.some(function (l) { return l.k === k; })) return;
-    lines.push({ k: k, q: defaultQty(byKey[k]), u: orderUnit((byKey[k].dq ? byKey[k].du : null) || byKey[k].u) });
-    justAdded = k;
-    persist(); render();
-    justAdded = null;
-  }
-  listEl.addEventListener('click', function (e) {
-    var step = e.target.closest('[data-line-step]');
-    if (step) {
-      var l = lines[+step.getAttribute('data-line-step')];
-      var inc = l.u === 'kg' ? 0.5 : l.u === 'g' ? 100 : 1;
-      l.q = snap(l.u, l.q + inc * +step.getAttribute('data-d'));
-      persist(); render();
-      var again = listEl.querySelector('[data-line-step="' + step.getAttribute('data-line-step') + '"][data-d="' + step.getAttribute('data-d') + '"]');
-      if (again) again.focus();
-      return;
-    }
-    var rm = e.target.closest('[data-line-remove]');
-    if (rm) {
-      lines.splice(+rm.getAttribute('data-line-remove'), 1);
-      persist(); render();
-      search.focus();
-    }
-  });
-  listEl.addEventListener('change', function (e) {
-    var q = e.target.closest('[data-line-q]');
-    if (q) {
-      var l = lines[+q.getAttribute('data-line-q')];
-      var v = parseFloat(String(q.value).replace(',', '.'));
-      l.q = isFinite(v) && v > 0 ? snap(l.u, v) : l.q;
-      persist(); render();
-    }
-    var u = e.target.closest('[data-line-unit]');
-    if (u) {
-      var ln = lines[+u.getAttribute('data-line-unit')], from = ln.u, to = u.value;
-      // Switching the unit keeps the amount: 0,5 kg becomes 500 g and back.
-      if (from === 'kg' && to === 'g') ln.q = Math.round(ln.q * 1000);
-      else if (from === 'g' && to === 'kg') ln.q = snap('kg', ln.q / 1000);
-      else if (from !== to) ln.q = 1;
-      ln.u = to;
-      persist(); render();
-    }
-  });
   document.addEventListener('kj:basket', function () { load(); render(); });
-
-  /* the picker: a combobox over every orderable product */
-  var search = form.querySelector('#picker-search');
-  var box = form.querySelector('#picker-list');
-  var active = -1, results = [];
-  function openList(q) {
-    var f = fold(q).trim();
-    results = !f ? [] : catalogue.filter(function (c) {
-      return f.split(/\s+/).every(function (w) { return c.f.indexOf(w) >= 0; });
-    }).slice(0, 12);
-    active = results.length ? 0 : -1;
-    box.innerHTML = results.length
-      ? results.map(function (c, i) {
-          var inBasket = lines.some(function (l) { return l.k === c.k; });
-          return '<li role="option" id="opt-' + i + '" class="picker__opt' + (i === active ? ' is-active' : '') + '" aria-selected="' + (i === active) + '" data-k="' + esc(c.k) + '">' +
-            '<span class="type-small text-black">' + esc(c.n) + (inBasket ? ' <span class="text-mid-gray">(komið)</span>' : '') + '</span>' +
-            '<span class="type-xsmall text-mid-gray">' + esc(c.c || '') + (typeof c.p === 'number' ? ' · ' + fmt(c.p) + ' ' + UNIT[c.u] : '') + '</span></li>';
-        }).join('')
-      : (f ? '<li class="picker__none type-small text-mid-gray" role="option" aria-disabled="true">Ekkert fannst. Skrifaðu það í athugasemdir eða hringdu í ' + PHONE + '.</li>' : '');
-    box.hidden = !f;
-    search.setAttribute('aria-expanded', f ? 'true' : 'false');
-    search.setAttribute('aria-activedescendant', active >= 0 ? 'opt-' + active : '');
-  }
-  function move(d) {
-    if (!results.length) return;
-    active = (active + d + results.length) % results.length;
-    box.querySelectorAll('.picker__opt').forEach(function (o, i) {
-      o.classList.toggle('is-active', i === active);
-      o.setAttribute('aria-selected', i === active ? 'true' : 'false');
-      if (i === active) o.scrollIntoView({ block: 'nearest' });
-    });
-    search.setAttribute('aria-activedescendant', 'opt-' + active);
-  }
-  function choose(k) {
-    add(k);
-    search.value = '';
-    openList('');
-    search.focus();
-  }
-  search.addEventListener('input', function () { openList(search.value); });
-  search.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
-    else if (e.key === 'Enter') { e.preventDefault(); if (active >= 0) choose(results[active].k); }
-    else if (e.key === 'Escape') { search.value = ''; openList(''); }
-  });
-  box.addEventListener('mousedown', function (e) { e.preventDefault(); });
-  box.addEventListener('click', function (e) {
-    var o = e.target.closest('[data-k]');
-    if (o) choose(o.getAttribute('data-k'));
-  });
-  search.addEventListener('blur', function () { setTimeout(function () { box.hidden = true; search.setAttribute('aria-expanded', 'false'); }, 120); });
 
   /* Pick-up day and time. The page is static, so the first possible day is
      worked out here, in Iceland's time, not when the page was built. */
   var pickup = form.querySelector('[data-pickup]');
-  var date = form.querySelector('[name="date"]');
-  var time = form.querySelector('[name="time"]');
-  if (occasion) {
-    // A native select permits only the occasion's choices, keeping its label
-    // and error associations from the ordinary date input.
-    var choices = document.createElement('select');
-    Array.from(date.attributes).forEach(function (attribute) {
-      if (attribute.name !== 'type' && attribute.name !== 'min') choices.setAttribute(attribute.name, attribute.value);
+  function radioGroup(name) {
+    var group = form.querySelector('[name="' + name + '"]').closest('fieldset');
+    group.id = 'order-' + name;
+    Object.defineProperty(group, 'value', {
+      get: function () { var checked = group.querySelector('input:checked'); return checked ? checked.value : ''; },
+      set: function (value) { group.querySelectorAll('input').forEach(function (input) { input.checked = input.value === value; }); }
     });
-    choices.classList.add('field__select');
-    date.replaceWith(choices);
-    date = choices;
+    return group;
   }
+  var date = radioGroup('date');
+  var time = radioGroup('time');
   var occasionDates = [];
 
   var notice = Number(pickup.getAttribute('data-notice')) || 1;
@@ -379,23 +231,50 @@
   var DAY = { format: function (d) { return dayIs(d.toISOString().slice(0, 10)); } };
   var first;
   var dateHint = document.getElementById('order-date-hint');
+  var visibleDays = 10;
+  var dayTilesInitialized = false;
+  var tiles = [];
+  var preselected = new URLSearchParams(location.search).get('sott') || '';
   function refreshFirstDay() {
     first = firstDay();
-    if (occasion) {
-      occasionDates = KjOccasions.pickupDays(occasion.pickupDays, iso(new Date()), first, weekdaysOnly);
-      var selected = date.value;
-      date.innerHTML = '<option value="">Veldu dag</option>' + occasionDates.map(function (day) {
-        return '<option value="' + day + '">' + esc(dayIs(day)) + ' ' + day.slice(0, 4) + '</option>';
+    occasionDates = occasion ? KjOccasions.pickupDays(occasion.pickupDays, iso(new Date()), first, false) : [];
+    var selected = date.value || preselected;
+    tiles = KJOrdering.dayTiles({ today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, occasionDays: occasion ? occasionDates : null, selected: selected });
+    var host = form.querySelector('[data-day-tiles]');
+    var old = Array.from(host.querySelectorAll('input')).map(function (input) { return input.value; }).join(',');
+    var shown = occasion ? tiles : tiles.slice(0, visibleDays);
+    if (old !== shown.map(function (day) { return day.value; }).join(',')) {
+      host.innerHTML = shown.map(function (day) {
+        return '<label class="day-tile is-drawn"><input type="radio" required name="date" value="' + day.value + '" aria-describedby="order-date-hint order-date-err"' + (day.selected ? ' checked' : '') + '><span><small>' + day.weekday + '</small><strong>' + day.date + '</strong><small>' + day.month + '</small></span></label>';
       }).join('');
-      date.value = occasionDates.indexOf(selected) >= 0 ? selected : '';
-      if (dateHint) dateHint.textContent = occasionDates.length ? 'Veldu afhendingardag fyrir ' + (occasion.key === 'jol' ? 'jólin.' : 'áramótin.') : 'Enginn afhendingardagur er eftir með tilskildum fyrirvara. Hafðu samband í síma ' + PHONE + '.';
-      return;
-    }
-    date.min = first;
-    if (dateHint) dateHint.textContent = 'Fyrsti mögulegi dagur er ' + DAY.format(new Date(first + 'T12:00:00Z')) + '.' + (weekdaysOnly ? ' Við afhendum virka daga.' : '');
+      if (!dayTilesInitialized && !reduce && window.gsap && window.ScrollTrigger) {
+        gsap.fromTo(host.children, { opacity: 0, y: 10 }, {
+          opacity: 1, y: 0, duration: .52, stagger: .04, ease: 'luxe',
+          scrollTrigger: { trigger: host, start: 'top 90%', once: true, onLeave: function (self) { self.animation.progress(1); } }
+        });
+      }
+    } else if (selected) date.value = selected;
+    dayTilesInitialized = true;
+    form.querySelector('[data-more-days]').hidden = !!occasion || visibleDays >= tiles.length;
+    if (dateHint) dateHint.textContent = occasion ? 'Veldu afhendingardag fyrir ' + (occasion.key === 'jol' ? 'jólin.' : 'áramótin.') : 'Fyrsti mögulegi dagur er ' + dayIs(first) + '.' + (weekdaysOnly ? ' Við afhendum virka daga.' : '');
   }
   refreshFirstDay();
-  date.addEventListener('focus', refreshFirstDay);
+  preselected = '';
+  form.querySelector('[data-more-days]').addEventListener('click', function () {
+    var old = visibleDays;
+    visibleDays += 10;
+    refreshFirstDay();
+    if (!reduce && window.gsap) gsap.fromTo(Array.from(form.querySelectorAll('.day-tile')).slice(old), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .4, stagger: .03, ease: 'luxe' });
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  });
+  if (occasion) {
+    var firstDate = occasionDates[0], lastDate = occasionDates[occasionDates.length - 1];
+    var shortDays = ['sun.', 'mán.', 'þri.', 'mið.', 'fim.', 'fös.', 'lau.'];
+    function shortDay(day) { var d = new Date(day + 'T12:00:00Z'); return shortDays[d.getUTCDay()] + ' ' + d.getUTCDate() + '.'; }
+    if (firstDate) document.querySelector('[data-order-lede]').textContent = 'Sótt ' + shortDay(firstDate) + ' til ' + shortDay(lastDate) + ' ' + MO[new Date(lastDate + 'T12:00:00Z').getUTCMonth()] + '.';
+    document.querySelector('[data-ordinary-order]').hidden = false;
+    document.querySelectorAll('.order-holidays').forEach(function (row) { row.hidden = true; });
+  }
 
   /* Arriving from a meat day (?dagur=sprengidagur): say so, pick the last
      possible pick-up day before it and leave the day's note. The products came

@@ -278,6 +278,7 @@
     var heading = document.querySelector('[data-split-heading]');
     if (!heading) return;
     var fades = document.querySelectorAll('[data-head-fade]');
+    var christmasHead = !!heading.closest('.jol-head');
     var done = function () { root.classList.add('motion-done'); };
     if (reduce) { done(); return; }
     var parts = heading.innerHTML.split(/<br\s*\/?>/i).map(function (t) { return t.trim(); });
@@ -294,8 +295,8 @@
     // Shorter than the hero (.8 s): this plays on every subpage, and the
     // intro text should be readable within half a second.
     var tl = gsap.timeline({ defaults: { ease: EASE.LUXE, duration: .55 } });
-    tl.to(lines, { yPercent: 0, stagger: UI.STAGGER }, 0);
-    tl.to(fades, { autoAlpha: 1, y: 0, stagger: UI.STAGGER, duration: .35, ease: UI.OUT, clearProps: 'transform,opacity,visibility' }, .12);
+    tl.to(lines, { yPercent: 0, stagger: UI.STAGGER }, christmasHead ? .08 : 0);
+    tl.to(fades, { autoAlpha: 1, y: 0, stagger: christmasHead ? .08 : UI.STAGGER, duration: .35, ease: UI.OUT, clearProps: 'transform,opacity,visibility' }, .12);
   })();
 
   /* ================= footer ================= */
@@ -490,10 +491,11 @@
 
     function panelFor(id) { return document.querySelector('[data-panel="' + id + '"]'); }
 
-    function open(id) {
+    function open(id, keyboard) {
       if (!id || openId === id) return;
       var panel = panelFor(id);
       if (!panel || !page) return;
+      if (openId) close();
       openId = id; lastFocus = document.activeElement; openedAt = performance.now();
       document.body.classList.add('is-modal-open');
       if (overlay) overlay.classList.add('is-active');
@@ -504,14 +506,15 @@
       var r = panel.getBoundingClientRect();
       var to = axis === 'y' ? { y: r.height } : { x: -r.width };
       var d = reduce ? 0 : UI.PANEL, ez = UI.DRAWER;
-      gsap.to(page, Object.assign({}, to, { duration: d, ease: ez }));
-      gsap.to(panel, axis === 'y' ? { y: 0, duration: d, ease: ez } : { x: 0, duration: d, ease: ez });
-      if (navbar && axis === 'x') gsap.to(navbar, { x: -r.width, duration: d, ease: ez });
-      if (overlay) gsap.to(overlay, { opacity: 1, duration: d, ease: ez });
+      gsap.to(page, Object.assign({}, to, { duration: d, ease: ez, overwrite: true }));
+      gsap.to(panel, axis === 'y' ? { y: 0, duration: d, ease: ez, overwrite: true } : { x: 0, duration: d, ease: ez, overwrite: true });
+      if (navbar && axis === 'x') gsap.to(navbar, { x: -r.width, duration: d, ease: ez, overwrite: true });
+      if (overlay) gsap.to(overlay, { opacity: 1, duration: d, ease: ez, overwrite: true });
       panel.setAttribute('aria-hidden', 'false');
       panel.inert = false;
       var f = panel.querySelector('button, [href], input, [tabindex]');
-      if (f) f.focus();
+      panel.setAttribute('tabindex', '-1');
+      (keyboard && f ? f : panel).focus({ preventScroll: true });
       megaIntro(panel);
       document.dispatchEvent(new CustomEvent('shift-modal:open', { detail: { id: id } }));
     }
@@ -524,17 +527,18 @@
       var d = reduce ? 0 : UI.PANEL, ez = UI.DRAWER;
       openId = null;
       gsap.to(page, {
-        x: 0, y: 0, duration: d, ease: ez,
+        x: 0, y: 0, duration: d, ease: ez, overwrite: true,
         onComplete: function () {
+          if (openId) return;
           document.body.classList.remove('is-modal-open');
           if (lenis) lenis.start();
         }
       });
-      if (navbar) gsap.to(navbar, { x: 0, duration: d, ease: ez });
-      if (panel) gsap.to(panel, axis === 'y' ? { y: '-100%', duration: d, ease: ez } : { x: '100%', duration: d, ease: ez });
+      if (navbar) gsap.to(navbar, { x: 0, duration: d, ease: ez, overwrite: true });
+      if (panel) gsap.to(panel, axis === 'y' ? { y: '-100%', duration: d, ease: ez, overwrite: true } : { x: '100%', duration: d, ease: ez, overwrite: true });
       if (overlay) gsap.to(overlay, {
-        opacity: 0, duration: d, ease: ez,
-        onComplete: function () { overlay.classList.remove('is-active'); }
+        opacity: 0, duration: d, ease: ez, overwrite: true,
+        onComplete: function () { if (!openId) overlay.classList.remove('is-active'); }
       });
       if (panel) { panel.setAttribute('aria-hidden', 'true'); panel.inert = true; }
       if (lastFocus) lastFocus.focus();
@@ -563,7 +567,7 @@
 
     document.addEventListener('click', function (e) {
       var o = e.target.closest('[data-modal-open]');
-      if (o) { e.preventDefault(); open(o.getAttribute('data-modal-open')); return; }
+      if (o) { e.preventDefault(); open(o.getAttribute('data-modal-open'), e.detail === 0); return; }
       var closer = e.target.closest('[data-modal-close]');
       if (closer) {
         if (!closer.matches('a[href]')) e.preventDefault();
@@ -586,10 +590,59 @@
 
     window.addEventListener('wheel', function (e) {
       if (!openId) return;
+      if (e.target.closest('[data-panel]') || openId === 'basket') return;
       if (performance.now() - openedAt < 350) return;
       if (Math.abs(e.deltaY) < 4) return;
       if (window.matchMedia('(min-width: 64rem)').matches) close();
     }, { passive: true });
+  })();
+
+  /* Shared pen strokes and grouped arrivals. A finished draw keeps its final
+     properties: removing them would expose the CSS gate's hidden start again. */
+  (function draws() {
+    var items = document.querySelectorAll('[data-draw],[data-build-item]');
+    if (reduce) { items.forEach(function (el) { el.classList.add('is-drawn'); }); return; }
+    root.classList.add('motion-draw');
+    document.querySelectorAll('[data-draw]').forEach(function (el) {
+      var type = el.dataset.draw;
+      var vars = type === 'stroke' ? { strokeDashoffset: 0 } : type === 'y' ? { scaleY: 1 } : { scaleX: 1 };
+      function done() { el.classList.add('is-drawn'); }
+      if (el.getBoundingClientRect().bottom < 0) { gsap.set(el, vars); done(); return; }
+      var tween = gsap.to(el, Object.assign(vars, {
+        // Frames trace like a pen (even speed, soft ends); hairlines and rings keep the site's ease.
+        paused: true, duration: el.closest('.step-marker') ? .8 : type === 'stroke' ? 1.4 : .9,
+        ease: type === 'stroke' && !el.closest('.step-marker') ? 'power2.inOut' : 'luxe', delay: Number(el.dataset.drawDelay) || 0, onComplete: done
+      }));
+      el.kjDrawTween = tween;
+      ScrollTrigger.create({ trigger: el.closest('.calendar-frame') || el, start: el.closest('.step-marker,.calendar-frame') ? 'top 75%' : 'top 88%',
+        onEnter: function () { tween.play(); }, onLeave: function () { tween.progress(1); }, once: true });
+    });
+    var build = Array.from(document.querySelectorAll('[data-build] > [data-build-item]'));
+    build = build.filter(function (el) {
+      if (el.getBoundingClientRect().bottom < 0) { gsap.set(el, { opacity: 1, y: 0 }); el.classList.add('is-drawn'); return false; }
+      return true;
+    });
+    function settle(batch) {
+      batch.forEach(function (el) {
+        var group = el.closest('.counter-category,.christmas-course');
+        var rule = group && group.querySelector('[data-draw="x"]');
+        if (rule && rule.kjDrawTween && !rule.classList.contains('is-drawn')) rule.kjDrawTween.play();
+      });
+      gsap.to(batch, { opacity: 1, y: 0, duration: .52, ease: 'luxe', stagger: batch[0] && batch[0].closest('.order-facts') ? .06 : .04,
+        delay: batch[0] && batch[0].closest('.order-facts') ? .2 : 0,
+        onComplete: function () { batch.forEach(function (el) { el.classList.add('is-drawn'); }); } });
+    }
+    ScrollTrigger.batch(build, { start: 'top 90%', batchMax: 12, once: true, onEnter: settle,
+      onLeave: function (batch) { gsap.killTweensOf(batch); gsap.set(batch, { opacity: 1, y: 0 }); batch.forEach(function (el) { el.classList.add('is-drawn'); }); } });
+    var thread = document.querySelector('.order-thread');
+    if (thread) {
+      thread.style.bottom = 'auto';
+      thread.style.height = document.getElementById('thu').offsetTop + 'px';
+    }
+    if (thread && matchMedia('(min-width: 64rem)').matches) gsap.fromTo(thread, { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#pontun', start: 'top 70%', endTrigger: '#thu', end: 'bottom 70%', scrub: .6, onRefreshInit: function () { thread.style.height = document.getElementById('thu').offsetTop + 'px'; } } });
+    document.querySelectorAll('.step-marker').forEach(function (marker) {
+      ScrollTrigger.create({ trigger: marker, start: 'top 75%', once: true, onEnter: function () { marker.classList.add('is-entered'); } });
+    });
   })();
 
   /* ================= scroll reveals ================= */

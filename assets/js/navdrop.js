@@ -7,9 +7,9 @@
   var button = drop.querySelector('button');
   var panel = drop.querySelector('.navdrop__panel');
   var fine = matchMedia('(hover: hover) and (pointer: fine)');
-  var openTimer, closeTimer;
+  var openTimer, closeTimer, keyboardOpen = false;
   function allowed() {
-    return fine.matches && !drop.hidden;
+    return fine.matches && innerWidth >= 1024 && !drop.hidden;
   }
   function cancelTimers() {
     clearTimeout(openTimer);
@@ -21,7 +21,11 @@
     drop.classList.toggle('is-open', open);
     button.setAttribute('aria-expanded', String(open));
     panel.inert = !open;
-    if (open && keyboard) panel.querySelector('a').focus();
+    keyboardOpen = open && !!keyboard;
+    if (open && keyboard) {
+      var first = Array.from(panel.querySelectorAll('a,button')).find(function (el) { return !el.closest('[hidden]'); });
+      if (first) first.focus();
+    }
   }
   trigger.addEventListener('pointerenter', function () {
     cancelTimers();
@@ -30,11 +34,12 @@
   trigger.addEventListener('pointerleave', function () {
     cancelTimers();
     closeTimer = setTimeout(function () {
-      if (!trigger.contains(document.activeElement)) setOpen(false);
+      if (!keyboardOpen) setOpen(false);
     }, 200);
   });
   button.addEventListener('click', function (event) {
     setOpen(button.getAttribute('aria-expanded') !== 'true', event.detail === 0);
+    if (event.detail !== 0 && drop.classList.contains('is-open')) panel.focus({ preventScroll: true });
   });
   trigger.addEventListener('focusin', function () { clearTimeout(closeTimer); });
   trigger.addEventListener('focusout', function (event) {
@@ -54,6 +59,6 @@
   fine.addEventListener('change', function () { setOpen(false); });
   // A pointer-opened panel should not ride along over the page while it scrolls.
   window.addEventListener('scroll', function () {
-    if (drop.classList.contains('is-open') && !trigger.contains(document.activeElement)) setOpen(false);
+    if (drop.classList.contains('is-open') && !keyboardOpen) setOpen(false);
   }, { passive: true });
 })();

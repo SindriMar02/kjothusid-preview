@@ -732,44 +732,9 @@ html.is-jol .season--jol .text-black { color: var(--jol-cream); }
 html.is-jol :is(.season--jol .text-mid-gray,.jol-kicker) { color: var(--jol-gold-text); text-transform: uppercase; letter-spacing: .12em; }
 html.is-jol .season--jol .season__body { position: relative; }
 /* Preview markers on dark Christmas surfaces: a solid light chip, readable at a glance. */
-html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot,.hero,.notice,.footer) .pending { color: #8f1411; background: var(--jol-cream); border: 1px solid var(--jol-cream); }
-html.is-jol :is(.season--jol,.jol-head,.occasion-card--aramot,.hero,.notice,.footer) .pending::before { background: #8f1411; }
+html.is-jol :is(.season--jol,.jol-head,.jol-gifts,.occasion-card--aramot,.hero,.notice,.footer) .pending { color: #8f1411; background: var(--jol-cream); border: 1px solid var(--jol-cream); }
+html.is-jol :is(.season--jol,.jol-head,.jol-gifts,.occasion-card--aramot,.hero,.notice,.footer) .pending::before { background: #8f1411; }
 /* S2 disclosure. Panel colours are independent of the navbar's light/dark ink. */
-.orders-nav { display: flex; align-items: center; position: relative; }
-.navdrop { display: none; }
-@media (hover: hover) and (pointer: fine) {
-  .navdrop { display: block; }
-  .navdrop[hidden] { display: none; }
-  .navdrop__toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 12px; color: inherit; cursor: pointer; }
-  .navdrop__toggle svg { width: 20px; height: 20px; transition: transform .2s var(--jol-ui); }
-  .navdrop.is-open .navdrop__toggle svg { transform: rotate(180deg); }
-  .navdrop__panel { position: absolute; right: 0; top: calc(100% + 14px); width: 330px; max-width: calc(100vw - 2 * var(--spacing-m)); padding: 10px 0 14px; border: 1px solid rgb(20 20 20 / .08); background: var(--color-white); color: var(--color-black); box-shadow: 0 28px 56px -30px rgb(20 20 20 / .5); transform-origin: top right; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .16s var(--jol-ui),transform .16s var(--jol-ui),visibility 0s .16s; }
-  .navdrop__panel::before { content: ''; position: absolute; bottom: 100%; inset-inline: -14px; height: 14px; }
-  .navdrop.is-open .navdrop__panel { opacity: 1; visibility: visible; transform: translateY(0); transition-duration: .2s,.2s,0s; transition-delay: 0s; }
-  /* A quiet typographic list in the site's own type; Christmas shows in the red label, the red
-     rule that grows on hover and a soft spruce wash. No boxes inside the panel. */
-  .navdrop__row { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 16px; align-items: center; min-height: 44px; padding: 12px 24px; color: inherit; transition: background-color .2s var(--jol-ui); }
-  .navdrop__row::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 2px; background: var(--color-black); transform: scaleY(0); transition: transform .26s var(--jol-luxe); }
-  .navdrop__row--jol::before { background: var(--jol-red); }
-  .navdrop__name { grid-column: 1; font-family: var(--font-display); font-size: 1.375rem; line-height: 1.1; letter-spacing: -.01em; transition: color .2s var(--jol-ui); }
-  .navdrop__meta { grid-column: 1; margin-top: 3px; font-size: .8125rem; line-height: 1.4; letter-spacing: .02em; color: rgb(20 20 20 / .66); }
-  .navdrop__go { grid-column: 2; grid-row: 1 / span 2; opacity: 0; transform: translateX(-6px); transition: opacity .2s var(--jol-ui), transform .26s var(--jol-luxe); }
-  .navdrop__label { margin: 8px 24px 2px; padding-top: 14px; border-top: 1px solid rgb(20 20 20 / .1); font-family: var(--font-display); font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--jol-red-deep); }
-  .navdrop__all { display: inline-flex; gap: .4em; margin: 10px 24px 0; padding-block: 10px; font-size: .8125rem; letter-spacing: .02em; color: var(--jol-spruce); background: linear-gradient(currentColor,currentColor) 0 calc(100% - 6px) / 0 1px no-repeat; transition: background-size .3s var(--jol-luxe); }
-  .navdrop__row:is(:hover,:focus-visible) { background: rgb(20 20 20 / .04); }
-  .navdrop__row--jol:is(:hover,:focus-visible) { background: rgb(35 57 47 / .07); }
-  .navdrop__row--jol:is(:hover,:focus-visible) .navdrop__name { color: var(--jol-spruce); }
-  .navdrop__row:is(:hover,:focus-visible)::before { transform: scaleY(1); }
-  .navdrop__row:is(:hover,:focus-visible) .navdrop__go { opacity: 1; transform: translateX(0); }
-  .navdrop__all:is(:hover,:focus-visible) { background-size: 100% 1px; }
-  html.is-jol .btn-jol:hover { background: var(--jol-red-deep); border-color: var(--jol-red-deep); }
-  html.is-jol .hero__christmas a:hover { text-decoration-color: var(--jol-red); }
-  html.is-jol .btn-fill:hover:not(:disabled) { background: var(--jol-red); }
-  html.is-jol .btn-outline:hover:not(:disabled) { color: var(--btn-on-fill); }
-}
-.navdrop__toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-.navdrop__panel a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-/* S10 Christmas page: full-bleed band, packaging cards, gift band. */
 html.is-jol .jol-head { position: relative; isolation: isolate; overflow: hidden; background: var(--jol-spruce); color: var(--jol-cream); padding-inline: var(--spacing-m); }
 html.is-jol .jol-head__inner { position: relative; z-index: 22; display: grid; gap: var(--spacing-s); grid-template-columns: minmax(0,1fr) auto; column-gap: var(--spacing-l); align-items: center; }
 /* The countdown is the band's focal point: a big gold numeral, the words under it. */
@@ -808,62 +773,11 @@ html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-
   .navdrop.is-open .navdrop__panel { transform: none; transition-duration: .12s,0s; transition-delay: 0s; }
   .navdrop__toggle svg,
   .navdrop.is-open .navdrop__toggle svg { transform: none; transition: none; }
-  .navdrop__row::before, .navdrop__go, .navdrop__all { transition: none; }
-  .navdrop__go { transform: none; }
   html.is-jol .btn:active:not(:disabled) { transform: none; }
   html.is-jol .btn-fill:is(:hover,:active)::after { transform: none; }
 }
 /* ==================== JÓL DECORATIONS: lights, baubles, ribbon, red ==================== */
-.jol-lights,.jol-baubles,.jol-ribbon{display:none}
-html.is-jol .jol-lights{display:block;position:absolute;inset:0 0 auto 0;z-index:23;height:48px;pointer-events:none;overflow:hidden}
-html.is-jol .jol-lights svg{display:block}
-html.is-jol .jol-lights__wire{fill:none;stroke:rgb(10 14 12 / .75);stroke-width:1.3}
-html.is-jol .jol-bulb__cap{fill:#2a2f2b}
-html.is-jol .jol-bulb__glass{fill:var(--c)}
-html.is-jol .jol-bulb__glow{fill:var(--c);opacity:.32;filter:blur(4px)}
-/* Twinkle lives on the glass and glow; the bulb itself owns the draw-in opacity. */
-html.is-jol :is(.jol-bulb__glass,.jol-bulb__glow){animation:jol-twinkle 3.2s ease-in-out infinite;animation-delay:inherit}
-@keyframes jol-twinkle{0%,100%{opacity:1}45%{opacity:.5}55%{opacity:.55}}
-html.is-jol .jol-bulb__glow{animation-name:jol-glow}
-@keyframes jol-glow{0%,100%{opacity:.34}45%{opacity:.12}55%{opacity:.14}}
-/* Draw-in (only with html.jol-draw, set by decor.js when motion is allowed): the wire draws,
-   bulbs light along it, threads grow, baubles drop, the ribbon runs down the card. */
-html.jol-draw .jol-lights__wire{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1)}
-html.jol-draw .is-drawn .jol-lights__wire{stroke-dashoffset:0}
-html.jol-draw .jol-bulb{opacity:0;transition:opacity .4s ease}
-html.jol-draw .is-drawn .jol-bulb{opacity:1}
-html.jol-draw .jol-bauble::before{transform:scaleY(0);transform-origin:50% 0;transition:transform .9s cubic-bezier(.16,1,.3,1) var(--draw-delay)}
-html.jol-draw .jol-bauble::after{opacity:0;translate:0 -14px;transition:opacity .5s ease calc(var(--draw-delay) + .55s),translate .8s cubic-bezier(.34,1.56,.64,1) calc(var(--draw-delay) + .55s)}
-html.jol-draw .jol-bauble{background-size:11px 0}
-html.jol-draw .is-drawn .jol-bauble{background-size:11px 7px;transition:background-size .2s ease calc(var(--draw-delay) + .5s)}
-html.jol-draw .is-drawn .jol-bauble::before{transform:scaleY(1)}
-html.jol-draw .is-drawn .jol-bauble::after{opacity:1;translate:0 0}
-html.jol-draw .jol-ribbon{transform:scaleY(0);transform-origin:50% 0;transition:transform 1.1s cubic-bezier(.16,1,.3,1) .2s}
-html.jol-draw .jol-ribbon.is-drawn{transform:scaleY(1)}
-html.is-jol :is(.season--jol,.jol-head,.footer){position:relative}
-html.is-jol .jol-baubles{display:block;position:absolute;inset:0;z-index:23;pointer-events:none;overflow:hidden}
-html.is-jol .jol-bauble{position:absolute;top:0;width:var(--size,48px);margin-left:calc(var(--size,48px) / -2);height:calc(var(--thread) + var(--size,48px) + 10px);transform-origin:50% 0;animation:jol-swing 6s ease-in-out infinite alternate}
-html.is-jol .jol-bauble::before{content:'';position:absolute;left:50%;top:0;width:1px;height:var(--thread);background:linear-gradient(var(--jol-gold),rgb(184 149 90 / .6))}
-html.is-jol .jol-bauble::after{content:'';position:absolute;left:0;top:calc(var(--thread) + 6px);width:var(--size,48px);height:var(--size,48px);border-radius:50%;
-  background:radial-gradient(circle at 34% 30%,rgb(255 255 255 / .85) 0 5%,rgb(255 255 255 / .18) 14%,transparent 32%),radial-gradient(circle at 50% 45%,var(--b) 0 52%,var(--b-dark) 100%);
-  box-shadow:inset -4px -6px 10px rgb(0 0 0 / .25),0 6px 14px -6px rgb(0 0 0 / .5)}
-html.is-jol .jol-bauble{--b:#c9221c;--b-dark:#6e0d0b}
-html.is-jol .jol-bauble--gold{--b:#d4aa55;--b-dark:#7a5a1f}
-html.is-jol .jol-bauble--silver{--b:#e4e1da;--b-dark:#8d8a83}
-html.is-jol .jol-bauble{background:linear-gradient(var(--jol-gold),var(--jol-gold)) 50% calc(var(--thread) + 1px) / 11px 7px no-repeat}
-@keyframes jol-swing{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
-/* More red: the top bar in deep Christmas red, the Jól card red beside the spruce Áramót card. */
-html.is-jol .notice{background:var(--jol-red-deep)}
-html.is-jol .occasion-card--jol{background:var(--jol-red-deep);color:var(--jol-cream);border-top-color:var(--jol-gold)}
-html.is-jol .occasion-card--jol::before{border-color:rgb(205 176 122 / .55)}
-html.is-jol .occasion-card--jol .occasion-card__weekday{color:var(--jol-cream)}
-html.is-jol .occasion-card--jol .plainlist li{border-color:rgb(244 238 226 / .3)}
-html.is-jol .occasion-card--jol .btn-fill{background:var(--jol-cream);color:var(--jol-red-deep);border:1px solid var(--jol-cream)}
-html.is-jol .occasion-card--jol .btn-fill:active{background:var(--jol-card)}
-html.is-jol .occasion-card--jol .pending{color:#8f1411;background:var(--jol-cream);border:1px solid var(--jol-cream)}
-/* Gift card wrapped in a red ribbon. */
-html.is-jol .jol-ribbon{display:block;position:absolute;top:0;bottom:0;right:18%;width:18px;background:linear-gradient(90deg,var(--jol-red-deep),var(--jol-red) 45%,var(--jol-red-deep));box-shadow:0 0 0 1px rgb(205 176 122 / .5);pointer-events:none}
-html.is-jol .jol-gifts .gift-boxes{overflow:hidden}
-@media (hover:hover) and (pointer:fine){html.is-jol .occasion-card--jol .btn-fill:hover{background:var(--jol-card)}}
-@media (max-width:47.999rem){html.is-jol .jol-ribbon{display:none}}
-@media (prefers-reduced-motion:reduce){html.is-jol :is(.jol-bulb__glass,.jol-bulb__glow,.jol-bauble){animation:none}}
+/* Decoration geometry and draw states live in ordering.css. */
+html.is-jol .jol-ribbon { display:block; position:absolute; top:0; bottom:0; left:1.5rem; width:2px; background:var(--jol-red); transform-origin:top; }
+html.motion-draw .jol-ribbon:not(.is-drawn) { transform:scaleY(0); }
+html.motion-draw .jol-ribbon { transition:transform 1.1s cubic-bezier(.16,1,.3,1) .2s; }
