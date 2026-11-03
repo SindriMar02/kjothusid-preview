@@ -160,9 +160,10 @@ main{flex:1 0 auto}
 @media (max-width:47.99rem){.hero[data-section-height="full"]{min-height:calc(var(--svh) * 90)}}
 .hero__media{position:absolute;left:0;right:0;z-index:0;top:calc(var(--hero-parallax-travel,0%) * -1);height:calc(100% + var(--hero-parallax-travel,0%) * 2);will-change:transform}
 .hero__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-/* Focal point for the narrow crop: the patties sit right of centre in this
-   photograph, and the slate at the left is the darkest part of the frame,
-   which is where the navbar needs its ground. */
+/* Focal point for the narrow crop: the lamb rib-eye sits right of centre in this
+   photograph (the nearer piece, with the cut face), and the dark grill and
+   background above and below it are what the navbar and the headline need as
+   their ground. */
 @media (max-aspect-ratio:1/1),(max-width:89.99rem){.hero__image{object-position:62% center}}
 .hero__overlay{position:absolute;inset:0;z-index:20;pointer-events:none;background:linear-gradient(to top,var(--color-black),transparent 60%);opacity:var(--hero-overlay-opacity,.4)}
 /* Top scrim. The reference's white navbar assumes a dark frame-top and this

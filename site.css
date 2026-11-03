@@ -634,3 +634,45 @@ input,textarea,select,button,summary{scroll-margin-top:calc(var(--top-chrome) + 
   body[data-page="coretemps"] .printcard__foot{display:block;margin-top:6mm;font-size:9pt;letter-spacing:.04em}
   body[data-page="coretemps"] *{animation:none!important;transition:none!important}
 }
+
+/* focus-guard (_tools/focus-guard) */
+/* focus-guard.css: pairs with focus-guard.js. No ring after a tap or a click; every ring for the keyboard.
+   Text fields keep theirs (the user is typing there whatever opened it). */
+html[data-input="pointer"] :focus-visible:not(input):not(textarea):not(select):not([contenteditable="true"]) { outline: none; }
+/* a focus target that is only a container (a menu panel, a dialog, a drawer): never ring it */
+[tabindex="-1"]:focus { outline: none; }
+
+/* Christmas additions share the paper, ink and existing button feedback. */
+.hero__snow-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 21;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero__snow-layer canvas { display: block; width: 100%; height: 100%; }
+[data-christmas][hidden] { display: none !important; }
+.hero__christmas { margin-top: var(--spacing-s); }
+.hero__christmas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.christmas { width: 100%; padding-inline: var(--spacing-m); background: var(--color-white); }
+.christmas .btn { min-height: 44px; --btn-duration: .2s; --btn-ease: cubic-bezier(.23,1,.32,1); }
+.occasion-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--spacing-m); }
+.occasion-card { border: 1px solid var(--color-black); padding: var(--spacing-m); display: flex; flex-direction: column; gap: var(--spacing-s); }
+.occasion-card .btn { margin-top: auto; align-self: flex-start; white-space: normal; }
+.gift-boxes { border-top: 1px solid var(--color-black); padding-top: var(--spacing-m); display: grid; gap: var(--spacing-m); }
+.gift-boxes .btn { justify-self: start; white-space: normal; }
+@media (max-width: 47.999rem) { .occasion-grid { grid-template-columns: 1fr; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .christmas .btn:active { transform: none; }
+  .christmas .btn-outline::before { transform: none; opacity: 0; transition: opacity .2s cubic-bezier(.23,1,.32,1); }
+}
+@media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
+  .christmas .btn-outline:hover::before { opacity: 1; }
+}

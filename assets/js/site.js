@@ -1,3 +1,14 @@
+/* focus-guard (_tools/focus-guard): no focus ring after a tap or click; the README says why */
+(function () {
+  var root = document.documentElement;
+  function set(v) { if (root.getAttribute('data-input') !== v) root.setAttribute('data-input', v); }
+  addEventListener('pointerdown', function () { set('pointer'); }, true);
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+    set('key');
+  }, true);
+})();
+
 /* Kjöthúsið: site behaviour that is not motion.
    - notices and the pop-up appear and disappear by their own dates, between builds
    - at most one pop-up, shown once per visitor until a new one is published

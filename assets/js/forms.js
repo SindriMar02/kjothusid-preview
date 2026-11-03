@@ -107,6 +107,11 @@
 
   /* ── enquiry ── */
   document.querySelectorAll('form[data-form="enquiry"]').forEach(function (form) {
+    var topic = new URLSearchParams(location.search).get('efni');
+    if (topic === 'Jólagjafakassar') {
+      var message = form.querySelector('[name="message"]');
+      if (message && !message.value) message.value = 'Jólagjafakassar\n\n';
+    }
     var ref = null;
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -137,6 +142,21 @@
   /* ── order ── */
   var form = document.querySelector('form[data-form="order"]');
   if (!form) return;
+  var occasion = null;
+  var occasionKey = new URLSearchParams(location.search).get('pontun');
+  if (occasionKey === 'jol' || occasionKey === 'aramot') {
+    var occasions = [];
+    try { occasions = JSON.parse(document.getElementById('kj-occasions').textContent); } catch (e) {}
+    occasion = occasions.find(function (o) { return o.key === occasionKey; }) || null;
+    if (occasion) {
+      var heading = document.querySelector('.page-head__title');
+      heading.textContent = occasionKey === 'jol' ? 'Jólapöntun' : 'Áramótapöntun';
+      document.title = heading.textContent + ' | Kjöthúsið';
+      var note = document.querySelector('[data-occasion-note="' + occasionKey + '"]');
+      if (note) note.hidden = false;
+    }
+  }
+
   var catalogue = [];
   try { catalogue = JSON.parse(document.getElementById('kj-catalogue').textContent); } catch (e) {}
   var byKey = {};
@@ -323,8 +343,21 @@
   var pickup = form.querySelector('[data-pickup]');
   var date = form.querySelector('[name="date"]');
   var time = form.querySelector('[name="time"]');
+  if (occasion) {
+    // A native select permits only the occasion's choices, keeping its label
+    // and error associations from the ordinary date input.
+    var choices = document.createElement('select');
+    Array.from(date.attributes).forEach(function (attribute) {
+      if (attribute.name !== 'type' && attribute.name !== 'min') choices.setAttribute(attribute.name, attribute.value);
+    });
+    choices.classList.add('field__select');
+    date.replaceWith(choices);
+    date = choices;
+  }
+  var occasionDates = [];
+
   var notice = Number(pickup.getAttribute('data-notice')) || 1;
-  var weekdaysOnly = pickup.getAttribute('data-weekdays') === '1';
+  var weekdaysOnly = !occasion && pickup.getAttribute('data-weekdays') === '1';
   var iso = function (d) { return d.toISOString().slice(0, 10); };
   var isWeekend = function (d) { return d.getUTCDay() === 0 || d.getUTCDay() === 6; };
   function firstDay() {
@@ -348,6 +381,16 @@
   var dateHint = document.getElementById('order-date-hint');
   function refreshFirstDay() {
     first = firstDay();
+    if (occasion) {
+      occasionDates = KjOccasions.pickupDays(occasion.pickupDays, iso(new Date()), first, weekdaysOnly);
+      var selected = date.value;
+      date.innerHTML = '<option value="">Veldu dag</option>' + occasionDates.map(function (day) {
+        return '<option value="' + day + '">' + esc(dayIs(day)) + ' ' + day.slice(0, 4) + '</option>';
+      }).join('');
+      date.value = occasionDates.indexOf(selected) >= 0 ? selected : '';
+      if (dateHint) dateHint.textContent = occasionDates.length ? 'Veldu afhendingardag fyrir ' + (occasion.key === 'jol' ? 'jólin.' : 'áramótin.') : 'Enginn afhendingardagur er eftir með tilskildum fyrirvara. Hafðu samband í síma ' + PHONE + '.';
+      return;
+    }
     date.min = first;
     if (dateHint) dateHint.textContent = 'Fyrsti mögulegi dagur er ' + DAY.format(new Date(first + 'T12:00:00Z')) + '.' + (weekdaysOnly ? ' Við afhendum virka daga.' : '');
   }
@@ -362,7 +405,7 @@
     var days = {};
     try { days = JSON.parse(document.getElementById('kj-days').textContent); } catch (e) {}
     var d = id && Object.prototype.hasOwnProperty.call(days, id) && days[id];
-    if (!d) return;
+    if (!d || occasion) return;
     var t = new Date().toISOString().slice(0, 10);
     var day = (d.dates || []).filter(function (x) { return x >= t; })[0];
     var ban = form.querySelector('[data-dayban]');
@@ -382,6 +425,7 @@
     if (!date.value) { setError(date, 'Veldu dag.'); return false; }
     var d = new Date(date.value + 'T12:00:00Z');
     if (isNaN(d)) { setError(date, 'Veldu dag.'); return false; }
+    if (occasion && occasionDates.indexOf(date.value) < 0) { setError(date, 'Veldu afhendingardag fyrir þessa hátíð.'); return false; }
     if (date.value < first) { setError(date, 'Við þurfum dags fyrirvara. Fyrsti mögulegi dagur er ' + DAY.format(new Date(first + 'T12:00:00Z')) + '.'); return false; }
     if (weekdaysOnly && isWeekend(d)) { setError(date, 'Við afhendum aðeins virka daga. Veldu mánudag til föstudags.'); return false; }
     setError(date, '');
@@ -435,6 +479,7 @@
       website: v('website'),
       page: location.pathname
     };
+    if (occasion) payload.occasion = occasion.key;
     send(form, payload).then(function () {
       if (Basket) Basket.clear();
       var summary = payload.lines.map(function (l) { return '<li>' + esc(l.name) + ', ' + String(l.qty).replace('.', ',') + ' ' + (l.unit === 'kg' ? 'kg (um það bil)' : l.unit === 'g' ? 'g (um það bil)' : 'stk.') + '</li>'; }).join('');

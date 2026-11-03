@@ -242,8 +242,14 @@
   (function hero() {
     var heading = document.querySelector('[data-hero-heading]');
     var media = document.querySelector('.hero__media');
-    var fades = document.querySelectorAll('[data-hero-fade]');
-    if (reduce) { gsap.set([media].concat(Array.prototype.slice.call(fades)).filter(Boolean), { autoAlpha: 1 }); return; }
+    var fades = Array.from(document.querySelectorAll('[data-hero-fade]:not([data-christmas])'));
+    var christmasLine = document.querySelector('[data-hero-fade][data-christmas]:not([hidden])');
+    if (christmasLine) fades.push(christmasLine);
+    function complete() {
+      window.kjHeroReady = true;
+      document.dispatchEvent(new Event('kj:hero-ready'));
+    }
+    if (reduce) { gsap.set([media].concat(Array.prototype.slice.call(fades)).filter(Boolean), { autoAlpha: 1 }); complete(); return; }
 
     var lines = [];
     if (heading) {
@@ -259,7 +265,7 @@
     }
     gsap.set(fades, { autoAlpha: 0, y: toPx(DIST.Y) });
 
-    var tl = gsap.timeline({ defaults: { ease: EASE.DEFAULT, duration: DUR.DEFAULT } });
+    var tl = gsap.timeline({ defaults: { ease: EASE.DEFAULT, duration: DUR.DEFAULT }, onComplete: complete });
     if (media) tl.from(media, { scale: 1.06, duration: DUR.SLOW }, 0);
     if (lines.length) tl.to(lines, { yPercent: 0, stagger: UI.STAGGER }, 0);
     tl.to(fades, { autoAlpha: 1, y: 0, stagger: UI.STAGGER }, '<+=' + STAG.RELAXED);
@@ -590,7 +596,7 @@
   if (!reduce) {
     gsap.utils.toArray('[data-reveal]').forEach(function (el) {
       gsap.fromTo(el, { autoAlpha: 0, y: toPx(DIST.Y) }, {
-        autoAlpha: 1, y: 0, duration: DUR.DEFAULT, ease: EASE.LUXE,
+        autoAlpha: 1, y: 0, duration: DUR.DEFAULT, ease: EASE.LUXE, delay: Number(el.dataset.revealDelay) || 0,
         scrollTrigger: { trigger: el, start: TRIG_START, once: true }
       });
     });
