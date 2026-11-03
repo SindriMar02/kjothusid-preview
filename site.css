@@ -711,7 +711,10 @@ html.is-jol .hero__overlay { background: linear-gradient(to top,rgba(18,26,22,.8
 html.is-jol .hero__christmas a { gap: .6em; color: var(--jol-cream); }
 html.is-jol .jol-snowflake { width: 1.25em; height: 1.25em; flex: none; color: var(--jol-gold); }
 html.is-jol .jol-stamp { display: block; flex: none; color: var(--jol-cream); }
-html.is-jol .mega .jol-snowflake { vertical-align: middle; margin-right: .6em; }
+/* Snowflake, label and JÓL tag on one line in the menu (the label span is otherwise a block). */
+html.is-jol .mega .link__text:has(> .jol-snowflake) { display: inline-flex; align-items: center; gap: .5em; }
+html.is-jol .mega .jol-snowflake { width: 1em; height: 1em; }
+html.is-jol .mega .jol-tag { margin-left: 0; }
 html.is-jol .jol-tag { display: inline-block; padding: .2em .45em; margin-left: .6em; background: var(--jol-red); color: var(--jol-cream); font: .7em Marcellus,serif; letter-spacing: .08em; vertical-align: middle; }
 /* S4 buttons. Transitions belong to the base state, including release. */
 html.is-jol .btn { min-height: 44px; --btn-duration: .2s; --btn-ease: var(--jol-ui); }
