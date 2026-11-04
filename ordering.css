@@ -2969,15 +2969,27 @@ html.is-jol .occasion-card--jol.jol-spray-host {
 html.is-jol .occasion-card--jol .jol-spray {
   z-index: 2;
 }
+/* Um okkur: the owner and the counter, one pair, same 4:5 frame */
+.about__photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-s);
+  max-width: 36rem;
+}
 .about__photo {
   margin: 0;
 }
 .about__photo img {
   display: block;
   width: 100%;
-  max-width: 28rem;
   height: auto;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
+}
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  .about__grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (min-width: 64rem) {
+  .about__grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
 }
 
