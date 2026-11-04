@@ -126,10 +126,22 @@
       }
       if (on && link.closest('.order-chips')) {
         var host = link.parentElement;
-        host.scrollTo({
-          left: link.offsetLeft - host.offsetLeft - 44,
-          behavior: reduce ? 'auto' : 'smooth',
-        });
+        var left = Math.max(0, link.offsetLeft - host.offsetLeft - 44);
+        host.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
+        // iOS Safari once left the strip at its far end with the active chip out of view (11-04,
+        // not reproducible): once the smooth scroll has had time, bring the chip back, unless
+        // the visitor has touched the strip since.
+        clearTimeout(host.kjChipFix);
+        if (!host.kjChipTouch) {
+          host.kjChipTouch = true;
+          host.addEventListener('touchstart', function () { clearTimeout(host.kjChipFix); }, { passive: true });
+        }
+        host.kjChipFix = setTimeout(function () {
+          if (!link.classList.contains('is-active')) return;
+          var h = host.getBoundingClientRect(),
+            c = link.getBoundingClientRect();
+          if (c.right <= h.left || c.left >= h.right) host.scrollLeft = left;
+        }, 900);
       }
     });
   }

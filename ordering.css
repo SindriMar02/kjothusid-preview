@@ -2925,3 +2925,20 @@ html.is-jol .jol-surface--cream .jol-bauble img {
   .about__grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
 }
 
+
+/* Phones and tablets: the price sits under the name. It lines up with the name text (past the
+   tick column) and keeps clear of the selected row's bar (Sindri 11-04: "verð í síma is too
+   close to border"). */
+@media (max-width: 1264px) {
+  .counter-row.has-order > .counter-row__price {
+    padding-left: calc(20px + 0.5rem);
+  }
+}
+@media (max-width: 63.999rem) {
+  .counter-row__price {
+    padding-left: 20px;
+  }
+}
+.prices__row.has-order .prices__end {
+  padding-left: calc(20px + 0.5rem);
+}

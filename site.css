@@ -23,6 +23,10 @@
 .notice__close{flex:none;width:1.75rem;height:1.75rem;display:grid;place-items:center;color:inherit;margin-block:-.25rem;position:relative}
 .notice__close svg{width:.875rem;height:.875rem}
 .notice :focus-visible{outline:1px solid var(--color-white);outline-offset:2px}
+/* The text sits on the page's centre axis: an empty spacer the width of the close button on the left (Sindri 11-04: "reads symmetrical"). */
+.notice{--notice-close:1.75rem;align-items:center}.notice::before{content:'';flex:none;width:var(--notice-close)}.notice__close{width:var(--notice-close)}
+/* Phones: the title on one line, the link under it; the detail stays on the page the link opens ("not too long and weird"). */
+@media (max-width:47.999rem){.notice__text strong{display:block;margin-right:0}.notice__text>span:not(.link,.pending){display:none}.notice__text .link{margin-left:0}}
 
 /* Their logo replaces the typeset name. Two files, one per ground. */
 /* The two files cross-fade on the navbar's own 300 ms, so the logo and its
@@ -705,6 +709,7 @@ html.is-jol .footer .footer__col-title { color: var(--jol-gold-text); }
 html.is-jol :is(.footer,.mega) :is(.text-dark-gray,.text-mid-gray,.mega__section-title,.sndr) { color: var(--jol-cream); }
 html.is-jol .mega__promo-inner { background: var(--jol-spruce-2); }
 html.is-jol .notice__close { color: var(--jol-cream); min-width: 44px; min-height: 44px; }
+html.is-jol .notice { --notice-close: 44px; }
 /* Hero takeover: spruce-black floor, a warm candle glow low right, the countdown in gold, a red CTA. */
 html.is-jol .hero__overlay { background: radial-gradient(70% 55% at 78% 100%, rgb(255 160 80 / .2), transparent 70%), linear-gradient(to top,rgba(18,26,22,.9),transparent 64%); opacity: 1; }
 html.is-jol .hero__countdown { display: block; margin-bottom: .4em; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); line-height: 1.1; letter-spacing: .04em; text-transform: uppercase; color: var(--jol-gold-text); }
