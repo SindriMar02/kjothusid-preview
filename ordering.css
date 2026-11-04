@@ -2942,3 +2942,14 @@ html.is-jol .jol-surface--cream .jol-bauble img {
 .prices__row.has-order .prices__end {
   padding-left: calc(20px + 0.5rem);
 }
+
+/* Phones: while the order bar is up, the first screen ends above it, so the hero's buttons never
+   sit under the bar or show through its scalloped edge (iOS pass 11-04). 72px = the bar + its edge. */
+@media (max-width: 47.999rem) {
+  body.has-order-bar .hero {
+    --hero-height: calc(var(--svh) * 100 - 72px - env(safe-area-inset-bottom)) !important;
+  }
+  html.is-jol body.has-order-bar .hero.jol-surface {
+    min-height: calc(100svh - 72px - env(safe-area-inset-bottom));
+  }
+}
