@@ -499,8 +499,6 @@ input,textarea,select,button,summary{scroll-margin-top:calc(var(--top-chrome) + 
 /* ---------------- um okkur ---------------- */
 .about__grid{display:grid;gap:var(--spacing-xl);align-items:start}
 @media (min-width:48rem){.about__grid{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:var(--spacing-xxl)}}
-.about__crest img{display:block;width:100%;max-width:13rem;height:auto}
-@media (min-width:48rem){.about__crest img{max-width:20rem}}
 .about__body{display:grid;gap:var(--spacing-m);max-width:40rem;text-wrap:pretty}
 .about__facts{display:grid;margin-top:var(--spacing-xxl);border-top:var(--ink-hair)}
 @media (min-width:48rem){.about__facts{grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--spacing-l)}}
