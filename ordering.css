@@ -2578,44 +2578,284 @@ html.is-jol .jol-head {
   }
 }
 
-/* K5 (Karen 10 Nov: "athugasemd við hvert og eitt item"): every line carries its own note field
-   in view, no pencil to find. Her prompts sit under it while it has focus. 16px on touch so iOS
-   does not zoom into the field. */
-.line-note {
-  display: block;
+/* A line's extras as small dropdowns (Sindri 10 Nov, design 2 of 3, from Karen's K5 questions).
+   The pills share the amount chip's build (hairline, 30px, 13px) so a line reads as one family;
+   a made choice fills cream and shows its words. The list (line-options.js) floats above the
+   page: outside the form (Enter cannot send the order) and outside the slip's scroll box. */
+.line-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-top: 0.5rem;
 }
-.line-note input {
+.line-opt {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 0 6px 0 9px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: #4a4a4a;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 160ms var(--order-ease),
+    background-color 160ms var(--order-ease),
+    color 160ms var(--order-ease),
+    transform 120ms var(--order-ease);
+}
+.line-opt .i {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  transition: transform 200ms var(--order-ease);
+}
+.line-opt[aria-expanded='true'] {
+  border-color: currentColor;
+  color: #141414;
+}
+.line-opt[aria-expanded='true'] .i {
+  transform: rotate(180deg);
+}
+.line-opt.is-set {
+  border-color: #141414;
+  background: #f4eee2;
+  color: #141414;
+}
+.line-opt--note {
+  padding: 0 9px 0 7px;
+  border-style: dashed;
+  color: #626262;
+}
+.line-opt--note .i,
+.line-opt--note[aria-expanded='true'] .i {
+  transform: none;
+}
+.line-opt--note.is-set {
+  border-style: solid;
+}
+/* the customer's note shows in full on its pill and wraps; nothing is cut off, even a long
+   word or a link with no spaces */
+.line-opt--note.is-set .line-opt__text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.line-opt--note.is-set {
+  white-space: normal;
+  text-align: left;
+  line-height: 1.3;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.line-opt--note.is-set .i {
+  align-self: flex-start;
+  margin-top: 1px;
+}
+.line-opt:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .line-opt:hover {
+    border-color: currentColor;
+    color: #141414;
+  }
+}
+@media (pointer: coarse) {
+  /* 34px pills with 10px between rows; each tap target reaches 44px without overlapping the
+     next row (5px each way meets in the middle of the gap) */
+  .line-opts {
+    gap: 10px 6px;
+  }
+  .line-opt {
+    min-height: 34px;
+    padding: 0 8px 0 11px;
+    font-size: 0.875rem;
+  }
+  .line-opt::after {
+    content: '';
+    position: absolute;
+    inset: -5px -3px;
+  }
+}
+
+.opt-pop {
+  position: fixed;
+  z-index: 1300;
+  top: 0;
+  left: 0;
+  padding: 6px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fbf8f1;
+  color: #141414;
+  border: 1px solid rgba(20, 20, 20, 0.14);
+  box-shadow: 0 18px 44px rgba(20, 20, 20, 0.2);
+  opacity: 0;
+  transform: translateY(-4px);
+  transform-origin: top left;
+  transition:
+    opacity 160ms var(--order-ease),
+    transform 200ms var(--order-ease);
+}
+.opt-pop.is-up {
+  transform: translateY(4px);
+  transform-origin: bottom left;
+}
+.opt-pop.is-open {
+  opacity: 1;
+  transform: none;
+}
+.opt-pop:focus {
+  outline: none;
+}
+.opt-pop__q {
+  margin: 0;
+  padding: 8px 14px 8px;
+  color: #6b5a3c;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+.opt-pop__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   width: 100%;
   min-height: 40px;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--rule);
-  border-radius: 0;
+  padding: 0 14px;
+  border: 0;
   background: transparent;
   color: inherit;
   font: inherit;
   font-size: 0.875rem;
-  transition: border-color 160ms var(--order-ease);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms var(--order-ease);
 }
-.line-note input::placeholder {
+.opt-pop__item .i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--jol-red, #861719);
+  opacity: 0;
+}
+.opt-pop__item[aria-checked='true'] {
+  background: #f1e9d8;
+}
+.opt-pop__item[aria-checked='true'] .i {
+  opacity: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .opt-pop__item:hover {
+    background: #f4eee2;
+  }
+}
+.opt-pop__thick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 10px 14px 4px;
+  border-top: 1px solid #e6dfcf;
+  font-size: 0.875rem;
+}
+.opt-pop__step {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--rule);
+}
+.opt-pop__step button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.opt-pop__step button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.opt-pop__step .i {
+  width: 14px;
+  height: 14px;
+}
+.opt-pop__step output {
+  min-width: 4.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.opt-pop__note {
+  display: block;
+  width: calc(100% - 28px);
+  margin: 0 14px;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  resize: none;
+}
+.opt-pop__note:focus {
+  outline: none;
+  border-color: #141414;
+}
+.opt-pop__note::placeholder {
   color: #767676;
   opacity: 1;
 }
-.line-note input:focus {
-  border-color: currentColor;
-}
-.line-note__hint {
-  display: none;
-  margin-top: 0.35rem;
-  color: #5f5f5f;
-}
-.line-note:focus-within .line-note__hint {
+.opt-pop__done {
   display: block;
+  width: calc(100% - 28px);
+  min-height: 40px;
+  margin: 10px 14px 8px;
+  border: 0;
+  background: #861719;
+  color: #f4eee2;
+  font-family: Marcellus, Georgia, serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 @media (pointer: coarse) {
-  .line-note input {
-    min-height: 44px;
+  .opt-pop__item {
+    min-height: 46px;
+    font-size: 1rem;
+  }
+  .opt-pop__step button {
+    width: 44px;
+    height: 44px;
+  }
+  /* 16px: iOS does not zoom into the field */
+  .opt-pop__note {
     font-size: 16px;
+  }
+  .opt-pop__done {
+    min-height: 46px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opt-pop,
+  .opt-pop.is-up {
+    transform: none;
+    transition: opacity 120ms linear;
+  }
+  .line-opt,
+  .line-opt .i {
+    transition: none;
   }
 }
 

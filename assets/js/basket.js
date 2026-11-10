@@ -18,7 +18,6 @@
   var undoKey = 'kj-pontun-undo';
   var icon = KJOrdering.icon;
   var bin = icon('trash');
-  var writingWish = false;
   var fmt = function (n) {
     return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(
       n,
@@ -209,23 +208,51 @@
       '" title="Auka magn">' +
       icon('plus') +
       '</button></div></div></div>' +
-      // A note on every line, always in view (Karen 10 Nov, K5: "athugasemd við hvert og eitt
-      // item"); her own prompts show under it while it has focus.
-      '<label class="line-note"><input type="text" data-wish-input maxlength="300" enterkeyhint="done" autocomplete="off" aria-label="Athugasemd við ' +
-      name +
-      '" aria-describedby="note-' +
-      surface +
-      '-' +
-      key +
-      '" placeholder="Athugasemd: krydd, pökkun, skurður" value="' +
-      esc(line.w || '') +
-      '"><span class="line-note__hint type-xsmall" id="note-' +
-      surface +
-      '-' +
-      key +
-      '">Til dæmis: á að marinera eða krydda? Hvernig á að vakúmpakka? Sérstakur skurður eða þykkt sneiða?</span></label>' +
+      optionPills(line, item, name) +
       '<span class="draw-rule is-drawn" aria-hidden="true"></span></div></li>'
     );
+  }
+  /* The line's extras as small dropdowns (Sindri 10 Nov, design 2 of 3; Karen's K5 questions):
+     Krydd, Vakúm and Skurður where the product takes them, and a note on every line. Each pill
+     shows its choice once made; line-options.js opens the list above the page. */
+  var OPTION_LABELS = { krydd: 'Krydd', vakum: 'Vakúm', skurdur: 'Skurður' };
+  function optionPills(line, item, name) {
+    var o = KJOrdering.cleanOptions(line.o, item.c, catalogue);
+    var pills = KJOrdering.lineGroups(item.c).map(function (group) {
+      var value = KJOrdering.optionValue(group, o);
+      return (
+        '<button type="button" class="line-opt' +
+        (value ? ' is-set' : '') +
+        '" data-opt="' +
+        group +
+        '" aria-haspopup="true" aria-expanded="false" aria-label="' +
+        OPTION_LABELS[group] +
+        ': ' +
+        esc(value || 'ekkert valið') +
+        '. ' +
+        name +
+        '"><span class="line-opt__text">' +
+        esc(value || OPTION_LABELS[group]) +
+        '</span>' +
+        icon('chevron-down') +
+        '</button>'
+      );
+    });
+    var note = (line.w || '').trim();
+    pills.push(
+      '<button type="button" class="line-opt line-opt--note' +
+        (note ? ' is-set' : '') +
+        '" data-opt="note" aria-haspopup="dialog" aria-expanded="false" aria-label="' +
+        (note ? 'Athugasemd: ' + esc(note) : 'Bæta við athugasemd') +
+        '. ' +
+        name +
+        '">' +
+        icon(note ? 'pencil' : 'plus') +
+        '<span class="line-opt__text">' +
+        (note ? esc(note) : 'Athugasemd') +
+        '</span></button>'
+    );
+    return '<div class="line-opts">' + pills.join('') + '</div>';
   }
 
   function readUndo() {
@@ -301,7 +328,7 @@
     });
     var changed = lines.filter(function (line) {
       var was = previousLines[line.k];
-      return was && (was.q !== line.q || was.u !== line.u || was.w !== (line.w || ''));
+      return was && (was.q !== line.q || was.u !== line.u || was.w !== (line.w || '') || was.o !== JSON.stringify(line.o || {}));
     });
     var message = '';
     if (added.length > 1) message = added.length + ' vörur komnar í pöntunina';
@@ -309,11 +336,18 @@
     else if (gone.length && lines.length) message = 'Fjarlægt: ' + previousLines[gone[0]].n;
     else if (changed.length)
       message =
-        (previousLines[changed[0].k].w !== (changed[0].w || '') ? 'Athugasemd vistuð: ' : 'Magn uppfært: ') +
+        (previousLines[changed[0].k].w !== (changed[0].w || '')
+          ? 'Athugasemd vistuð: '
+          : previousLines[changed[0].k].o !== JSON.stringify(changed[0].o || {})
+            ? 'Ósk vistuð: '
+            : 'Magn uppfært: ') +
         changed[0].n;
+    // While a note is being typed, each keystroke saves; line-options.js says it once on close.
+    if (/^Athugasemd/.test(message) && document.activeElement && document.activeElement.matches('[data-opt-note]'))
+      message = '';
     previousLines = {};
     lines.forEach(function (line) {
-      previousLines[line.k] = { q: line.q, u: line.u, w: line.w || '', n: line.n };
+      previousLines[line.k] = { q: line.q, u: line.u, w: line.w || '', o: JSON.stringify(line.o || {}), n: line.n };
     });
     return message;
   }
@@ -394,7 +428,6 @@
   });
 
   function render() {
-    if (writingWish) return;
     var lines = Basket.all();
     var fresh = lines
       .filter(function (line) {
@@ -813,31 +846,8 @@
       Basket.set(lines);
     }
   });
-  document.addEventListener('input', function (e) {
-    if (!e.target.matches('[data-wish-input]')) return;
-    var key = e.target.closest('[data-order-line]').dataset.orderLine;
-    var lines = Basket.all();
-    lines.forEach(function (line) {
-      if (line.k === key) line.w = e.target.value.slice(0, 300);
-    });
-    writingWish = true;
-    Basket.set(lines);
-    writingWish = false;
-    document.querySelectorAll('[data-order-line]').forEach(function (row) {
-      if (row.dataset.orderLine !== key) return;
-      var input = row.querySelector('[data-wish-input]');
-      if (input !== e.target) input.value = e.target.value;
-    });
-  });
   document.addEventListener('change', function (e) {
     if (e.target.matches('[data-line-amount]')) changeLine(e, e.target);
-  });
-  /* The note sits inside the order form, so Enter would send the whole order mid-sentence.
-     Enter (the keyboard's ✓, enterkeyhint="done") only closes the note; it is already saved. */
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter' || e.isComposing || !e.target.matches('[data-wish-input]')) return;
-    e.preventDefault();
-    e.target.blur();
   });
   document.addEventListener(
     'keydown',

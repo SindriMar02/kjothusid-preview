@@ -184,7 +184,7 @@
     var saved = Basket ? Basket.all() : [];
     lines = saved.map(function (x) {
       var c = byKey[x.k];
-      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u), w: x.w || '' } : null;
+      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u), w: x.w || '', o: x.o } : null;
     }).filter(Boolean);
     var params = new URLSearchParams(location.search);
     (loadedDeepLinks ? [] : params.getAll('v')).forEach(function (k) {
@@ -196,7 +196,7 @@
   // A price unit describes the price; the relay's quantity is kilograms or pieces.
   function orderUnit(u) { return u === 'flat' || u === 'pk' ? 'stk' : u === 'g' ? 'g' : (u || 'kg'); }
   function persist() {
-    if (Basket) Basket.set(lines.map(function (l) { return { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u, w: l.w || '' }; }));
+    if (Basket) Basket.set(lines.map(function (l) { var x = { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u, w: l.w || '' }; if (l.o) x.o = l.o; return x; }));
   }
 
   var linesErr = form.querySelector('[data-lines-error]');
@@ -390,7 +390,9 @@
           // The Business Central item number, from Karen's Items export (scripts/bc-items.js).
           // Shown in the order email so staff type the order in without looking it up.
           bcItemNo: c.b || null,
-          // The customer's note on this line (K5): printed under the item in the order email.
+          // The line's extras (Krydd, Vakúm, Skurður) in the words the pills show, and the
+          // customer's own note (K5): both printed under the item in the order email.
+          options: KJOrdering.optionText(KJOrdering.cleanOptions(l.o, c.c, catalogue)),
           note: (l.w || '').trim().slice(0, 300)
         };
       }),
