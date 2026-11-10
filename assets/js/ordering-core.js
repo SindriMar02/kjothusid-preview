@@ -94,26 +94,6 @@
       '<svg class="i" aria-hidden="true"><use href="#i-' + name + '"/></svg>'
     );
   }
-  // Wishes are never clipped. Reject an oversized wish block before submission.
-  function mergeNotes(lines, notes) {
-    var wishes = lines
-      .filter(function (line) {
-        return line.w && line.w.trim();
-      })
-      .map(function (line) {
-        return line.n + ': ' + line.w.trim();
-      })
-      .join('\n');
-    if (wishes.length > 2000) throw new RangeError('wish-limit');
-    var room = 2000 - wishes.length;
-    var own = String(notes || '').trim();
-    return (
-      wishes +
-      (own && room > (wishes ? 1 : 0)
-        ? (wishes ? '\n' : '') + own.slice(0, room - (wishes ? 1 : 0))
-        : '')
-    );
-  }
   function done(lines, date, time, name, email, phone, sent) {
     return [
       !!lines.length,
@@ -207,7 +187,7 @@
             line.q <= 10000 &&
             ['kg', 'g', 'stk'].indexOf(line.u) >= 0 &&
             string(line.w) &&
-            line.w.length <= 140
+            line.w.length <= 300
           );
         })
       );
@@ -310,7 +290,6 @@
     nextSlot: nextSlot,
     icon: icon,
     units: units,
-    mergeNotes: mergeNotes,
     done: done,
     dropdownRows: dropdownRows,
     dayTiles: dayTiles,

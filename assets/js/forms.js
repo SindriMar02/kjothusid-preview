@@ -158,6 +158,18 @@
       if (note) note.hidden = false;
     }
   }
+  /* Holiday orders run to the holiday's own last pick-up time (Karen 10 Nov, K4: til kl. 17:00).
+     The later slots are rendered hidden and disabled; only this holiday's page opens them. */
+  (function lateSlots() {
+    var to = occasion && occasion.pickupTo;
+    form.querySelectorAll('[data-late]').forEach(function (chip) {
+      var open = !!to && chip.querySelector('input').value <= to;
+      chip.hidden = !open;
+      chip.querySelector('input').disabled = !open;
+    });
+    var until = form.querySelector('[data-time-to]');
+    if (to && until && to > until.textContent) until.textContent = to;
+  })();
 
   var catalogue = [];
   try { catalogue = JSON.parse(document.getElementById('kj-catalogue').textContent); } catch (e) {}
@@ -200,8 +212,10 @@
     var group = form.querySelector('[name="' + name + '"]').closest('fieldset');
     group.id = 'order-' + name;
     Object.defineProperty(group, 'value', {
-      get: function () { var checked = group.querySelector('input:checked'); return checked ? checked.value : ''; },
-      set: function (value) { group.querySelectorAll('input').forEach(function (input) { input.checked = input.value === value; }); }
+      // A disabled choice (a holiday-only late slot on an ordinary order) is never chosen,
+      // not even by "Eins og síðast" restoring a remembered holiday time (Codex audit 10 Nov).
+      get: function () { var checked = group.querySelector('input:checked:not(:disabled)'); return checked ? checked.value : ''; },
+      set: function (value) { group.querySelectorAll('input').forEach(function (input) { input.checked = !input.disabled && input.value === value; }); }
     });
     return group;
   }
@@ -310,7 +324,7 @@
     if (notes && !notes.value && d.note) notes.value = d.note;
   })();
   window.KJPickup = {
-    options: function () { return { today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, banned: banned, occasionDays: occasion ? occasionDates : null, times: Array.from(form.querySelectorAll('[name="time"]')).map(function (input) { return input.value; }) }; },
+    options: function () { return { today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, banned: banned, occasionDays: occasion ? occasionDates : null, times: Array.from(form.querySelectorAll('[name="time"]:not(:disabled)')).map(function (input) { return input.value; }) }; },
     select: function (slot) {
       if (!KJOrdering.dayTiles(this.options()).some(function (day) { return day.value === slot.date; })) return;
       visibleDays = 60;
@@ -362,9 +376,6 @@
 
     ref = ref || makeRef();
     var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
-    var notes;
-    try { notes = KJOrdering.mergeNotes(lines.map(function (l) { return { n: byKey[l.k].n, w: l.w }; }), v('notes')); }
-    catch (error) { status(form, 'error', 'Óskirnar eru of langar fyrir eina pöntun. Hringdu í ' + PHONE + ' og við hjálpum þér.'); return; }
     var payload = {
       kind: 'order',
       ref: ref,
@@ -378,10 +389,12 @@
           approx: l.u === 'kg' || l.u === 'g', unitPrice: typeof c.p === 'number' ? c.p : null, priceUnit: c.u || null,
           // The Business Central item number, from Karen's Items export (scripts/bc-items.js).
           // Shown in the order email so staff type the order in without looking it up.
-          bcItemNo: c.b || null
+          bcItemNo: c.b || null,
+          // The customer's note on this line (K5): printed under the item in the order email.
+          note: (l.w || '').trim().slice(0, 300)
         };
       }),
-      notes: notes,
+      notes: v('notes'),
       website: v('website'),
       page: location.pathname
     };

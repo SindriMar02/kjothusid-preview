@@ -6,7 +6,7 @@
    client's red as the single accent.
    ========================================================================== */
 
-:root{--top-chrome:3.75rem;--notice-h:0px;--hair:1px solid var(--color-light-gray);--ink-hair:1px solid var(--color-black)}
+:root{--top-chrome:4rem;--notice-h:0px;--hair:1px solid var(--color-light-gray);--ink-hair:1px solid var(--color-black)}
 .text-mid-gray{color:var(--color-mid-gray)}
 .arrow{width:1em;height:1em;flex:none;display:inline-block;vertical-align:-.15em}
 .dot{margin-inline:var(--spacing-xs);color:var(--color-light-gray)}
@@ -32,11 +32,15 @@
 /* The two files cross-fade on the navbar's own 300 ms, so the logo and its
    ground always change together. */
 .navbar__logo{display:grid;line-height:0}
-.navbar__logo-img{grid-area:1/1;height:2rem;width:auto;transition:opacity .3s ease}
+/* K3 (Karen 10 Nov: "logo-ið okkar efst í miðjunni mega stækka töluvert"): about 40% larger, all year. */
+.navbar__logo-img{grid-area:1/1;height:2.75rem;width:auto;transition:opacity .3s ease}
+/* Phones: 64px bar, so the 44px logo keeps 10px above and below. */
+.navbar__inner{min-height:4rem}
 .navbar__logo-img--dark{opacity:0}
 .navbar[data-nav-theme="dark"] .navbar__logo-img--light{opacity:0}
 .navbar[data-nav-theme="dark"] .navbar__logo-img--dark{opacity:1}
-@media (min-width:48rem){.navbar__logo-img{height:2.375rem}}
+/* The bar grows with it from 48rem, so the logo keeps 9px above and below (site.js measures --top-chrome). */
+@media (min-width:48rem){.navbar__logo-img{height:3.375rem}.navbar__inner{min-height:4.5rem}:root{--top-chrome:4.5rem}}
 .navbar__right{gap:var(--spacing-l)}
 .navbar__right-extra{display:none}
 @media (min-width:64rem){.navbar__right-extra{display:inline-block}}
@@ -688,8 +692,10 @@ html[data-input="pointer"] :focus-visible:not(input):not(textarea):not(select):n
    Christmas orders (mid November), before the full theme turns on in December. */
 :root,
 html.is-jol {
-  --jol-spruce: #23392f;
-  --jol-spruce-2: #2e4a3d;
+  /* The dark Christmas ground is a deep red (Karen 10 Nov, K2: "breyta græna litnum yfir í
+     rauðann"); --jol-red stays the brighter action red, so they never sit on each other. */
+  --jol-ground: #861719;
+  --jol-ground-2: #6d1214;
   --jol-red: #d41b19;
   --jol-red-deep: #a8141a;
   --jol-cream: #f4eee2;
@@ -700,18 +706,18 @@ html.is-jol {
   --jol-luxe: cubic-bezier(.16,1,.3,1);
 }
 html.is-jol { --color-white: var(--jol-cream); }
-/* The solid bar behind the navbar over dark sections is spruce, not black, in the season. */
-html.is-jol .navbar[data-nav-theme="dark"]::before { background: var(--jol-spruce); }
+/* The solid bar behind the navbar over dark sections is the red ground, not black, in the season. */
+html.is-jol .navbar[data-nav-theme="dark"]::before { background: var(--jol-ground); }
 /* S1 notice, S3 hero, S6 footer, S7 mega menu. */
-html.is-jol :is(.notice,.footer,.mega) { background: var(--jol-spruce); color: var(--jol-cream); }
+html.is-jol :is(.notice,.footer,.mega) { background: var(--jol-ground); color: var(--jol-cream); }
 html.is-jol .footer { border-top: 1px solid var(--jol-gold); }
 html.is-jol .footer .footer__col-title { color: var(--jol-gold-text); }
 html.is-jol :is(.footer,.mega) :is(.text-dark-gray,.text-mid-gray,.mega__section-title,.sndr) { color: var(--jol-cream); }
-html.is-jol .mega__promo-inner { background: var(--jol-spruce-2); }
+html.is-jol .mega__promo-inner { background: var(--jol-ground-2); }
 html.is-jol .notice__close { color: var(--jol-cream); min-width: 44px; min-height: 44px; }
 html.is-jol .notice { --notice-close: 44px; }
-/* Hero takeover: spruce-black floor, a warm candle glow low right, the countdown in gold, a red CTA. */
-html.is-jol .hero__overlay { background: radial-gradient(70% 55% at 78% 100%, rgb(255 160 80 / .2), transparent 70%), linear-gradient(to top,rgba(18,26,22,.9),transparent 64%); opacity: 1; }
+/* Hero takeover: a red-black floor, a warm candle glow low right, the countdown in gold, a red CTA. */
+html.is-jol .hero__overlay { background: radial-gradient(70% 55% at 78% 100%, rgb(255 160 80 / .2), transparent 70%), linear-gradient(to top,rgba(38,9,10,.9),transparent 64%); opacity: 1; }
 html.is-jol .hero__countdown { display: block; margin-bottom: .4em; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); line-height: 1.1; letter-spacing: .04em; text-transform: uppercase; color: var(--jol-gold-text); }
 html.is-jol .hero__offers { display: none; }
 html.is-jol .btn-jol { background: var(--jol-red); color: var(--jol-cream); border: 1px solid var(--jol-red); transition: background-color .2s var(--jol-ui), border-color .2s var(--jol-ui), transform .16s var(--jol-ui); }
@@ -719,14 +725,14 @@ html.is-jol .btn-jol:active { background: var(--jol-red-deep); border-color: var
 html.is-jol .hero__christmas a { gap: .6em; color: var(--jol-cream); }
 /* S4 buttons. Transitions belong to the base state, including release. */
 html.is-jol .btn { min-height: 44px; --btn-duration: .2s; --btn-ease: var(--jol-ui); }
-html.is-jol .btn-fill { background: var(--jol-spruce); color: var(--jol-cream); transition: background-color .2s var(--jol-ui),color .2s var(--jol-ui),transform .16s var(--jol-ui),border-color .2s var(--jol-ui); }
-html.is-jol .btn-outline { color: var(--jol-spruce); border-color: var(--jol-spruce); --btn-fill: var(--jol-spruce); --btn-on-fill: var(--jol-cream); }
+html.is-jol .btn-fill { background: var(--jol-ground); color: var(--jol-cream); transition: background-color .2s var(--jol-ui),color .2s var(--jol-ui),transform .16s var(--jol-ui),border-color .2s var(--jol-ui); }
+html.is-jol .btn-outline { color: var(--jol-ground); border-color: var(--jol-ground); --btn-fill: var(--jol-ground); --btn-on-fill: var(--jol-cream); }
 html.is-jol :is(.footer,.mega,.season--jol,.hero,.occasion-card--aramot) .btn-outline,
-html.is-jol .btn-outline.text-white { color: var(--jol-cream); border-color: var(--jol-cream); --btn-fill: var(--jol-cream); --btn-on-fill: var(--jol-spruce); }
+html.is-jol .btn-outline.text-white { color: var(--jol-cream); border-color: var(--jol-cream); --btn-fill: var(--jol-cream); --btn-on-fill: var(--jol-ground); }
 html.is-jol .btn-fill:active:not(:disabled) { background: var(--jol-red); }
 /* S5 season band and S8 kickers. */
 html.is-jol .season:not(.season--jol) { display: none; }
-html.is-jol .season--jol { background: var(--jol-spruce); color: var(--jol-cream); padding-block: var(--spacing-xl); }
+html.is-jol .season--jol { background: var(--jol-ground); color: var(--jol-cream); padding-block: var(--spacing-xl); }
 html.is-jol .season--jol .text-black { color: var(--jol-cream); }
 html.is-jol :is(.season--jol .text-mid-gray,.jol-kicker) { color: var(--jol-gold-text); text-transform: uppercase; letter-spacing: .12em; }
 html.is-jol .season--jol .season__body { position: relative; }
@@ -734,7 +740,7 @@ html.is-jol .season--jol .season__body { position: relative; }
 html.is-jol :is(.season--jol,.jol-head,.jol-gifts,.occasion-card--aramot,.hero,.notice,.footer) .pending { color: #8f1411; background: var(--jol-cream); border: 1px solid var(--jol-cream); }
 html.is-jol :is(.season--jol,.jol-head,.jol-gifts,.occasion-card--aramot,.hero,.notice,.footer) .pending::before { background: #8f1411; }
 /* S2 disclosure. Panel colours are independent of the navbar's light/dark ink. */
-html.is-jol .jol-head { position: relative; isolation: isolate; overflow: hidden; background: var(--jol-spruce); color: var(--jol-cream); padding-inline: var(--spacing-m); }
+html.is-jol .jol-head { position: relative; isolation: isolate; overflow: hidden; background: var(--jol-ground); color: var(--jol-cream); padding-inline: var(--spacing-m); }
 html.is-jol .jol-head__inner { position: relative; z-index: 22; display: grid; gap: var(--spacing-s); grid-template-columns: minmax(0,1fr) auto; column-gap: var(--spacing-l); align-items: center; }
 /* The countdown is the band's focal point: a big gold numeral, the words under it. */
 html.is-jol .jol-count { grid-column: 2; grid-row: 1 / 4; display: grid; justify-items: end; text-align: right; }
@@ -743,17 +749,17 @@ html.is-jol .jol-count__label { margin-top: .5em; font-family: var(--font-displa
 html.is-jol .jol-head__intro { max-width: 42rem; color: rgb(244 238 226 / .88); }
 html.is-jol .occasion-card { position: relative; isolation: isolate; border: 0; border-top: 4px solid var(--jol-red); background: var(--jol-card); color: var(--color-black); padding: var(--spacing-l); }
 html.is-jol .occasion-card--jol::before { content: ''; position: absolute; inset: 6px; z-index: -1; border: 1px solid var(--jol-gold); pointer-events: none; }
-html.is-jol .occasion-card--aramot { background: var(--jol-spruce); color: var(--jol-cream); border-top-color: var(--jol-gold); }
+html.is-jol .occasion-card--aramot { background: var(--jol-ground); color: var(--jol-cream); border-top-color: var(--jol-gold); }
 html.is-jol .occasion-card .plainlist li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding-block: 6px; }
 html.is-jol .occasion-card__weekday { font-variant: small-caps; color: #6b6b6b; }
 html.is-jol .occasion-card--aramot .occasion-card__weekday { color: var(--jol-cream); }
 html.is-jol .occasion-card--jol .btn-fill { background: var(--jol-red); color: var(--jol-cream); }
 html.is-jol .occasion-card--jol .btn-fill:active { background: var(--jol-red-deep); }
-html.is-jol .occasion-card--aramot .btn-fill { border: 1px solid var(--jol-cream); background: var(--jol-cream); color: var(--jol-spruce); }
+html.is-jol .occasion-card--aramot .btn-fill { border: 1px solid var(--jol-cream); background: var(--jol-cream); color: var(--jol-ground); }
 html.is-jol .occasion-card--aramot .btn-fill:active { border-color: var(--jol-gold); background: var(--jol-cream); }
 html.is-jol .jol-products { margin-bottom: var(--spacing-l); }
-/* Gift boxes: a light card with the Jól red ribbon, so the page alternates spruce, cream, spruce
-   and the band never runs into the spruce footer. */
+/* Gift boxes: a light card with the Jól red ribbon, so the page alternates red ground, cream,
+   red ground and the band never runs into the red footer. */
 html.is-jol .jol-gifts { color: var(--color-black); }
 html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-l); background: var(--jol-card); border: 0; border-top: 4px solid var(--jol-red); outline: 1px solid var(--jol-gold); outline-offset: -7px; }
 @media (hover: hover) and (pointer: fine) {

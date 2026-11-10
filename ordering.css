@@ -31,6 +31,41 @@ html.is-jol {
 .orders-count[hidden] {
   display: none;
 }
+.navbar[data-nav-theme='dark'] .orders-count {
+  background: #f4eee2;
+  color: #141414;
+}
+/* Phones: the menu button, the logo on the centre axis, and the order as one icon with its count
+   (Sindri 10 Nov: "make the header make sense, maybe a hamburger menu is best"; the bigger logo
+   from K3 needs the room). The word and the Pantanir menu live in the hamburger menu. */
+.orders-icon {
+  display: none;
+}
+@media (max-width: 47.999rem) {
+  .orders-nav > .link,
+  .orders-nav > .navdrop {
+    display: none;
+  }
+  .orders-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    color: inherit;
+  }
+  .orders-icon .i {
+    width: 24px;
+    height: 24px;
+  }
+  .orders-icon .orders-count {
+    position: absolute;
+    top: 3px;
+    right: 1px;
+    margin: 0;
+  }
+}
 .navdrop {
   display: none;
 }
@@ -88,7 +123,7 @@ html.is-jol {
   transition-delay: 0s;
 }
 html.is-jol .navdrop__panel {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
   color: var(--jol-cream);
   --rule: var(--rule-on-dark);
 }
@@ -121,7 +156,7 @@ html.is-jol .navdrop__panel {
 }
 .order-holidays {
   padding: 0.65rem 1rem;
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
   color: var(--jol-cream);
   font-size: 0.875rem;
 }
@@ -591,7 +626,7 @@ html.is-jol .navdrop__panel {
 }
 html.is-jol .day-tile input:checked + span,
 html.is-jol .time-chip input:checked + span {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
   color: var(--jol-cream);
 }
 .day-tile input:focus-visible + span,
@@ -680,8 +715,20 @@ html.is-jol .jol-count__num {
   flex-wrap: wrap;
   gap: 0.75rem;
 }
+/* On the red ground the action red would vanish (1.9:1): the first action is cream with red ink. */
 html.is-jol .jol-head__actions .btn-fill {
-  background: var(--jol-red);
+  background: var(--jol-cream);
+  color: var(--jol-ground);
+  border-color: var(--jol-cream);
+}
+html.is-jol .jol-head__actions .btn-fill:active:not(:disabled) {
+  background: var(--jol-cream);
+  border-color: var(--jol-gold);
+}
+@media (hover: hover) and (pointer: fine) {
+  html.is-jol .jol-head__actions .btn-fill:hover {
+    border-color: var(--jol-gold);
+  }
 }
 .pickup-calendar {
   margin-bottom: 3rem;
@@ -731,7 +778,7 @@ html.is-jol .jol-head__actions .btn-fill {
   color: var(--jol-cream);
 }
 .calendar-day--aramot:focus-visible {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
 }
 .calendar-day:active {
   transform: scale(0.97);
@@ -784,7 +831,7 @@ html.is-jol .jol-head__actions .btn-fill {
   grid-template-columns: minmax(0, 1fr);
 }
 html.is-jol .jol-gifts {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
   color: var(--jol-cream);
 }
 .gift-boxes {
@@ -832,7 +879,7 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
     color: var(--jol-cream);
   }
   .calendar-day--aramot:hover {
-    background: var(--jol-spruce);
+    background: var(--jol-ground);
     color: var(--jol-cream);
   }
 }
@@ -1046,216 +1093,11 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
   }
 }
 
-/* Glass decorations: only their ambient transform and opacity keep animating. */
-.jol-lights,
-.jol-baubles {
-  display: none;
-}
+/* Dark Christmas bands hold their snow layer. */
 html.is-jol :is(.season--jol, .jol-head, .footer) {
   position: relative;
 }
-html.is-jol .jol-lights {
-  display: block;
-  position: absolute;
-  inset: 0 0 auto;
-  height: 70px;
-  z-index: 23;
-  pointer-events: none;
-  overflow: hidden;
-}
-.jol-lights__wire {
-  fill: none;
-  stroke: #0e1a13;
-  stroke-opacity: 0.9;
-  stroke-width: 1.25;
-}
-.jol-bulb {
-  position: absolute;
-  width: 12px;
-  margin-left: -6px;
-  transform: rotate(var(--angle));
-  transform-origin: top;
-  transition:
-    opacity 0.35s var(--order-ease) var(--bulb-delay),
-    translate 0.35s var(--order-ease) var(--bulb-delay);
-}
-.jol-bulb img {
-  display: block;
-  width: 100%;
-  height: auto;
-  position: relative;
-  z-index: 1;
-}
-.jol-bulb__glow {
-  position: absolute;
-  left: 50%;
-  top: 17px;
-  width: 26px;
-  height: 26px;
-  margin: -13px;
 
-  opacity: 0.55;
-  transition: opacity 0.4s linear calc(var(--bulb-delay) + 0.4s);
-}
-.jol-bulb__glow::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, var(--glow), transparent 70%);
-  filter: blur(6px);
-}
-html.motion-draw .is-drawn .jol-bulb__glow::before {
-  animation: glass-twinkle var(--period) ease-in-out var(--phase) infinite
-    alternate;
-}
-@keyframes glass-twinkle {
-  from {
-    opacity: 0.35;
-  }
-  to {
-    opacity: 0.7;
-  }
-}
-html.is-jol .jol-baubles {
-  display: block;
-  position: absolute;
-  inset: 0;
-  z-index: 23;
-  pointer-events: none;
-  overflow: hidden;
-}
-.jol-bauble {
-  position: absolute;
-  top: 0;
-  width: var(--size);
-  height: calc(var(--thread) + var(--size) * 1.35);
-  margin-left: calc(var(--size) / -2);
-  transform-origin: 50% 0;
-}
-.jol-bauble__thread {
-  position: absolute;
-  top: 0;
-  left: calc(50% - 5px);
-  width: 10px;
-  height: calc(var(--thread) + 5px);
-  fill: none;
-  stroke: var(--jol-gold);
-  stroke-width: 1;
-  overflow: visible;
-}
-.jol-bauble__drop {
-  position: absolute;
-  top: var(--thread);
-  left: 0;
-  width: 100%;
-  transition:
-    opacity 0.5s var(--order-ease) calc(var(--draw-delay) + 0.7s),
-    translate 0.6s var(--order-luxe) calc(var(--draw-delay) + 0.7s);
-}
-.jol-bauble img {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.35));
-}
-html.motion-draw .jol-lights__wire {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1.4s var(--order-luxe) 0.5s;
-}
-html.motion-draw .is-drawn .jol-lights__wire {
-  stroke-dashoffset: 0;
-}
-html.motion-draw .jol-lights:not(.is-drawn) .jol-bulb {
-  opacity: 0;
-  translate: 0 -4px;
-}
-html.motion-draw .jol-lights:not(.is-drawn) .jol-bulb__glow {
-  opacity: 0;
-}
-html.motion-draw .jol-bauble__thread path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 0.7s var(--order-luxe) var(--draw-delay);
-}
-html.motion-draw .is-drawn .jol-bauble__thread path {
-  stroke-dashoffset: 0;
-}
-html.motion-draw .jol-baubles:not(.is-drawn) .jol-bauble__drop {
-  opacity: 0;
-  translate: 0 -24px;
-}
-html.motion-draw .is-drawn .jol-bauble {
-  animation:
-    glass-settle 1.8s ease-in-out calc(var(--draw-delay) + 0.7s) both,
-    glass-sway var(--period) ease-in-out
-      calc(var(--draw-delay) + 2.5s + var(--ambient-phase, 0s)) infinite;
-}
-@keyframes glass-settle {
-  0% {
-    rotate: 0deg;
-  }
-  20% {
-    rotate: 6deg;
-  }
-  40% {
-    rotate: -4deg;
-  }
-  60% {
-    rotate: 2.5deg;
-  }
-  80% {
-    rotate: -1.5deg;
-  }
-  100% {
-    rotate: 0deg;
-  }
-}
-/* Starts and ends at rest, so the sway picks up from the settled bauble without a snap. */
-@keyframes glass-sway {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(1.6deg);
-  }
-  75% {
-    transform: rotate(-1.6deg);
-  }
-}
-.jol-baubles:not(.is-in-view) .jol-bauble,
-.jol-lights:not(.is-in-view) .jol-bulb__glow::before {
-  animation-play-state: paused !important;
-}
-html:not(.is-jol) .jol-lights__wire {
-  stroke: #2c3a31;
-}
-@media (max-width: 47.999rem) {
-  .jol-bulb {
-    width: 10px;
-    margin-left: -5px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  html.motion-draw .jol-lights__wire,
-  html.motion-draw .jol-bauble__thread path {
-    stroke-dashoffset: 0;
-    transition: none;
-  }
-  html.motion-draw .jol-bauble,
-  .jol-bulb__glow::before {
-    animation: none !important;
-  }
-  html.motion-draw .jol-bulb,
-  html.motion-draw .jol-bauble__drop {
-    opacity: 1 !important;
-    translate: none !important;
-    transition: none;
-  }
-  .jol-bulb__glow {
-    opacity: 0.55;
-  }
-}
 .order-head,
 .ordering {
   width: 100%;
@@ -1299,7 +1141,7 @@ html.is-jol :is(.jol-head, .jol-gifts) .btn-outline {
   color: var(--jol-cream);
   border-color: var(--jol-cream);
   --btn-fill: var(--jol-cream);
-  --btn-on-fill: var(--jol-spruce);
+  --btn-on-fill: var(--jol-ground);
 }
 .pickup-calendar,
 .christmas-courses {
@@ -1619,29 +1461,6 @@ html.motion-draw .order-progress__step::before {
 .order-line__name {
   padding-right: 44px;
 }
-.wish-button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-}
-.wish-button.has-wish .i {
-  fill: currentColor;
-  stroke: var(--slip-paper);
-}
-.order-line__wish {
-  color: #626262;
-  font-style: italic;
-  overflow-wrap: break-word;
-  padding-right: 44px;
-}
-.order-line__wish:empty {
-  display: none;
-}
-.wish-reveal,
 .company-reveal {
   display: grid;
   grid-template-rows: 0fr;
@@ -1655,25 +1474,14 @@ html.motion-draw .order-progress__step::before {
 .company-reveal {
   transition-duration: 0.24s;
 }
-.wish-reveal.is-open,
 .company-reveal.is-open {
   grid-template-rows: 1fr;
   opacity: 1;
   visibility: visible;
 }
-.wish-reveal > div,
 .company-reveal > div {
   min-height: 0;
   overflow: hidden;
-}
-.wish-reveal input {
-  width: 100%;
-  height: 44px;
-  padding: 0.5rem;
-  margin-block: 0.5rem;
-  border: 1px solid var(--rule);
-  background: transparent;
-  font-size: 0.8125rem;
 }
 .company-toggle {
   display: flex;
@@ -1776,7 +1584,7 @@ html.motion-draw .sent__title {
   }
   html.is-jol .navdrop__row:hover,
   html.is-jol .navdrop__row:focus-visible {
-    background: var(--jol-spruce-2);
+    background: var(--jol-ground-2);
   }
   .navdrop__row:hover > .i {
     transform: translateX(3px);
@@ -1853,7 +1661,6 @@ html.motion-draw .sent__title {
   .order-progress *,
   .order-progress *::before,
   .order-progress *::after,
-  .wish-reveal,
   .company-reveal,
   .field__control > .i,
   .counter-row::before,
@@ -2074,19 +1881,11 @@ html.motion-draw .slip--sent > ul {
   gap: 8px;
   align-items: center;
 }
-.order-line .wish-button {
-  position: static;
-  flex: 0 0 44px;
-}
 .line-remove {
   width: 44px;
   min-height: 44px;
   display: grid;
   place-items: center;
-}
-.order-line__wish {
-  padding: 0;
-  margin-top: 8px;
 }
 .order-line__qty button:disabled {
   opacity: 0.35;
@@ -2119,56 +1918,12 @@ html.motion-draw .slip--sent > ul {
   }
 }
 
-/* Christmas signature: string lights in swags and hanging baubles, no fir images (Sindri 11-04).
-   Only the decoration layer clips; copy keeps its flow. --garland-depth = the band they hang in. */
-html.is-jol {
-  --garland-depth: 130px;
-}
-html.is-jol .jol-surface {
-  position: relative;
-  padding-top: calc(var(--garland-depth) + 48px);
-}
-html.is-jol .jol-decor {
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--garland-depth);
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 23;
-}
-html.is-jol .jol-decor .jol-lights,
-html.is-jol .jol-decor .jol-baubles {
-  height: var(--garland-depth);
-}
-html.is-jol .jol-lights__wire {
-  stroke: var(--jol-gold);
-  stroke-width: 1.2;
-  stroke-opacity: 0.9;
-}
-html.is-jol .jol-lights__hook {
-  fill: var(--jol-gold);
-}
-html.is-jol .jol-surface--cream .jol-lights__wire {
-  stroke: #6b5a2e;
-}
-html.is-jol .jol-surface--cream .jol-lights__hook {
-  fill: #6b5a2e;
-}
-html.is-jol .hero.jol-surface {
-  padding-top: calc(var(--top-chrome) + var(--garland-depth) + 32px);
-  min-height: max(100svh, 850px);
-}
-html.is-jol .hero .jol-decor {
-  top: var(--top-chrome);
-}
+/* Christmas surfaces (K1, Karen 10 Nov: the lights and baubles came out, snow carries the season). */
 html.is-jol .footer {
   border-top: 0;
 }
-html.is-jol .jol-gifts {
-  overflow: visible;
-}
 html.is-jol .order-head--occasion {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
   color: var(--jol-cream);
   max-width: none;
 }
@@ -2178,16 +1933,9 @@ html.is-jol .order-head--occasion :is(h1, a, .text-mid-gray) {
 html.is-jol .order-head--occasion :is(.jol-kicker, [data-order-lede]) {
   color: var(--jol-gold-text);
 }
-html.is-jol .order-head--occasion > :not(.jol-decor, .hero__snow-layer) {
+html.is-jol .order-head--occasion > :not(.hero__snow-layer) {
   position: relative;
   z-index: 22;
-}
-html.is-jol .order-holidays {
-  position: relative;
-  padding-top: 48px;
-}
-html.is-jol .order-holidays .jol-lights {
-  height: 48px;
 }
 html.is-jol
   :is(
@@ -2205,19 +1953,19 @@ html.is-jol :is(.draw-rule, .counter-row, .prices__row, .slip__pickup) {
   --rule: var(--jol-gold);
 }
 html.is-jol .is-complete .order-progress__circle {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
   color: var(--jol-cream);
-  border-color: var(--jol-spruce);
+  border-color: var(--jol-ground);
 }
 html.is-jol .is-current .order-progress__circle {
   border-color: var(--jol-red);
 }
 html.is-jol .order-progress__step::after {
-  background: var(--jol-spruce);
+  background: var(--jol-ground);
 }
 html.is-jol .prices__add {
-  border-color: var(--jol-spruce);
-  color: var(--jol-spruce);
+  border-color: var(--jol-ground);
+  color: var(--jol-ground);
 }
 html.is-jol .navdrop__row:has(use[href='#i-christmas-tree']) .navdrop__icon,
 html.is-jol .navdrop__row:has(use[href='#i-gift']) .navdrop__icon {
@@ -2229,41 +1977,10 @@ html.is-jol:has(.order-head--occasion) .day-tile span {
 html.is-jol:has(.order-head--aramot) .day-tile span {
   border-top-color: var(--jol-gold);
 }
-html.motion-draw .jol-decor {
-  clip-path: inset(0 50% 0 50%);
-  opacity: 0.6;
-  transition:
-    clip-path 1.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    opacity 1.1s;
-}
-html.motion-draw .jol-decor.is-drawn {
-  clip-path: inset(0);
-  opacity: 1;
-}
 @media (hover: hover) and (pointer: fine) {
   html.is-jol .prices__add:hover {
-    background: var(--jol-spruce);
+    background: var(--jol-ground);
     color: var(--jol-cream);
-  }
-}
-@media (min-width: 768px) and (max-width: 1000px) {
-  html.is-jol {
-    --garland-depth: 110px;
-  }
-}
-@media (max-width: 767px) {
-  html.is-jol {
-    --garland-depth: 76px;
-  }
-  html.is-jol .hero.jol-surface {
-    min-height: 100svh;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  html.motion-draw .jol-decor {
-    clip-path: none;
-    opacity: 1;
-    transition: none;
   }
 }
 
@@ -2665,7 +2382,7 @@ html.is-jol .jol-head {
     mask: radial-gradient(circle at 7px 0, transparent 5px, #000 5.5px) 0 0 / 14px 100% repeat-x;
   }
   html.is-jol .order-bar {
-    background: var(--jol-spruce);
+    background: var(--jol-ground);
   }
   .order-bar__icon {
     position: relative;
@@ -2788,8 +2505,8 @@ html.is-jol .jol-head {
   display: none;
 }
 
-/* Ticket lines are one compact row: name · amount chip · price · trash. The − / + box and the
-   wish pencil open under a line from its chip (Sindri 11-03: "save space where you can"). */
+/* Ticket lines are one compact row: name · amount chip · price · trash. The − / + box opens
+   under a line from its chip (Sindri 11-03: "save space where you can"). */
 .order-line__top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto 36px;
@@ -2851,9 +2568,6 @@ html.is-jol .jol-head {
 .is-editing .order-line__edit > .order-line__bottom {
   padding-top: 0.6rem;
 }
-.order-line .wish-button {
-  position: static;
-}
 @media (prefers-reduced-motion: reduce) {
   .order-line__edit,
   .line-amount .i {
@@ -2861,31 +2575,44 @@ html.is-jol .jol-head {
   }
 }
 
-/* Cream page heads in Christmas mode: the lights hang from under the header, the head keeps its
-   own spacing below them (Round 4; fir images removed 11-04). */
-html.is-jol .jol-surface.jol-surface--cream {
-  --garland-depth: 76px;
-  padding-top: calc(var(--garland-depth) + var(--cream-head-gap, 3.5rem));
+/* K5 (Karen 10 Nov: "athugasemd við hvert og eitt item"): every line carries its own note field
+   in view, no pencil to find. Her prompts sit under it while it has focus. 16px on touch so iOS
+   does not zoom into the field. */
+.line-note {
+  display: block;
+  margin-top: 0.5rem;
 }
-html.is-jol .jol-surface--cream .jol-decor {
-  top: var(--cream-decor-top, 0px);
+.line-note input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  transition: border-color 160ms var(--order-ease);
 }
-html.is-jol .jol-surface--cream .jol-bulb__glow {
-  opacity: 0.35;
+.line-note input::placeholder {
+  color: #767676;
+  opacity: 1;
 }
-/* On cream the dark drop shadow read as a grey smudge: a small warm contact shadow instead (11-04). */
-html.is-jol .jol-surface--cream .jol-bauble img {
-  filter: drop-shadow(0 2px 3px rgba(74, 52, 20, 0.18));
+.line-note input:focus {
+  border-color: currentColor;
 }
-@media (max-width: 1000px) {
-  html.is-jol .jol-surface.jol-surface--cream {
-    --garland-depth: 64px;
-  }
+.line-note__hint {
+  display: none;
+  margin-top: 0.35rem;
+  color: #5f5f5f;
 }
-@media (max-width: 767px) {
-  html.is-jol .jol-surface.jol-surface--cream {
-    --garland-depth: 52px;
-    --cream-head-gap: 1.25rem;
+.line-note:focus-within .line-note__hint {
+  display: block;
+}
+@media (pointer: coarse) {
+  .line-note input {
+    min-height: 44px;
+    font-size: 16px;
   }
 }
 
@@ -2943,8 +2670,5 @@ html.is-jol .jol-surface--cream .jol-bauble img {
 @media (max-width: 47.999rem) {
   body.has-order-bar .hero {
     --hero-height: calc(var(--svh) * 100 - 72px - env(safe-area-inset-bottom)) !important;
-  }
-  html.is-jol body.has-order-bar .hero.jol-surface {
-    min-height: calc(100svh - 72px - env(safe-area-inset-bottom));
   }
 }

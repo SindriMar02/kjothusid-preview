@@ -18,7 +18,6 @@
   var undoKey = 'kj-pontun-undo';
   var icon = KJOrdering.icon;
   var bin = icon('trash');
-  var wishOpen = {};
   var writingWish = false;
   var fmt = function (n) {
     return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(
@@ -209,36 +208,23 @@
       name +
       '" title="Auka magn">' +
       icon('plus') +
-      '</button></div>' +
-      '<button type="button" class="wish-button' +
-      (line.w ? ' has-wish' : '') +
-      '" data-wish aria-controls="wish-' +
+      '</button></div></div></div>' +
+      // A note on every line, always in view (Karen 10 Nov, K5: "athugasemd við hvert og eitt
+      // item"); her own prompts show under it while it has focus.
+      '<label class="line-note"><input type="text" data-wish-input maxlength="300" enterkeyhint="done" autocomplete="off" aria-label="Athugasemd við ' +
+      name +
+      '" aria-describedby="note-' +
       surface +
       '-' +
       key +
-      '" aria-label="Ósk um ' +
-      name +
-      '" title="Ósk" aria-expanded="' +
-      !!wishOpen[line.k] +
-      '">' +
-      icon('pencil') +
-      '</button></div></div>' +
-      '<p class="order-line__wish type-xsmall">' +
+      '" placeholder="Athugasemd: krydd, pökkun, skurður" value="' +
       esc(line.w || '') +
-      '</p>' +
-      '<div id="wish-' +
+      '"><span class="line-note__hint type-xsmall" id="note-' +
       surface +
       '-' +
       key +
-      '" class="wish-reveal' +
-      (wishOpen[line.k] ? ' is-open' : '') +
-      '"><div><input type="text" data-wish-input maxlength="140" aria-label="Ósk um ' +
-      name +
-      '" placeholder="Til dæmis skorið í 2 cm sneiðar" value="' +
-      esc(line.w || '') +
-      '"' +
-      (wishOpen[line.k] ? '' : ' disabled') +
-      '></div></div><span class="draw-rule is-drawn" aria-hidden="true"></span></div></li>'
+      '">Til dæmis: á að marinera eða krydda? Hvernig á að vakúmpakka? Sérstakur skurður eða þykkt sneiða?</span></label>' +
+      '<span class="draw-rule is-drawn" aria-hidden="true"></span></div></li>'
     );
   }
 
@@ -323,7 +309,7 @@
     else if (gone.length && lines.length) message = 'Fjarlægt: ' + previousLines[gone[0]].n;
     else if (changed.length)
       message =
-        (previousLines[changed[0].k].w !== (changed[0].w || '') ? 'Ósk vistuð: ' : 'Magn uppfært: ') +
+        (previousLines[changed[0].k].w !== (changed[0].w || '') ? 'Athugasemd vistuð: ' : 'Magn uppfært: ') +
         changed[0].n;
     previousLines = {};
     lines.forEach(function (line) {
@@ -749,27 +735,6 @@
       if (at >= 0) removeLine(all[at], at);
       return;
     }
-    var wish = e.target.closest('[data-wish]');
-    if (wish) {
-      var row = wish.closest('[data-order-line]');
-      var key = row.dataset.orderLine;
-      wishOpen[key] = !wishOpen[key];
-      document.querySelectorAll('[data-order-line]').forEach(function (el) {
-        if (el.dataset.orderLine !== key) return;
-        el.querySelector('[data-wish]').setAttribute(
-          'aria-expanded',
-          String(wishOpen[key]),
-        );
-        el.querySelector('.wish-reveal').classList.toggle(
-          'is-open',
-          wishOpen[key],
-        );
-        el.querySelector('[data-wish-input]').disabled = !wishOpen[key];
-      });
-      if (wishOpen[key])
-        row.querySelector('[data-wish-input]').focus({ preventScroll: true });
-      return;
-    }
     var control = e.target.closest(
       '[data-line-minus],[data-line-plus],[data-line-toggle]',
     );
@@ -853,7 +818,7 @@
     var key = e.target.closest('[data-order-line]').dataset.orderLine;
     var lines = Basket.all();
     lines.forEach(function (line) {
-      if (line.k === key) line.w = e.target.value.slice(0, 140);
+      if (line.k === key) line.w = e.target.value.slice(0, 300);
     });
     writingWish = true;
     Basket.set(lines);
@@ -862,14 +827,17 @@
       if (row.dataset.orderLine !== key) return;
       var input = row.querySelector('[data-wish-input]');
       if (input !== e.target) input.value = e.target.value;
-      row.querySelector('.order-line__wish').textContent = e.target.value;
-      row
-        .querySelector('[data-wish]')
-        .classList.toggle('has-wish', !!e.target.value);
     });
   });
   document.addEventListener('change', function (e) {
     if (e.target.matches('[data-line-amount]')) changeLine(e, e.target);
+  });
+  /* The note sits inside the order form, so Enter would send the whole order mid-sentence.
+     Enter (the keyboard's ✓, enterkeyhint="done") only closes the note; it is already saved. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.isComposing || !e.target.matches('[data-wish-input]')) return;
+    e.preventDefault();
+    e.target.blur();
   });
   document.addEventListener(
     'keydown',
