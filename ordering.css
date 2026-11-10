@@ -1923,6 +1923,9 @@ html.is-jol .footer {
   border-top: 0;
 }
 html.is-jol .order-head--occasion {
+  /* holds its snow layer: without this the canvas stretches over the whole page
+     and every flake draws as a tall streak (found 10 Nov, after the lights left) */
+  position: relative;
   background: var(--jol-ground);
   color: var(--jol-cream);
   max-width: none;
