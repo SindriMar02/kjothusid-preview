@@ -145,6 +145,14 @@
     /* Touch: one instant jump. A smooth native scroll was pulled back ~280 px mid-way in iOS Safari
        before the correction landed it (Codex FG2 11 Nov); desktop keeps the smooth scroll. */
     place(!reduce && !touch);
+    /* The error text changes the page height, so motion.js runs ScrollTrigger.refresh() ~200 ms
+       later, and that refresh put back the scroll position from before this jump (traced in iOS
+       Safari 11 Nov: 1561 -> 353 -> 1561). Re-place in the same task as each refresh that follows. */
+    if (window.ScrollTrigger && ScrollTrigger.addEventListener) {
+      var replace = function () { place(false); };
+      ScrollTrigger.addEventListener('refresh', replace);
+      setTimeout(function () { ScrollTrigger.removeEventListener('refresh', replace); }, 1500);
+    }
     setTimeout(function () { place(false); }, reduce ? 0 : 700);
   }
 
