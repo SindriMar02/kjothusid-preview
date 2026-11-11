@@ -164,6 +164,11 @@ html.is-jol .navdrop__panel {
   align-items: center;
   min-height: 44px;
 }
+/* iOS pass 11 Nov: on phones the two holiday links wrap and the " · " hung at the line end. */
+@media (max-width: 47.99rem) {
+  .order-holidays__sep { display: none; }
+  .order-holidays a { display: flex; }
+}
 .ordering {
   padding-top: 0;
   padding-bottom: 5rem;
