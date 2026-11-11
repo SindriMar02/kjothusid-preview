@@ -6,6 +6,8 @@
   'use strict';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var BASE_PATH = (function () { try { return JSON.parse(document.getElementById('kj-data').textContent).base || '/'; } catch (e) { return '/'; } })();
+  var DATA = {};
+  try { DATA = JSON.parse(document.getElementById('kj-data').textContent); } catch (e) {}
   var PHONE = '557 8833';
   var UNIT = { kg: 'kr/kg', stk: 'kr/stk', pk: 'kr/pk', flat: 'kr' };
   var fmt = function (n) { return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(n); };
@@ -73,6 +75,7 @@
   function send(form, payload) {
     var url = form.getAttribute('data-endpoint');
     if (url === 'demo') {
+      if (payload.kind === 'gift') { status(form, 'demo', esc(DATA.giftForm.preview)); return Promise.resolve({ preview: true }); }
       status(form, 'demo', '<strong>Þetta er forskoðun og ekkert var sent.</strong> Á opnaða vefnum fer ' + (payload.kind === 'order' ? 'pöntunin' : 'fyrirspurnin') + ' beint til Kjöthússins í tölvupósti. Í síma ' + PHONE + ' er alltaf hægt að panta.');
       return payload.kind === 'order' ? Promise.resolve({ preview: true }) : new Promise(function () {});
     }
@@ -140,11 +143,13 @@
   });
 
   /* ── order ── */
-  var form = document.querySelector('form[data-form="order"]');
+  var form = document.querySelector('form[data-form="order"], form[data-form="gift"]');
   if (!form) return;
+  if (!DATA.pickup) { try { DATA = JSON.parse(form.dataset.config); } catch (e) {} }
+  var gift = form.dataset.form === 'gift';
   var occasion = null;
   var occasionKey = new URLSearchParams(location.search).get('pontun');
-  if (occasionKey === 'jol' || occasionKey === 'aramot') {
+  if (!gift && (occasionKey === 'jol' || occasionKey === 'aramot')) {
     var occasions = [];
     try { occasions = JSON.parse(document.getElementById('kj-occasions').textContent); } catch (e) {}
     occasion = occasions.find(function (o) { return o.key === occasionKey; }) || null;
@@ -158,19 +163,6 @@
       if (note) note.hidden = false;
     }
   }
-  /* Holiday orders run to the holiday's own last pick-up time (Karen 10 Nov, K4: til kl. 17:00).
-     The later slots are rendered hidden and disabled; only this holiday's page opens them. */
-  (function lateSlots() {
-    var to = occasion && occasion.pickupTo;
-    form.querySelectorAll('[data-late]').forEach(function (chip) {
-      var open = !!to && chip.querySelector('input').value <= to;
-      chip.hidden = !open;
-      chip.querySelector('input').disabled = !open;
-    });
-    var until = form.querySelector('[data-time-to]');
-    if (to && until && to > until.textContent) until.textContent = to;
-  })();
-
   var catalogue = [];
   try { catalogue = JSON.parse(document.getElementById('kj-catalogue').textContent); } catch (e) {}
   var byKey = {};
@@ -184,7 +176,7 @@
     var saved = Basket ? Basket.all() : [];
     lines = saved.map(function (x) {
       var c = byKey[x.k];
-      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u), w: x.w || '', o: x.o } : null;
+      return c ? { k: x.k, q: x.q || defaultQty(c), u: orderUnit(x.u || (c.dq ? c.du : null) || c.u), w: x.w || '' } : null;
     }).filter(Boolean);
     var params = new URLSearchParams(location.search);
     (loadedDeepLinks ? [] : params.getAll('v')).forEach(function (k) {
@@ -196,12 +188,12 @@
   // A price unit describes the price; the relay's quantity is kilograms or pieces.
   function orderUnit(u) { return u === 'flat' || u === 'pk' ? 'stk' : u === 'g' ? 'g' : (u || 'kg'); }
   function persist() {
-    if (Basket) Basket.set(lines.map(function (l) { var x = { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u, w: l.w || '' }; if (l.o) x.o = l.o; return x; }));
+    if (Basket) Basket.set(lines.map(function (l) { var x = { k: l.k, n: byKey[l.k].n, q: l.q, u: l.u, w: l.w || '' }; return x; }));
   }
 
   var linesErr = form.querySelector('[data-lines-error]');
   function render() {
-    if (lines.length) linesErr.hidden = true;
+    if (linesErr && lines.length) linesErr.hidden = true;
   }
   document.addEventListener('kj:basket', function () { load(); render(); });
 
@@ -221,6 +213,19 @@
   }
   var date = radioGroup('date');
   var time = radioGroup('time');
+  function filterTimes() {
+    var window = KJOrdering.pickupWindow(DATA.pickup, occasion, date.value);
+    var cleared = false;
+    form.querySelectorAll('[name="time"]').forEach(function (input) {
+      var open = input.value >= window.from && input.value <= window.to;
+      if (!open && input.checked) { input.checked = false; cleared = true; }
+      input.disabled = !open;
+      input.closest('label').hidden = !open;
+    });
+    var hint = document.getElementById('order-time-hint');
+    hint.textContent = 'Frá ' + window.from + ' til ' + window.to + '.' + (!time.value ? ' ' + DATA.giftForm.chooseTime : '');
+    if (cleared) setError(time, DATA.giftForm.chooseTime);
+  }
   var occasionDates = [];
   var banned = [];
   try {
@@ -279,6 +284,7 @@
         });
       }
     } else if (selected) date.value = selected;
+    filterTimes();
     dayTilesInitialized = true;
     form.querySelector('[data-more-days]').hidden = !!occasion || visibleDays >= tiles.length;
     if (dateHint) dateHint.textContent = occasion ? 'Veldu afhendingardag fyrir ' + (occasion.key === 'jol' ? 'jólin.' : 'áramótin.') : 'Fyrsti mögulegi dagur er ' + dayIs(first) + '.' + (weekdaysOnly ? ' Við afhendum virka daga.' : '');
@@ -324,12 +330,13 @@
     if (notes && !notes.value && d.note) notes.value = d.note;
   })();
   window.KJPickup = {
-    options: function () { return { today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, banned: banned, occasionDays: occasion ? occasionDates : null, times: Array.from(form.querySelectorAll('[name="time"]:not(:disabled)')).map(function (input) { return input.value; }) }; },
+    options: function () { return { today: iso(new Date()), noticeDays: notice, weekdaysOnly: weekdaysOnly, banned: banned, occasionDays: occasion ? occasionDates : null, pickup: DATA.pickup, occasion: occasion, times: Array.from(form.querySelectorAll('[name="time"]')).filter(function (input) { return !occasion ? KJOrdering.inWindow(input.value, DATA.pickup, null, '') : occasionDates.some(function (day) { return KJOrdering.inWindow(input.value, DATA.pickup, occasion, day); }); }).map(function (input) { return input.value; }) }; },
     select: function (slot) {
       if (!KJOrdering.dayTiles(this.options()).some(function (day) { return day.value === slot.date; })) return;
       visibleDays = 60;
       refreshFirstDay();
       date.value = slot.date;
+      filterTimes();
       time.value = slot.time;
       date.dispatchEvent(new Event('change', { bubbles: true }));
       time.dispatchEvent(new Event('change', { bubbles: true }));
@@ -349,7 +356,7 @@
     return true;
   }
   date.addEventListener('change', checkDate);
-  time.addEventListener('change', function () { if (time.value) setError(time, ''); });
+  time.addEventListener('change', function () { filterTimes(); if (time.value) setError(time, ''); });
 
   function checkEmailPhone() {
     var email = form.querySelector('[name="email"]'), phone = form.querySelector('[name="phone"]');
@@ -359,6 +366,36 @@
     if (okP && phone.value.replace(/\D/g, '').length < 7) { setError(phone, 'Símanúmerið þarf að vera að minnsta kosti 7 tölustafir.'); okP = false; }
     if (okP && /[^\d\s+()-]/.test(phone.value.trim())) { setError(phone, 'Notaðu aðeins tölustafi, bil, +, bandstrik eða sviga í símanúmerinu.'); okP = false; }
     return ok && okP;
+  }
+
+  if (gift) {
+    var amount = form.querySelector('[name="amount"]');
+    var giftRef = null;
+    function amountValue() {
+      return /^\d{1,3}(?:\.\d{3})*(?: kr\.)?$|^\d+$/.test(amount.value.trim()) ? Number(amount.value.trim().replace(/ kr\.$/, '').replace(/\./g, '')) : NaN;
+    }
+    amount.addEventListener('focus', function () { var n = amountValue(); if (Number.isFinite(n)) amount.value = String(n); });
+    amount.addEventListener('blur', function () { var n = amountValue(); if (Number.isSafeInteger(n)) amount.value = fmt(n) + ' kr.'; });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var n = amountValue();
+      var ok = Number.isSafeInteger(n) && n >= 1000 && n <= 1000000;
+      setError(amount, ok ? '' : DATA.giftForm.amountError);
+      ok = checkDate() && ok;
+      ok = required(time, DATA.giftForm.chooseTime) && ok;
+      ok = required(form.querySelector('[name="name"]'), 'Settu inn fullt nafn.') && ok;
+      ok = checkEmailPhone() && ok;
+      if (!ok) { status(form, 'error', 'Lagaðu það sem er merkt hér að ofan.'); focusFirstError(form); return; }
+      giftRef = giftRef || makeRef();
+      var v = function (name) { return form.querySelector('[name="' + name + '"]').value.trim(); };
+      send(form, { kind: 'gift', ref: giftRef, amount: n, customer: { name: v('name'), email: v('email'), phone: v('phone') }, fulfilment: { type: 'pickup', date: date.value, time: time.value, place: '' }, notes: v('notes'), website: v('website'), page: location.pathname }).then(function (result) {
+        if (result.preview) return;
+        form.classList.add('is-sent');
+        status(form, 'ok', esc(DATA.giftForm.success) + ' ' + esc(giftRef) + '.');
+        form.querySelector('[type="submit"]').disabled = true;
+      }).catch(function (err) { status(form, 'error', failMessage(err)); });
+    });
+    return;
   }
 
   var ref = null;
@@ -390,9 +427,7 @@
           // The Business Central item number, from Karen's Items export (scripts/bc-items.js).
           // Shown in the order email so staff type the order in without looking it up.
           bcItemNo: c.b || null,
-          // The line's extras (Krydd, Vakúm, Skurður) in the words the pills show, and the
-          // customer's own note (K5): both printed under the item in the order email.
-          options: KJOrdering.optionText(KJOrdering.cleanOptions(l.o, c.c, catalogue)),
+          // The note is the only per-line request sent by the current site.
           note: (l.w || '').trim().slice(0, 300)
         };
       }),

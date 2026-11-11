@@ -212,32 +212,9 @@
       '<span class="draw-rule is-drawn" aria-hidden="true"></span></div></li>'
     );
   }
-  /* The line's extras as small dropdowns (Sindri 10 Nov, design 2 of 3; Karen's K5 questions):
-     Krydd, Vakúm and Skurður where the product takes them, and a note on every line. Each pill
-     shows its choice once made; line-options.js opens the list above the page. */
-  var OPTION_LABELS = { krydd: 'Krydd', vakum: 'Vakúm', skurdur: 'Skurður' };
+  // One S1 note pill per line. Legacy options never reach the UI.
   function optionPills(line, item, name) {
-    var o = KJOrdering.cleanOptions(line.o, item.c, catalogue);
-    var pills = KJOrdering.lineGroups(item.c).map(function (group) {
-      var value = KJOrdering.optionValue(group, o);
-      return (
-        '<button type="button" class="line-opt' +
-        (value ? ' is-set' : '') +
-        '" data-opt="' +
-        group +
-        '" aria-haspopup="true" aria-expanded="false" aria-label="' +
-        OPTION_LABELS[group] +
-        ': ' +
-        esc(value || 'ekkert valið') +
-        '. ' +
-        name +
-        '"><span class="line-opt__text">' +
-        esc(value || OPTION_LABELS[group]) +
-        '</span>' +
-        icon('chevron-down') +
-        '</button>'
-      );
-    });
+    var pills = [];
     var note = (line.w || '').trim();
     pills.push(
       '<button type="button" class="line-opt line-opt--note' +
@@ -328,7 +305,7 @@
     });
     var changed = lines.filter(function (line) {
       var was = previousLines[line.k];
-      return was && (was.q !== line.q || was.u !== line.u || was.w !== (line.w || '') || was.o !== JSON.stringify(line.o || {}));
+      return was && (was.q !== line.q || was.u !== line.u || was.w !== (line.w || ''));
     });
     var message = '';
     if (added.length > 1) message = added.length + ' vörur komnar í pöntunina';
@@ -338,16 +315,14 @@
       message =
         (previousLines[changed[0].k].w !== (changed[0].w || '')
           ? 'Athugasemd vistuð: '
-          : previousLines[changed[0].k].o !== JSON.stringify(changed[0].o || {})
-            ? 'Ósk vistuð: '
-            : 'Magn uppfært: ') +
+          : 'Magn uppfært: ') +
         changed[0].n;
     // While a note is being typed, each keystroke saves; line-options.js says it once on close.
     if (/^Athugasemd/.test(message) && document.activeElement && document.activeElement.matches('[data-opt-note]'))
       message = '';
     previousLines = {};
     lines.forEach(function (line) {
-      previousLines[line.k] = { q: line.q, u: line.u, w: line.w || '', o: JSON.stringify(line.o || {}), n: line.n };
+      previousLines[line.k] = { q: line.q, u: line.u, w: line.w || '', n: line.n };
     });
     return message;
   }

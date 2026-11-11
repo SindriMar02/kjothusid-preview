@@ -221,43 +221,9 @@
           '</ul></div>';
       }
     }
+    // K8: this row always opens the live basket and exists only while it has items.
     var nav = document.querySelector('[data-nav-basket]');
-    if (nav && !basket.all().length && saved && saved.orders.length) {
-      if (nav.tagName !== 'A') {
-        var link = document.createElement('a');
-        link.className = nav.className;
-        link.dataset.navBasket = '';
-        nav.replaceWith(link);
-        nav = link;
-      }
-      nav.href = data.base + 'pantanir/#aftur';
-      nav.hidden = false;
-      nav.removeAttribute('data-modal-open');
-      nav.dataset.rememberNav = '';
-      nav.innerHTML =
-        '<span class="navdrop__icon">' +
-        core.icon('basket') +
-        '</span><span>Síðasta pöntun · ' +
-        count(saved.orders[0].lines.length) +
-        '</span>' +
-        core.icon('chevron-right');
-    } else if (nav && nav.hasAttribute('data-remember-nav')) {
-      var button = document.createElement('button');
-      button.type = 'button';
-      button.className = nav.className;
-      button.dataset.navBasket = '';
-      nav.replaceWith(button);
-      nav = button;
-      nav.dataset.modalOpen = 'basket';
-      nav.hidden = !basket.all().length;
-      nav.innerHTML =
-        '<span class="navdrop__icon">' +
-        core.icon('shopping-bag') +
-        '</span><span>Pöntunin þín<small data-nav-basket-count>' +
-        count(basket.all().length) +
-        '</small></span>' +
-        core.icon('chevron-right');
-    }
+    if (nav) nav.hidden = !basket.all().length;
     document.dispatchEvent(new Event('kj:dropdown-state'));
     document
       .querySelectorAll('.basket-panel [data-basket-empty]')
@@ -314,27 +280,6 @@
       card
         .querySelector('[data-remember-expand]')
         .focus({ preventScroll: true });
-    }
-    var nav = event.target.closest('[data-remember-nav]');
-    if (nav) {
-      if (card) {
-        event.preventDefault();
-        dismissed = false;
-        render();
-        card.scrollIntoView({
-          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches
-            ? 'auto'
-            : 'smooth',
-        });
-        if (!event.detail) card.focus({ preventScroll: true });
-      } else {
-        try {
-          sessionStorage.setItem(
-            'kj-aftur-focus',
-            event.detail === 0 ? '1' : '0',
-          );
-        } catch (error) {}
-      }
     }
     if (event.target.closest('[data-forget]')) {
       var before = saved;

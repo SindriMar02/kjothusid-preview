@@ -108,7 +108,7 @@
     ];
   }
   function dropdownRows(season, count) {
-    return 1 + (season ? 2 : 0) + (count ? 1 : 0);
+    return 2 + (season ? 2 : 0) + (count ? 1 : 0);
   }
   // The unit sits inside the amount box as one small button: it shows the current unit and
   // a tap switches to the other (the amount converts, 0,5 kg is 500 g). Sindri 11-03: the
@@ -219,7 +219,6 @@
       time: order.time,
       lines: order.lines.map(function (line) {
         var kept = { k: line.k, n: line.n, q: line.q, u: line.u, w: line.w || '' };
-        if (line.o && typeof line.o === 'object') kept.o = line.o;
         return kept;
       }),
     };
@@ -266,8 +265,6 @@
         return;
       }
       var clean = { k: item.k, n: item.n, q: line.q, u: line.u, w: line.w };
-      var o = cleanOptions(line.o, item.c, catalogue);
-      if (Object.keys(o).length) clean.o = o;
       var at = lines.findIndex(function (item) {
         return item.k === line.k;
       });
@@ -283,85 +280,25 @@
   function nextSlot(slot, options) {
     if (!slot || (options.times || []).indexOf(slot.time) < 0) return null;
     var day = dayTiles(options).find(function (day) {
-      return new Date(day.value + 'T12:00:00Z').getUTCDay() === slot.weekday;
+      return new Date(day.value + 'T12:00:00Z').getUTCDay() === slot.weekday &&
+        (!options.pickup || inWindow(slot.time, options.pickup, options.occasion, day.value));
     });
     return day ? { date: day.value, time: slot.time } : null;
   }
-  /* Order-line options (Sindri 10 Nov, design 2 of 3, from Karen's K5 questions: "á að
-     marinera/krydda? Hvernig viltu fá kjötið vakúmpakkað? Viltu spes skurð eða þykkt á
-     sneiðum?"). Small dropdowns on each line instead of a text box. Which ones a product gets
-     follows its category; the marinades are the shop's own products ("... marinering" under
-     Meðlæti og krydd), so no choice is invented. */
-  var RAW = ['Nautakjöt', 'Lambakjöt', 'Svínakjöt', 'Folaldakjöt', 'Kjúklingur'];
-  var OPTION_CATEGORIES = {
-    krydd: RAW,
-    vakum: RAW.concat(['Hakk og hamborgarar', 'Unnar kjötvörur', 'Jólavörur', 'Álegg', 'Fiskur']),
-    skurdur: RAW.concat(['Unnar kjötvörur', 'Jólavörur', 'Álegg', 'Fiskur']),
-  };
-  var PACKS = { 'Í heilu lagi': 'Vakúm í heilu lagi', 'Í skömmtum': 'Vakúm í skömmtum' };
-  var CUTS = { 'Sneiðar': 1, 'Steikur': 3 };
-  function lineGroups(category) {
-    return ['krydd', 'vakum', 'skurdur'].filter(function (group) {
-      return OPTION_CATEGORIES[group].indexOf(category) >= 0;
-    });
+  function pickupWindow(pickup, occasion, day) {
+    var hours = occasion && occasion.pickupHours && occasion.pickupHours[(day || '').slice(5)];
+    return {
+      from: (hours && hours.from) || (occasion && occasion.pickupFrom) || pickup.from,
+      to: (hours && hours.to) || (occasion && occasion.pickupTo) || pickup.to
+    };
   }
-  function kryddChoices(catalogue) {
-    var marinades = (catalogue || [])
-      .filter(function (item) {
-        return item.c === 'Meðlæti og krydd' && /marinering$/i.test(item.n.trim());
-      })
-      .map(function (item) {
-        return item.n;
-      });
-    return ['Kryddað'].concat(marinades.length ? marinades : ['Marinerað']);
-  }
-  function cm(value, cut) {
-    var n = Number(value);
-    return n >= 0.5 && n <= 6 && Math.round(n * 2) === n * 2 ? n : CUTS[cut];
-  }
-  // Keeps only what this product may carry; anything else (old, edited, foreign) is dropped.
-  function cleanOptions(o, category, catalogue) {
-    var out = {};
-    if (!o || typeof o !== 'object' || Array.isArray(o)) return out;
-    var groups = lineGroups(category);
-    if (
-      groups.indexOf('krydd') >= 0 &&
-      typeof o.krydd === 'string' &&
-      (catalogue ? kryddChoices(catalogue).indexOf(o.krydd) >= 0 : o.krydd.length <= 60)
-    )
-      out.krydd = o.krydd;
-    if (groups.indexOf('vakum') >= 0 && PACKS.hasOwnProperty(o.vakum)) out.vakum = o.vakum;
-    if (groups.indexOf('skurdur') >= 0 && CUTS.hasOwnProperty(o.skurdur)) {
-      out.skurdur = o.skurdur;
-      out.cm = cm(o.cm, o.skurdur);
-    }
-    return out;
-  }
-  function cmText(n) {
-    return String(n).replace('.', ',') + ' cm';
-  }
-  // What the pill shows and the shop's mail prints, in the same words.
-  function optionValue(group, o) {
-    if (group === 'krydd') return o.krydd || '';
-    if (group === 'vakum') return o.vakum ? PACKS[o.vakum] : '';
-    return o.skurdur ? o.skurdur + ' ' + cmText(o.cm) : '';
-  }
-  function optionText(o) {
-    return ['krydd', 'vakum', 'skurdur']
-      .map(function (group) {
-        return optionValue(group, o || {});
-      })
-      .filter(Boolean);
+  function inWindow(time, pickup, occasion, day) {
+    var window = pickupWindow(pickup, occasion, day);
+    return time >= window.from && time <= window.to;
   }
   root.KJOrdering = {
-    lineGroups: lineGroups,
-    kryddChoices: kryddChoices,
-    cleanOptions: cleanOptions,
-    optionValue: optionValue,
-    optionText: optionText,
-    cmText: cmText,
-    CUTS: CUTS,
-    PACKS: PACKS,
+    pickupWindow: pickupWindow,
+    inWindow: inWindow,
     validRemember: validRemember,
     readRemember: readRemember,
     remember: remember,

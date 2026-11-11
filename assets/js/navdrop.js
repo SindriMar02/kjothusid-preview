@@ -6,12 +6,14 @@
   var trigger = drop.parentElement;
   var button = drop.querySelector('button');
   var panel = drop.querySelector('.navdrop__panel');
+  var mobile = trigger.querySelector('.orders-icon');
+  var lastTrigger = button;
   var fine = matchMedia('(hover: hover) and (pointer: fine)');
   var openTimer,
     closeTimer,
     keyboardOpen = false;
   function allowed() {
-    return fine.matches && innerWidth >= 1024 && !drop.hidden;
+    return !drop.hidden;
   }
   function cancelTimers() {
     clearTimeout(openTimer);
@@ -22,6 +24,7 @@
     open = open && allowed();
     drop.classList.toggle('is-open', open);
     button.setAttribute('aria-expanded', String(open));
+    mobile.setAttribute('aria-expanded', String(open));
     panel.inert = !open;
     keyboardOpen = open && !!keyboard;
     if (open && !keyboard) panel.focus({ preventScroll: true });
@@ -36,24 +39,28 @@
   }
   trigger.addEventListener('pointerenter', function () {
     cancelTimers();
-    if (allowed())
+    if (allowed() && fine.matches && innerWidth >= 1024)
       openTimer = setTimeout(function () {
+        lastTrigger = button;
         setOpen(true);
       }, 80);
   });
   trigger.addEventListener('pointerleave', function () {
+    if (!fine.matches || innerWidth < 1024) return;
     cancelTimers();
     closeTimer = setTimeout(function () {
       if (!keyboardOpen) setOpen(false);
     }, 200);
   });
-  button.addEventListener('click', function (event) {
-    setOpen(
-      button.getAttribute('aria-expanded') !== 'true',
-      event.detail === 0,
-    );
-    if (event.detail !== 0 && drop.classList.contains('is-open'))
-      panel.focus({ preventScroll: true });
+  [button, mobile].forEach(function (control) {
+    control.addEventListener('click', function (event) {
+      event.preventDefault();
+      lastTrigger = control;
+      setOpen(button.getAttribute('aria-expanded') !== 'true', event.detail === 0);
+    });
+  });
+  panel.addEventListener('click', function (event) {
+    if (event.target.closest('a,button')) setOpen(false);
   });
   trigger.addEventListener('focusin', function () {
     clearTimeout(closeTimer);
@@ -69,7 +76,7 @@
       event.preventDefault();
       event.stopPropagation();
       setOpen(false);
-      button.focus();
+      lastTrigger.focus();
     }
   });
   document.addEventListener('pointerdown', function (event) {

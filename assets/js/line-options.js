@@ -1,10 +1,5 @@
-/* The order line's extras (Sindri 10 Nov, design 2 of 3; Karen's K5 questions as choices).
-   Each pill on a line (Krydd, Vakúm, Skurður, Athugasemd) opens one small list that floats
-   above the page. It lives outside the order form, so Enter in the note can never send the
-   order, and outside the slip's scroll box, so nothing clips it. A choice is saved at once
-   to the order (KJBasket) and the line re-renders with the choice on its pill.
-   Focus: a tap moves focus to the list itself (no ring, focus-guard); the keyboard lands on
-   the chosen item. Esc and a tap outside close it; focus returns to the pill. */
+/* One floating S1 note panel outside forms and scroll boxes. Pointer opens on the
+   panel; keyboard opens on the field. Escape, outside tap and Enter close it. */
 (function () {
   'use strict';
   var Basket = window.KJBasket;
@@ -21,13 +16,6 @@
   });
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var icon = core.icon;
-  var QUESTIONS = {
-    krydd: 'Á að krydda eða marinera?',
-    vakum: 'Hvernig viltu fá það vakúmpakkað?',
-    skurdur: 'Sérstakur skurður eða þykkt?',
-  };
-  var NONE = { krydd: 'Nei takk', vakum: 'Ekki vakúmpakkað', skurdur: 'Eins og venjulega' };
-
   var pop = document.createElement('div');
   pop.className = 'opt-pop';
   pop.id = 'opt-pop';
@@ -70,74 +58,19 @@
     return null;
   }
 
-  function choiceRows(group, o, item) {
-    var current = group === 'krydd' ? o.krydd : group === 'vakum' ? o.vakum : o.skurdur;
-    var values =
-      group === 'krydd'
-        ? core.kryddChoices(catalogue)
-        : group === 'vakum'
-          ? Object.keys(core.PACKS)
-          : Object.keys(core.CUTS);
-    var rows = [{ value: '', label: NONE[group] }].concat(
-      values.map(function (value) {
-        return { value: value, label: group === 'vakum' ? core.PACKS[value] : value };
-      }),
-    );
-    return rows
-      .map(function (row) {
-        var on = (current || '') === row.value;
-        return (
-          '<button type="button" class="opt-pop__item" role="radio" aria-checked="' +
-          on +
-          '" data-value="' +
-          esc(row.value) +
-          '"><span>' +
-          esc(row.label) +
-          '</span>' +
-          icon('check') +
-          '</button>'
-        );
-      })
-      .join('');
-  }
   function build() {
     var line = lineOf(state.key);
     var item = byKey[state.key] || { n: line ? line.n : '', c: '' };
-    var o = core.cleanOptions(line && line.o, item.c, catalogue);
-    if (state.group === 'note') {
-      pop.setAttribute('role', 'dialog');
-      pop.setAttribute('aria-label', 'Athugasemd við ' + item.n);
-      pop.innerHTML =
-        '<p class="opt-pop__q" id="opt-pop-q">Athugasemd við ' +
-        esc(item.n) +
-        '</p><textarea class="opt-pop__note" data-opt-note rows="3" maxlength="300" enterkeyhint="done" aria-labelledby="opt-pop-q" placeholder="Til dæmis: fituhreinsað, fjórar sneiðar í poka">' +
-        esc((line && line.w) || '') +
-        '</textarea><button type="button" class="opt-pop__done" data-opt-done>Lokið</button>';
-      return;
-    }
+    var examples = data.lineNoteExamples || {};
+    var key = ['Svínakjöt', 'Folaldakjöt', 'Kjúklingur'].indexOf(item.c) >= 0 ? 'raw' : item.c;
+    var notes = examples[key] || examples.default || [];
     pop.setAttribute('role', 'dialog');
-    pop.setAttribute('aria-label', QUESTIONS[state.group] + ' ' + item.n);
-    var html =
-      '<p class="opt-pop__q" id="opt-pop-q">' +
-      QUESTIONS[state.group] +
-      '</p><div role="radiogroup" aria-labelledby="opt-pop-q">' +
-      choiceRows(state.group, o, item) +
-      '</div>';
-    if (state.group === 'skurdur' && o.skurdur) {
-      html +=
-        '<div class="opt-pop__thick"><span>Þykkt</span><span class="opt-pop__step"><button type="button" data-opt-cm="-0.5" aria-label="Þynnra"' +
-        (o.cm <= 0.5 ? ' disabled' : '') +
-        '>' +
-        icon('minus') +
-        '</button><output aria-live="polite">' +
-        core.cmText(o.cm) +
-        '</output><button type="button" data-opt-cm="0.5" aria-label="Þykkara"' +
-        (o.cm >= 6 ? ' disabled' : '') +
-        '>' +
-        icon('plus') +
-        '</button></span></div><button type="button" class="opt-pop__done" data-opt-done>Lokið</button>';
-    }
-    pop.innerHTML = html;
+    pop.setAttribute('aria-label', 'Athugasemd við ' + item.n);
+    pop.innerHTML = '<p class="opt-pop__q" id="opt-pop-q">Athugasemd við ' + esc(item.n) +
+      '</p><div class="opt-pop__examples" id="opt-pop-examples"><p>' + esc(data.giftForm.noteExampleLabel) + '</p>' +
+      notes.map(function (note) { return '<p>' + esc(note) + '</p>'; }).join('') +
+      '</div><textarea class="opt-pop__note" data-opt-note rows="3" maxlength="300" enterkeyhint="done" aria-labelledby="opt-pop-q" aria-describedby="opt-pop-examples">' +
+      esc((line && line.w) || '') + '</textarea><button type="button" class="opt-pop__done" data-opt-done>Lokið</button>';
   }
   // Below the pill when it fits, above it otherwise; always inside the visible screen, which
   // on a phone with the keyboard up is the visual viewport, not the layout viewport.
@@ -183,13 +116,10 @@
     void pop.offsetWidth;
     pop.classList.add('is-open');
     var note = pop.querySelector('[data-opt-note]');
-    if (note) {
-      // A tap on "Athugasemd" means "let me write": the field takes focus (and the keyboard).
+    if (note && byKeyboard) {
+      // Keyboard opens on the first control. Pointer opens on the container.
       note.focus({ preventScroll: true });
       note.setSelectionRange(note.value.length, note.value.length);
-    } else if (byKeyboard) {
-      var at = pop.querySelector('[aria-checked="true"]') || pop.querySelector('.opt-pop__item');
-      if (at) at.focus();
     } else pop.focus({ preventScroll: true });
   }
   function close(returnFocus) {
@@ -216,57 +146,14 @@
 
   document.addEventListener('click', function (e) {
     var pill = e.target.closest('[data-opt]');
-    if (pill && pill.closest('[data-order-line]')) {
+    if (pill && pill.dataset.opt === 'note' && pill.closest('[data-order-line]')) {
       var same = state && state.pill === pill;
       if (same) close(e.detail === 0);
       else open(pill, e.detail === 0);
       return;
     }
     if (!state || !pop.contains(e.target)) return;
-    var choice = e.target.closest('.opt-pop__item');
-    var step = e.target.closest('[data-opt-cm]');
     var keyboard = e.detail === 0;
-    if (choice) {
-      var group = state.group;
-      var value = choice.dataset.value;
-      save(state.key, function (line) {
-        var o = Object.assign({}, line.o || {});
-        if (!value) {
-          delete o[group];
-          if (group === 'skurdur') delete o.cm;
-        } else {
-          o[group] = value;
-          if (group === 'skurdur') o.cm = core.CUTS[value];
-        }
-        line.o = o;
-      });
-      // A cut stays open so its thickness can be set; every other choice closes the list.
-      if (group === 'skurdur' && value) {
-        build();
-        place();
-        if (keyboard) {
-          var plus = pop.querySelector('[data-opt-cm="0.5"]');
-          if (plus) plus.focus();
-        } else pop.focus({ preventScroll: true });
-      } else close(keyboard);
-      return;
-    }
-    if (step) {
-      var delta = Number(step.dataset.optCm);
-      save(state.key, function (line) {
-        var o = Object.assign({}, line.o || {});
-        o.cm = Math.min(6, Math.max(0.5, (Number(o.cm) || core.CUTS[o.skurdur] || 1) + delta));
-        line.o = o;
-      });
-      var focusAt = keyboard ? step.dataset.optCm : null;
-      build();
-      place();
-      if (focusAt) {
-        var again = pop.querySelector('[data-opt-cm="' + focusAt + '"]:not([disabled])') || pop.querySelector('[data-opt-done]');
-        if (again) again.focus();
-      } else pop.focus({ preventScroll: true });
-      return;
-    }
     if (e.target.closest('[data-opt-done]')) close(keyboard);
   });
   var noteTimer = 0;
@@ -331,14 +218,7 @@
         }
         return;
       }
-      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && pop.contains(document.activeElement)) {
-        var items = Array.prototype.slice.call(pop.querySelectorAll('.opt-pop__item'));
-        if (!items.length) return;
-        e.preventDefault();
-        var at = items.indexOf(document.activeElement);
-        var next = e.key === 'ArrowDown' ? (at + 1) % items.length : (at - 1 + items.length) % items.length;
-        items[at < 0 ? 0 : next].focus();
-      }
+
     },
     true,
   );
