@@ -142,7 +142,9 @@
       if (!focusEl.hasAttribute('tabindex')) focusEl.setAttribute('tabindex', '-1');
     }
     try { focusEl.focus({ preventScroll: true }); } catch (e) { focusEl.focus(); }
-    place(!reduce);
+    /* Touch: one instant jump. A smooth native scroll was pulled back ~280 px mid-way in iOS Safari
+       before the correction landed it (Codex FG2 11 Nov); desktop keeps the smooth scroll. */
+    place(!reduce && !touch);
     setTimeout(function () { place(false); }, reduce ? 0 : 700);
   }
 
