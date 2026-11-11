@@ -108,10 +108,24 @@
        audit 11 Nov: on phones the gift amount error ended ~1000 px above the screen). The
        field's label sits just under the fixed header; re-checked once the error layout settles. */
     var box = target.closest('.field') || bad;
+    /* Clear the whole pinned stack, not only the header: on phones /pantanir/ also pins the order
+       steps and the category chips over the form (Codex re-check 11 Nov: name field hidden behind them). */
+    var PINNED = '[data-site-header], .order-progress, .order-chips, .counter-search, .order-rail__sticky';
+    function pinnedBottom(r) {
+      var bottom = 0;
+      document.querySelectorAll(PINNED).forEach(function (el) {
+        var pos = getComputedStyle(el).position;
+        if (pos !== 'sticky' && pos !== 'fixed' && !el.matches('[data-site-header]')) return;
+        var b = el.getBoundingClientRect();
+        if (!b.height || b.top > window.innerHeight * 0.4 || b.right <= r.left || b.left >= r.right) return;
+        bottom = Math.max(bottom, b.bottom);
+      });
+      return bottom;
+    }
     function place(smooth) {
-      var header = document.querySelector('[data-site-header]');
-      var clear = (header ? header.getBoundingClientRect().bottom : 0) + 24;
-      var top = box.getBoundingClientRect().top;
+      var r = box.getBoundingClientRect();
+      var clear = pinnedBottom(r) + 24;
+      var top = r.top;
       if (top >= clear && top < window.innerHeight * 0.6) return;
       var y = Math.max(0, top + window.scrollY - clear);
       if (window.kjLenis) window.kjLenis.scrollTo(y, { immediate: !smooth });
