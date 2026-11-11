@@ -1047,6 +1047,10 @@ html.motion-draw [data-build-item]:not(.is-drawn) {
   .calendar-day small {
     font-size: 0.55rem;
   }
+  /* Design audit 11 Nov: the hours were 8.8 px here. Phones read them under the grid. */
+  .calendar-day__hours {
+    display: none;
+  }
   .calendar-day > span {
     display: none;
   }
@@ -2848,3 +2852,10 @@ html.is-jol .jol-head {
 .giftcard-image{display:block;max-width:100%;height:auto;margin-block:2rem}
 
 .giftcard-copy{display:grid;gap:var(--spacing-m);max-width:40rem}
+
+/* Pickup hours under the December calendar, phones only (design audit 11 Nov). */
+.calendar-hours { display: none; }
+@media (max-width: 47.99rem) {
+  .calendar-hours { display: grid; gap: 0.25rem; margin-top: var(--spacing-s, 1rem); }
+  .calendar-hours p { margin: 0; }
+}

@@ -788,3 +788,10 @@ html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-
 }
 /* ==================== JÓL DECORATIONS: lights, baubles, ribbon, red ==================== */
 /* Decoration geometry and draw states live in ordering.css. */
+
+/* Design audit 11 Nov: with items in the order, the floating basket pill sat on the hero's
+   intro text (bottom right, 180 x 40 px overlap at 1280 and 1440). Lift the hero content
+   clear of the pill while it is shown. */
+@media (min-width:48rem){
+  body:has(> .basket:not([hidden])) .hero__content{padding-bottom:calc(var(--spacing-l) + 3rem + var(--spacing-m))}
+}

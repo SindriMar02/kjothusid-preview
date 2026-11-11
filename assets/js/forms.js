@@ -102,10 +102,24 @@
   }
   function focusFirstError(form) {
     var bad = form.querySelector('[aria-invalid="true"], [data-lines-error]:not([hidden])');
-    if (bad) {
-      (bad.matches('input,textarea,select') ? bad : (bad.querySelector('input') || form.querySelector('#picker-search') || bad)).focus();
-      bad.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    if (!bad) return;
+    var target = bad.matches('input,textarea,select') ? bad : (bad.querySelector('input') || form.querySelector('#picker-search') || bad);
+    /* One measured scroll instead of focus()'s jump racing a smooth scrollIntoView (design
+       audit 11 Nov: on phones the gift amount error ended ~1000 px above the screen). The
+       field's label sits just under the fixed header; re-checked once the error layout settles. */
+    var box = target.closest('.field') || bad;
+    function place(smooth) {
+      var header = document.querySelector('[data-site-header]');
+      var clear = (header ? header.getBoundingClientRect().bottom : 0) + 24;
+      var top = box.getBoundingClientRect().top;
+      if (top >= clear && top < window.innerHeight * 0.6) return;
+      var y = Math.max(0, top + window.scrollY - clear);
+      if (window.kjLenis) window.kjLenis.scrollTo(y, { immediate: !smooth });
+      else window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
     }
+    try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+    place(!reduce);
+    setTimeout(function () { place(false); }, reduce ? 0 : 700);
   }
 
   /* ── enquiry ── */
