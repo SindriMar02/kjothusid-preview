@@ -131,7 +131,17 @@
       if (window.kjLenis) window.kjLenis.scrollTo(y, { immediate: !smooth });
       else window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
     }
-    try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+    /* Touch screens: focusing a text field opens the iOS keyboard, and Safari then pans the page to
+       the field on its own, fighting this scroll (Codex foreground iOS run 11 Nov: 5 of 8 errors
+       ended behind the header, scroll went out and back). There the error message takes focus
+       (no keyboard); the customer taps the field when ready. Pointer/keyboard devices focus the field. */
+    var touch = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    var focusEl = target;
+    if (touch && target.matches('input:not([type=radio]):not([type=checkbox]), textarea')) {
+      focusEl = box.querySelector('.field__error:not([hidden])') || box;
+      if (!focusEl.hasAttribute('tabindex')) focusEl.setAttribute('tabindex', '-1');
+    }
+    try { focusEl.focus({ preventScroll: true }); } catch (e) { focusEl.focus(); }
     place(!reduce);
     setTimeout(function () { place(false); }, reduce ? 0 : 700);
   }

@@ -22,6 +22,8 @@
 .notice__text .link{margin-left:var(--spacing-xxs)}
 .notice__close{flex:none;width:1.75rem;height:1.75rem;display:grid;place-items:center;color:inherit;margin-block:-.25rem;position:relative}
 .notice__close svg{width:.875rem;height:.875rem}
+/* iOS pass 11 Nov: the close button is 28 px; an invisible 44 x 44 hit area keeps the bar height. */
+.notice__close::after{content:"";position:absolute;inset:-.5rem}
 .notice :focus-visible{outline:1px solid var(--color-white);outline-offset:2px}
 /* The text sits on the page's centre axis: an empty spacer the width of the close button on the left (Sindri 11-04: "reads symmetrical"). */
 .notice{--notice-close:1.75rem;align-items:center}.notice::before{content:'';flex:none;width:var(--notice-close)}.notice__close{width:var(--notice-close)}
