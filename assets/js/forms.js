@@ -149,7 +149,7 @@
        later, and that refresh put back the scroll position from before this jump (traced in iOS
        Safari 11 Nov: 1561 -> 353 -> 1561). Re-place in the same task as each refresh that follows. */
     if (window.ScrollTrigger && ScrollTrigger.addEventListener) {
-      var replace = function () { place(false); };
+      var replace = function () { place(!reduce && !touch); };
       ScrollTrigger.addEventListener('refresh', replace);
       setTimeout(function () { ScrollTrigger.removeEventListener('refresh', replace); }, 1500);
     }
