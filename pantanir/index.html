@@ -42,12 +42,12 @@
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/Marcellus-Regular.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/NimbusSans-Regular.woff2" crossorigin>
 
-<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=2610a2e0">
-<link rel="stylesheet" href="/kjothusid-preview/site.css?v=2610a2e0">
-<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=2610a2e0">
-<link rel="stylesheet" href="/kjothusid-preview/ordering.css?v=2610a2e0">
-<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=2610a2e0">
-<link rel="stylesheet" href="/kjothusid-preview/booklet.css?v=2610a2e0">
+<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=0b1ec4d4">
+<link rel="stylesheet" href="/kjothusid-preview/site.css?v=0b1ec4d4">
+<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=0b1ec4d4">
+<link rel="stylesheet" href="/kjothusid-preview/ordering.css?v=0b1ec4d4">
+<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=0b1ec4d4">
+<link rel="stylesheet" href="/kjothusid-preview/booklet.css?v=0b1ec4d4">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Forsíða","item":"https://kjothusid.is/"},{"@type":"ListItem","position":2,"name":"Pantanir","item":"https://kjothusid.is/pantanir/"}]}</script>
 </head>
 <body class="is-subpage is-preview" data-page="order">
@@ -191,8 +191,9 @@
          prototype set the name in Marcellus here; the client's red wordmark
          replaces it, reversed over the hero and dark sections. -->
     <a class="navbar__logo" href="/kjothusid-preview/" aria-label="Kjöthúsið, forsíða" translate="no">
-      <img class="navbar__logo-img navbar__logo-img--light" src="/kjothusid-preview/assets/img/logo.svg" alt="" width="215" height="66">
-      <img class="navbar__logo-img navbar__logo-img--dark" src="/kjothusid-preview/assets/img/logo-reversed.svg" alt="" width="215" height="66">
+      <!-- K17 (Karen 12 Nov): the full logo, the pig and the bull over the wordmark. -->
+      <img class="navbar__logo-img navbar__logo-img--light" src="/kjothusid-preview/assets/img/crest.svg" alt="" width="398" height="244">
+      <img class="navbar__logo-img navbar__logo-img--dark" src="/kjothusid-preview/assets/img/crest-reversed.svg" alt="" width="398" height="244">
     </a>
     <div class="navbar__right">
       <span class="navbar__right-extra"><span class="link"><a href="/kjothusid-preview/kjarnhiti/" class="link__anchor type-small"><span class="link__text">Kjarnhiti</span><span class="link__underline" aria-hidden="true"><span class="link__line"></span></span></a></span></span>
@@ -1263,13 +1264,6 @@
       <fieldset class="field tile-field" aria-describedby="order-date-hint order-date-err">
       <legend><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg>Dagur</legend>
         <div class="day-tiles" data-day-tiles data-build><label class="day-tile" data-build-item>
-      <input type="radio" required name="date" value="2026-11-12" aria-describedby="order-date-hint order-date-err">
-      <span>
-      <small>FIM.</small>
-      <strong>12</strong>
-      <small>NÓV.</small>
-      </span>
-      </label><label class="day-tile" data-build-item>
       <input type="radio" required name="date" value="2026-11-13" aria-describedby="order-date-hint order-date-err">
       <span>
       <small>FÖS.</small>
@@ -1332,9 +1326,16 @@
       <strong>25</strong>
       <small>NÓV.</small>
       </span>
+      </label><label class="day-tile" data-build-item>
+      <input type="radio" required name="date" value="2026-11-26" aria-describedby="order-date-hint order-date-err">
+      <span>
+      <small>FIM.</small>
+      <strong>26</strong>
+      <small>NÓV.</small>
+      </span>
       </label></div>
         <button type="button" data-more-days>Fleiri dagar →</button>
-      <p class="field__hint type-xsmall" id="order-date-hint">Fyrsti mögulegi dagur er fimmtudagur 12. nóvember.</p>
+      <p class="field__hint type-xsmall" id="order-date-hint">Fyrsti mögulegi dagur er föstudagur 13. nóvember.</p>
       <p class="field__error type-xsmall" id="order-date-err" hidden>
       </p>
       </fieldset>
@@ -1604,18 +1605,18 @@
 <script src="/kjothusid-preview/assets/vendor/lenis.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/gsap.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/ScrollTrigger.min.js" defer></script>
-<script src="/kjothusid-preview/assets/js/christmas.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/motion.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/ordering-core.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/navdrop.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/decor.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/site.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/basket.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/line-options.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/calendar.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/extras.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/doneness.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/occasions.js?v=2610a2e0" defer></script><script src="/kjothusid-preview/assets/js/forms.js?v=2610a2e0" defer></script><script src="/kjothusid-preview/assets/js/ordering.js?v=2610a2e0" defer></script><script src="/kjothusid-preview/assets/js/snow.js?v=2610a2e0" defer></script>
-<script src="/kjothusid-preview/assets/js/remember.js?v=2610a2e0" defer></script>
+<script src="/kjothusid-preview/assets/js/christmas.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/motion.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/ordering-core.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/navdrop.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/decor.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/site.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/basket.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/line-options.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/calendar.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/extras.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/doneness.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/occasions.js?v=0b1ec4d4" defer></script><script src="/kjothusid-preview/assets/js/forms.js?v=0b1ec4d4" defer></script><script src="/kjothusid-preview/assets/js/ordering.js?v=0b1ec4d4" defer></script><script src="/kjothusid-preview/assets/js/snow.js?v=0b1ec4d4" defer></script>
+<script src="/kjothusid-preview/assets/js/remember.js?v=0b1ec4d4" defer></script>
 </body>
 </html>

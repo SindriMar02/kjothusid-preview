@@ -35,17 +35,17 @@
    ground always change together. */
 .navbar__logo{display:grid;line-height:0}
 /* K7: a larger centred logo at each breakpoint, all year. */
-.navbar__logo-img{grid-area:1/1;height:3.25rem;width:auto;transition:opacity .3s ease}
-/* Phones: 72px bar and 52px logo leave 10px above and below. */
-.navbar__inner{min-height:4.5rem;padding-block:.625rem}
+.navbar__logo-img{grid-area:1/1;height:5.5rem;width:auto;transition:opacity .3s ease}
+/* K17: the full crest (398:244). Phones: 108px bar, 88px crest, 10px above and below. */
+.navbar__inner{min-height:6.75rem;padding-block:.625rem}
 .navbar__logo-img--dark{opacity:0}
 .navbar[data-nav-theme="dark"] .navbar__logo-img--light{opacity:0}
 .navbar[data-nav-theme="dark"] .navbar__logo-img--dark{opacity:1}
 /* 88px and 100px bars grow with the logo; site.js measures notices as well. */
-@media (min-width:48rem){.navbar__logo-img{height:4.25rem}.navbar__inner{min-height:5.5rem}:root{--top-chrome:5.5rem}}
+@media (min-width:48rem){.navbar__logo-img{height:7rem}.navbar__inner{min-height:8.25rem}:root{--top-chrome:8.25rem}}
 .navbar__right{gap:var(--spacing-l)}
 .navbar__right-extra{display:none}
-@media (min-width:64rem){.navbar__logo-img{height:5rem}.navbar__inner{min-height:6.25rem}:root{--top-chrome:6.25rem}}
+@media (min-width:64rem){.navbar__logo-img{height:8.75rem}.navbar__inner{min-height:10rem}:root{--top-chrome:10rem}}
 .navbar__gift{display:none}
 @media (min-width:64rem){.navbar__gift{display:inline-block}}
 @media (min-width:80rem){.navbar__right-extra{display:inline-block}}
