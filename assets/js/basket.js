@@ -59,6 +59,13 @@
       ? item.p * (line.u === 'g' && item.u === 'kg' ? line.q / 1000 : line.q)
       : null;
   }
+  // Boxes (kassi:) have a fixed price, so they get no "≈" and no weight note when they are all the basket holds.
+  function isFixed(line) {
+    return /^kassi:/.test(line.k);
+  }
+  function approx(lines) {
+    return lines.every(isFixed) ? '' : '≈ ';
+  }
   function estimate(lines) {
     return lines.reduce(function (sum, line) {
       return sum + (linePrice(line) || 0);
@@ -72,7 +79,7 @@
     return (
       '<span class="total-line">' +
       (total
-        ? 'Áætlað <strong>' + fmt(total) + ' kr.</strong> án vsk.'
+        ? (approx(lines) ? 'Áætlað' : 'Samtals') + ' <strong>' + fmt(total) + ' kr.</strong> án vsk.'
         : 'Verð í síma') +
       '<button type="button" class="total-info" data-total-info aria-expanded="' +
       noteOpen +
@@ -80,7 +87,7 @@
       icon('help-circle') +
       '</button></span><span class="total-note type-xsmall"' +
       (noteOpen ? '' : ' hidden') +
-      '>Endanlegt verð miðast við vigt og staðfestingu okkar.</span>'
+      '>' + (approx(lines) ? 'Endanlegt verð miðast við vigt og staðfestingu okkar.' : 'Kassarnir eru á föstu verði.') + '</span>'
     );
   }
   document.addEventListener('click', function (e) {
@@ -168,7 +175,7 @@
       icon('chevron-down') +
       '</button>' +
       '<span class="order-line__price type-xsmall">' +
-      (price === null ? 'Verð í síma' : '≈ ' + fmt(price) + ' kr.') +
+      (price === null ? 'Verð í síma' : approx([line]) + fmt(price) + ' kr.') +
       '</span>' +
       '<button type="button" class="line-remove" data-line-remove aria-label="Taka ' +
       name +
@@ -288,7 +295,7 @@
   function barSteady(lines) {
     return (
       nextStep() ||
-      (estimate(lines) ? '≈ ' + fmt(estimate(lines)) + ' kr.' : 'Verð í síma')
+      (estimate(lines) ? approx(lines) + fmt(estimate(lines)) + ' kr.' : 'Verð í síma')
     );
   }
   // What changed since the last render, in words (raw text, set with textContent).
@@ -532,7 +539,7 @@
           : '') +
         '</span>' +
         (estimate(lines)
-          ? '<span class="basket__estimate">≈ ' +
+          ? '<span class="basket__estimate">' + approx(lines) +
             fmt(estimate(lines)) +
             ' kr.</span>'
           : '');
