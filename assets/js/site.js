@@ -74,6 +74,8 @@
   (function popup() {
     var all = Array.prototype.slice.call(document.querySelectorAll('dialog[data-popup]')).filter(live);
     if (!all.length || typeof HTMLDialogElement === 'undefined') return;
+    // Never over the order or gift card form: someone there is in the middle of a task. It waits for the next page.
+    if (document.querySelector('form[data-form="order"], form[data-form="gift"]')) return;
     all.sort(function (a, b) { return Date.parse(b.getAttribute('data-start') || 0) - Date.parse(a.getAttribute('data-start') || 0); });
     var d = all[0];
     var id = d.getAttribute('data-popup') + '@' + d.getAttribute('data-rev');

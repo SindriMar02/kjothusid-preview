@@ -63,6 +63,15 @@
     var item = byKey[state.key] || { n: line ? line.n : '', c: '' };
     var examples = data.lineNoteExamples || {};
     var key = ['Svínakjöt', 'Folaldakjöt', 'Kjúklingur'].indexOf(item.c) >= 0 ? 'raw' : item.c;
+    // Christmas rows all sit in Jólavörur: raw cuts get the beef, lamb or raw examples by their name;
+    // smoked, cured and cooked goods (hangikjöt, paté, carpaccio, skinka, boxes) keep the default.
+    if (item.c === 'Jólavörur') {
+      var n = String(item.n || '').toLocaleLowerCase('is');
+      key = /hangi|paté|carpaccio|grafi|soðið|eldaður|sneitt|skinka|sykursölt|reykt|hamborgar|borgari|bollur|kassi/.test(n) ? 'default'
+        : /naut/.test(n) ? 'Nautakjöt'
+        : /lamb/.test(n) ? 'Lambakjöt'
+        : 'raw';
+    }
     var notes = examples[key] || examples.default || [];
     pop.setAttribute('role', 'dialog');
     pop.setAttribute('aria-label', 'Athugasemd við ' + item.n);
