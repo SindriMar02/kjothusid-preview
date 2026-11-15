@@ -447,10 +447,19 @@
   }
 
   var ref = null;
+  /* The same rules as the amount controls and the relay (worker/src/input.ts): kilos to one decimal,
+     grams in tens from 10 g, whole pieces. 13 Nov scenario run: 0,3 kg and 1,2 kg were refused here. */
+  function badQty(l) {
+    var q = l.q;
+    if (!isFinite(q) || q <= 0) return true;
+    if (l.u === 'g') return q < 10 || q > 100000 || Math.round(q) !== q || q % 10 !== 0;
+    if (l.u === 'kg') return q > 10000 || Math.abs(q * 10 - Math.round(q * 10)) > 1e-9;
+    return q > 10000 || Math.round(q) !== q;
+  }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var ok = true;
-    var linesMessage = !lines.length ? 'Veldu að minnsta kosti eina vöru.' : lines.length > 80 ? 'Hámark er 80 vörur í hverri pöntun.' : lines.some(function (l) { return !isFinite(l.q) || l.q <= 0 || l.q > 10000 || Math.round(l.q * 2) !== l.q * 2; }) ? 'Magn þarf að vera frá 0,5 til 10.000 í hálfum eða heilum einingum.' : '';
+    var linesMessage = !lines.length ? 'Veldu að minnsta kosti eina vöru.' : lines.length > 80 ? 'Hámark er 80 vörur í hverri pöntun.' : lines.some(badQty) ? 'Magn þarf að vera í kílóum með einum aukastaf (til dæmis 0,3 kg), í grömmum í tugum (til dæmis 300 g) eða í heilum stykkjum.' : '';
     linesErr.hidden = !linesMessage;
     if (linesMessage) { linesErr.textContent = linesMessage; ok = false; }
     ok = checkDate() && ok;
@@ -527,7 +536,13 @@
           alarms: [{ minutesBefore: 60 }]
         }, 'kjothusid-pontun-' + ref + '.ics');
       });
-      window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 120, behavior: reduce ? 'auto' : 'smooth' });
+      var pinned = 0;
+      document.querySelectorAll('[data-site-header], .order-progress, .order-chips').forEach(function (el) {
+        var p = getComputedStyle(el).position, b = el.getBoundingClientRect();
+        if ((p === 'sticky' || p === 'fixed' || el.matches('[data-site-header]')) && b.height && b.top < window.innerHeight * 0.4) pinned = Math.max(pinned, b.bottom);
+      });
+      var to = Math.max(0, form.getBoundingClientRect().top + window.scrollY - pinned - 24);
+      if (window.kjLenis) window.kjLenis.scrollTo(to, { immediate: reduce }); else window.scrollTo({ top: to, behavior: reduce ? 'auto' : 'smooth' });
     }).catch(function (err) { status(form, 'error', failMessage(err)); });
   });
   form.addEventListener('input', function (e) {

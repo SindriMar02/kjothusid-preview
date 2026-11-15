@@ -2864,3 +2864,8 @@ html.is-jol .jol-head {
   .calendar-hours { display: grid; gap: 0.25rem; margin-top: var(--spacing-s, 1rem); }
   .calendar-hours p { margin: 0; }
 }
+
+/* The sent view replaces the three-column order form: one centred column of reading width (13 Nov scenario run:
+   the receipt sat in the narrow left column with the rest of the screen empty). */
+.form--order.is-sent { display: block; max-width: 40rem; margin-inline: auto; }
+.form--order.is-sent .sent { width: 100%; }
