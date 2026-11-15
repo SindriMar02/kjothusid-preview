@@ -807,3 +807,8 @@ html.is-jol .jol-gifts .gift-boxes { position: relative; padding: var(--spacing-
 .jol-gifts .box{border-color:color-mix(in srgb,currentColor 45%,transparent)}
 .jol-gifts .box .box__name{color:inherit}
 .jol-gifts .box__list li::before{background:currentColor}
+/* A recipe's order button names the cut; long names wrap instead of being cut off on a phone. */
+.recipe__foot .btn{white-space:normal;text-align:center;height:auto;min-height:3rem;line-height:1.35;padding-block:.75rem;max-width:100%}
+/* "Kjöt-/vinnslan": the hyphen shows only where the word is broken (wide screens). */
+.hy-wide::after{content:"-"}
+@media (max-width:47.99rem){.hy-wide{display:none}}

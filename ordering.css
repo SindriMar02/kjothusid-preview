@@ -2869,3 +2869,10 @@ html.is-jol .jol-head {
    the receipt sat in the narrow left column with the rest of the screen empty). */
 .form--order.is-sent { display: block; max-width: 40rem; margin-inline: auto; }
 .form--order.is-sent .sent { width: 100%; }
+/* Gift card page on a wide screen: words and form on the left, the envelope beside them (design pass 15 Nov: it filled the width and the form sat indented under it). */
+@media (min-width:64rem){
+  .giftcard{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,30rem);column-gap:var(--spacing-xxl);align-items:start}
+  .giftcard>.giftcard-copy{grid-column:1;grid-row:1}
+  .giftcard>.giftcard-image{grid-column:2;grid-row:1/span 2;position:sticky;top:9rem;margin:0}
+  .giftcard>.form--gift{grid-column:1;grid-row:2;margin:var(--spacing-l) 0 0;padding-inline:0;max-width:48rem}
+}
