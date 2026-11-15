@@ -446,6 +446,30 @@
     return;
   }
 
+  /* The receipt (or any element) lands below the whole pinned stack, and stays there through the
+     ScrollTrigger refresh its new height triggers (scenario run 15 Nov: on phones the heading ended under the bars). */
+  function landBelowPinned(el) {
+    var touch = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    function place(smooth) {
+      var pinned = 0;
+      document.querySelectorAll('[data-site-header], .order-progress, .order-chips').forEach(function (p) {
+        var pos = getComputedStyle(p).position, b = p.getBoundingClientRect();
+        if ((pos === 'sticky' || pos === 'fixed' || p.matches('[data-site-header]')) && b.height && b.top < window.innerHeight * 0.4) pinned = Math.max(pinned, b.bottom);
+      });
+      var top = el.getBoundingClientRect().top;
+      if (top >= pinned + 8 && top < window.innerHeight * 0.5) return;
+      var to = Math.max(0, top + window.scrollY - pinned - 24);
+      if (window.kjLenis) window.kjLenis.scrollTo(to, { immediate: !smooth }); else window.scrollTo({ top: to, behavior: smooth ? 'smooth' : 'auto' });
+    }
+    place(!reduce && !touch);
+    if (window.ScrollTrigger && ScrollTrigger.addEventListener) {
+      var again = function () { place(!reduce && !touch); };
+      ScrollTrigger.addEventListener('refresh', again);
+      setTimeout(function () { ScrollTrigger.removeEventListener('refresh', again); }, 1500);
+    }
+    setTimeout(function () { place(false); }, reduce ? 0 : 800);
+  }
+
   var ref = null;
   /* The same rules as the amount controls and the relay (worker/src/input.ts): kilos to one decimal,
      grams in tens from 10 g, whole pieces. 13 Nov scenario run: 0,3 kg and 1,2 kg were refused here. */
@@ -536,13 +560,12 @@
           alarms: [{ minutesBefore: 60 }]
         }, 'kjothusid-pontun-' + ref + '.ics');
       });
-      var pinned = 0;
-      document.querySelectorAll('[data-site-header], .order-progress, .order-chips').forEach(function (el) {
-        var p = getComputedStyle(el).position, b = el.getBoundingClientRect();
-        if ((p === 'sticky' || p === 'fixed' || el.matches('[data-site-header]')) && b.height && b.top < window.innerHeight * 0.4) pinned = Math.max(pinned, b.bottom);
-      });
-      var to = Math.max(0, form.getBoundingClientRect().top + window.scrollY - pinned - 24);
-      if (window.kjLenis) window.kjLenis.scrollTo(to, { immediate: reduce }); else window.scrollTo({ top: to, behavior: reduce ? 'auto' : 'smooth' });
+      // A second tap of a double tap must not land on whatever the shorter receipt uncovered (scenario run 15 Nov:
+      // phones ended on the FAQ page). Taps are swallowed for a moment after the receipt appears.
+      var quietUntil = Date.now() + 900;
+      var swallow = function (ev) { if (Date.now() < quietUntil) { ev.preventDefault(); ev.stopPropagation(); } else document.removeEventListener('click', swallow, true); };
+      document.addEventListener('click', swallow, true);
+      landBelowPinned(form);
     }).catch(function (err) { status(form, 'error', failMessage(err)); });
   });
   form.addEventListener('input', function (e) {

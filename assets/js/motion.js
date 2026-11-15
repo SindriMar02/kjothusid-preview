@@ -604,6 +604,8 @@
         defaults: { ease: EASE.LUXE, duration: DUR.DEFAULT },
         onComplete: function () { gsap.set(links, { pointerEvents: 'auto' }); }
       });
+      // links take clicks as soon as they read as there, not when the whole intro ends (scenario run 15 Nov)
+      tl.call(function () { gsap.set(links, { pointerEvents: 'auto' }); }, null, 0.35);
       if (bar) tl.fromTo(bar, { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }, 0);
       if (grid) tl.fromTo(grid, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }, 0);
       if (lines.length) tl.fromTo(lines, { scaleY: 0 }, { scaleY: 1 }, 0);
