@@ -509,7 +509,8 @@
   (function heroSlides() {
     var media = document.querySelector('.hero .hero__media');
     if (!media || !window.gsap) return;
-    var slides = Array.prototype.slice.call(media.querySelectorAll('.hero__image'));
+    /* A slide hidden for this screen shape (the landscape-only lamb on phones) is left out. */
+    var slides = Array.prototype.slice.call(media.querySelectorAll('.hero__image')).filter(function (img) { return getComputedStyle(img).display !== 'none'; });
     if (slides.length < 2) return;
     /* Reduced motion keeps the slideshow but as a plain fade: no zoom. */
     var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -537,6 +538,8 @@
       if (started) return; started = true;
       slides.forEach(function (img, i) {
         if (i === 0 || !img.dataset.srcset) return;
+        var pic = img.parentElement && img.parentElement.tagName === 'PICTURE' ? img.parentElement : null;
+        if (pic) pic.querySelectorAll('source[data-srcset]').forEach(function (s) { s.srcset = s.getAttribute('data-srcset'); s.removeAttribute('data-srcset'); });
         img.srcset = img.dataset.srcset; img.removeAttribute('data-srcset');
         var done = function () { ready[i] = true; };
         if (img.decode) img.decode().then(done, function () { if (img.complete && img.naturalWidth) done(); });

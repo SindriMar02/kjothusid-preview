@@ -161,6 +161,8 @@ main{flex:1 0 auto}
 .hero__media{position:absolute;left:0;right:0;z-index:0;top:calc(var(--hero-parallax-travel,0%) * -1);height:calc(100% + var(--hero-parallax-travel,0%) * 2);will-change:transform}
 .hero__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero__media .hero__image:not(.is-on){opacity:0}
+.hero__media picture{display:contents}
+@media (max-aspect-ratio:3/4){.hero__image{object-position:50% 50%}.hero__image--steaks{object-position:50% 78%}.hero__image--wide{display:none}}
 /* Focal point for the narrow crop: the lamb rib-eye sits right of centre in this
    photograph (the nearer piece, with the cut face), and the dark grill and
    background above and below it are what the navbar and the headline need as
