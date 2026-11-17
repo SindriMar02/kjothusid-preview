@@ -513,47 +513,69 @@
   (function heroSlides() {
     var media = document.querySelector('.hero .hero__media');
     if (!media || !window.gsap) return;
-    /* A slide hidden for this screen shape (the landscape-only lamb on phones) is left out. */
-    var slides = Array.prototype.slice.call(media.querySelectorAll('.hero__image')).filter(function (img) { return getComputedStyle(img).display !== 'none'; });
-    if (slides.length < 2) return;
+    var all = Array.prototype.slice.call(media.querySelectorAll('.hero__image'));
+    if (all.length < 2) return;
     /* Reduced motion keeps the slideshow but as a plain fade: no zoom. */
     var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var ready = slides.map(function (img, i) { return i === 0; });
-    var cur = 0, busy = false, visible = true, timer = null;
+    var tall = window.matchMedia('(max-aspect-ratio: 3/4)');
     var HOLD = 5000, FADE = 1.6;
-    gsap.set(slides, { opacity: function (i) { return i === 0 ? 1 : 0; } });
+    var cur = all[0], busy = false, visible = true, timer = null, started = false;
+    /* Codex audit 17 Nov: a slide only joins when its CURRENT source has loaded and decoded; a failed or
+       half-loaded image never does, and a source change (rotation picks the other <picture> source)
+       takes it out until the new file is ready again. */
+    var ready = new Map();
+    function shown(img) { return getComputedStyle(img).display !== 'none'; }
+    function check(img) {
+      if (!img.currentSrc || !img.complete || !img.naturalWidth) { ready.set(img, false); return; }
+      var src = img.currentSrc;
+      var ok = function () { if (img.currentSrc === src && img.naturalWidth) ready.set(img, true); };
+      if (img.decode) img.decode().then(ok, function () { ready.set(img, false); }); else ok();
+    }
+    all.forEach(function (img) {
+      ready.set(img, false);
+      img.addEventListener('load', function () { check(img); });
+      img.addEventListener('error', function () { ready.set(img, false); });
+      check(img);
+    });
+    function aria() { all.forEach(function (img) { img.setAttribute('aria-hidden', img === cur ? 'false' : 'true'); }); }
+    function show(img, now) {
+      all.forEach(function (x) { if (x !== img) { gsap.killTweensOf(x); gsap.set(x, { opacity: 0, scale: 1, zIndex: '' }); x.classList.remove('is-on'); } });
+      gsap.killTweensOf(img); gsap.set(img, { opacity: 1, scale: 1, zIndex: '' }); img.classList.add('is-on');
+      cur = img; busy = false; aria();
+    }
+    gsap.set(all, { opacity: function (i) { return i === 0 ? 1 : 0; } });
+    aria();
     function arm() { clearTimeout(timer); timer = setTimeout(next, HOLD); }
     function next() {
       if (busy || document.hidden || !visible) return arm();
-      var n = -1;
-      for (var k = 1; k < slides.length; k++) { var j = (cur + k) % slides.length; if (ready[j]) { n = j; break; } }
-      if (n < 0) return arm();
+      var list = all.filter(shown), at = list.indexOf(cur), n = null;
+      for (var k = 1; k <= list.length; k++) { var c = list[(at + k + list.length) % list.length]; if (c !== cur && ready.get(c)) { n = c; break; } }
+      if (!n) return arm();
       busy = true;
-      var inc = slides[n], out = slides[cur];
+      var inc = n, out = cur;
       inc.style.zIndex = 2; out.style.zIndex = 1;
       gsap.fromTo(inc, { opacity: 0, scale: calm ? 1 : 1.06 }, { opacity: 1, scale: 1, duration: FADE, ease: 'power2.inOut', overwrite: true,
-        onComplete: function () {
-          gsap.set(out, { opacity: 0, scale: 1 }); out.classList.remove('is-on'); inc.classList.add('is-on');
-          inc.style.zIndex = ''; out.style.zIndex = ''; cur = n; busy = false; arm();
-        } });
+        onComplete: function () { show(inc); arm(); } });
     }
-    var started = false;
     function loadRest() {
       if (started) return; started = true;
-      slides.forEach(function (img, i) {
-        if (i === 0 || !img.dataset.srcset) return;
+      all.forEach(function (img) {
         var pic = img.parentElement && img.parentElement.tagName === 'PICTURE' ? img.parentElement : null;
         if (pic) pic.querySelectorAll('source[data-srcset]').forEach(function (s) { s.srcset = s.getAttribute('data-srcset'); s.removeAttribute('data-srcset'); });
-        img.srcset = img.dataset.srcset; img.removeAttribute('data-srcset');
-        var done = function () { ready[i] = true; };
-        if (img.decode) img.decode().then(done, function () { if (img.complete && img.naturalWidth) done(); });
-        else img.addEventListener('load', done, { once: true });
+        if (img.dataset.srcset) { img.srcset = img.dataset.srcset; img.removeAttribute('data-srcset'); }
       });
     }
-    /* Start fetching the rest as soon as the FIRST photo is in, not after the whole page (booklets, fonts,
-       snow) has loaded: that delay left the first change 10+ seconds away (Sindri 17 Nov: "just a singular one"). */
-    var first = slides[0];
+    /* Start fetching the rest as soon as the first photo is in, not after the whole page has loaded. */
+    var first = all[0];
     if (first.complete && first.naturalWidth) loadRest(); else { first.addEventListener('load', loadRest, { once: true }); setTimeout(loadRest, 2500); }
+    /* Rotation or a resize across 3:4: the browser picks the other source, and a slide may be hidden for
+       this shape (the landscape-only lamb). Never leave the hero on a hidden or reloading slide. */
+    function reshape() {
+      all.forEach(function (img) { ready.set(img, false); check(img); });
+      if (!shown(cur)) { var f = all.filter(shown)[0]; if (f) show(f); }
+      arm();
+    }
+    if (tall.addEventListener) tall.addEventListener('change', reshape); else if (tall.addListener) tall.addListener(reshape);
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(media);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) arm(); });
     arm();
