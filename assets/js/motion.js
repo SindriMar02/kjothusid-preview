@@ -389,6 +389,22 @@
     var nameEl = document.querySelector('[data-cut-name]');
     var noteEl = document.querySelector('[data-cut-note]');
     var listEl = document.querySelector('[data-cut-list]');
+    var prodEl = document.querySelector('[data-cut-products]');
+    var prodDefault = prodEl ? prodEl.innerHTML : '';
+    /* Sindri 17 Nov: a cut leads to its group of meat. DATA.cuts = { cut: [product names] } from the build;
+       the beef page lights those rows up from ?hluti=<cut>. */
+    var CUT_ITEMS = DATA.cuts || {};
+    /* "úr" takes the dative: úr framhrygg, úr hálsi, úr læri. */
+    var DAT = { hals: 'hálsi', bogur: 'bóg', framhryggur: 'framhrygg', spjaldhryggur: 'spjaldhrygg', mjadmasteik: 'mjaðmasteik', laeri: 'læri', klumpur: 'klumpi', bringa: 'bringu', sida: 'síðu', framskanki: 'framskanka', skanki: 'skanka' };
+    function cutHref(key) { return BASE + String(DATA.cutsPage || '/voruurval/nautakjot/').replace(/^\//, '') + (CUT_ITEMS[key] ? '?hluti=' + key : ''); }
+    function products(key) {
+      if (!prodEl) return;
+      if (!key) { prodEl.innerHTML = prodDefault; return; }
+      var items = CUT_ITEMS[key] || [];
+      prodEl.innerHTML = items.length
+        ? '<p class="type-xsmall uppercase text-mid-gray cuts__products-k">Hjá okkur úr ' + esc(DAT[key] || CUTS[key][0].toLowerCase()) + '</p><p class="type-small text-black">' + items.map(esc).join(' · ') + '</p><a class="cuts__go type-small" href="' + cutHref(key) + '">Sjá vörurnar <span aria-hidden="true">→</span></a>'
+        : '<p class="type-small text-mid-gray">Spurðu okkur um þennan hluta í síma ' + esc(DATA.phone || '557 8833') + '.</p><a class="cuts__go type-small" href="' + cutHref(key) + '">Allt nautakjöt <span aria-hidden="true">→</span></a>';
+    }
     var defaults = { name: nameEl ? nameEl.textContent : '', note: noteEl ? noteEl.textContent : '' };
     var paths = [];
     var active = null;
@@ -431,6 +447,7 @@
           b.classList.toggle('is-on', b.getAttribute('data-cut') === active);
         });
       }
+      products(active);
       if (nameEl) nameEl.textContent = active ? CUTS[active][0] : defaults.name;
       if (noteEl) noteEl.textContent = active ? CUTS[active][1] : defaults.note;
       if (tag) {
@@ -472,16 +489,86 @@
           show(p.dataset.cut);
         });
         host.addEventListener('pointerleave', function (e) { if (isMouse(e)) show(null); });
-        /* Same latch as the list: on a phone the drawing is the primary control. */
+        /* A mouse click on a cut goes to its meat (hover already showed what it is). A finger has no
+           hover, so a tap latches the cut and the panel's "Sjá vörurnar" link takes it from there. */
         host.addEventListener('click', function (e) {
           var p = e.target.closest && e.target.closest('path');
           if (!p || !p.dataset.cut) return;
+          if (isMouse(e) && e.detail > 0) { window.location.href = cutHref(p.dataset.cut); return; }
           show(p.dataset.cut === active ? null : p.dataset.cut);
         });
       })
       .catch(function () {});
   }
   buildCutMap();
+
+  /* Hero slideshow (Sindri 17 Nov: "a roulette of pictures"). The first photo is in the HTML and preloaded;
+     the others only load after the page has, and each is decode()d before it is ever faded in, so a change
+     never shows a half-loaded photo (feedback-hero-cycle-seamless). One tween per change, nothing stacks.
+     Stops while the tab is hidden or the hero is off screen; reduced motion keeps the first photo only. */
+  (function heroSlides() {
+    var media = document.querySelector('.hero .hero__media');
+    if (!media || !window.gsap) return;
+    var slides = Array.prototype.slice.call(media.querySelectorAll('.hero__image'));
+    if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var ready = slides.map(function (img, i) { return i === 0; });
+    var cur = 0, busy = false, visible = true, timer = null;
+    var HOLD = 6500, FADE = 1.6;
+    gsap.set(slides, { opacity: function (i) { return i === 0 ? 1 : 0; } });
+    function arm() { clearTimeout(timer); timer = setTimeout(next, HOLD); }
+    function next() {
+      if (busy || document.hidden || !visible) return arm();
+      var n = -1;
+      for (var k = 1; k < slides.length; k++) { var j = (cur + k) % slides.length; if (ready[j]) { n = j; break; } }
+      if (n < 0) return arm();
+      busy = true;
+      var inc = slides[n], out = slides[cur];
+      inc.style.zIndex = 2; out.style.zIndex = 1;
+      gsap.fromTo(inc, { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: FADE, ease: 'power2.inOut', overwrite: true,
+        onComplete: function () {
+          gsap.set(out, { opacity: 0, scale: 1 }); out.classList.remove('is-on'); inc.classList.add('is-on');
+          inc.style.zIndex = ''; out.style.zIndex = ''; cur = n; busy = false; arm();
+        } });
+    }
+    function loadRest() {
+      slides.forEach(function (img, i) {
+        if (i === 0 || !img.dataset.srcset) return;
+        img.srcset = img.dataset.srcset; img.removeAttribute('data-srcset');
+        var done = function () { ready[i] = true; };
+        if (img.decode) img.decode().then(done, function () { if (img.complete && img.naturalWidth) done(); });
+        else img.addEventListener('load', done, { once: true });
+      });
+    }
+    if (document.readyState === 'complete') setTimeout(loadRest, 800); else window.addEventListener('load', function () { setTimeout(loadRest, 800); }, { once: true });
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(media);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) arm(); });
+    arm();
+  })();
+
+  /* The beef page opened from the drawing (?hluti=<cut>): that cut's rows stay bright, the rest step back,
+     and one line says which cut it is with a way back to the whole list. */
+  (function cutFilter() {
+    var key = new URLSearchParams(window.location.search).get('hluti');
+    if (!key || !CUTS[key]) return;
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.prices__row[data-cuts]')).filter(function (r) {
+      return (' ' + r.getAttribute('data-cuts') + ' ').indexOf(' ' + key + ' ') >= 0;
+    });
+    if (!rows.length) return;
+    var list = rows[0].closest('.prices__list');
+    if (!list) return;
+    list.classList.add('has-cut');
+    rows.forEach(function (r) { r.classList.add('is-cut'); });
+    var bar = document.createElement('p');
+    bar.className = 'cut-bar type-small';
+    var clear = window.location.pathname;
+    bar.innerHTML = '<span><strong>' + esc(CUTS[key][0]) + '</strong> · ' + rows.length + (rows.length === 1 ? ' vara' : ' vörur') + '</span><a href="' + clear + '">Sýna allt nautakjöt</a>';
+    list.parentNode.insertBefore(bar, list);
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    requestAnimationFrame(function () {
+      var y = bar.getBoundingClientRect().top + window.scrollY - (document.querySelector('.site-header') ? document.querySelector('.site-header').offsetHeight + 16 : 96);
+      window.scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
+    });
+  })();
 
   /* ================= shift modal (panel + page shove) ================= */
   (function modal() {

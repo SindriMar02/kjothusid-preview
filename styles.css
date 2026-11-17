@@ -160,6 +160,7 @@ main{flex:1 0 auto}
 @media (max-width:47.99rem){.hero[data-section-height="full"]{min-height:calc(var(--svh) * 90)}}
 .hero__media{position:absolute;left:0;right:0;z-index:0;top:calc(var(--hero-parallax-travel,0%) * -1);height:calc(100% + var(--hero-parallax-travel,0%) * 2);will-change:transform}
 .hero__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero__media .hero__image:not(.is-on){opacity:0}
 /* Focal point for the narrow crop: the lamb rib-eye sits right of centre in this
    photograph (the nearer piece, with the cut face), and the dark grill and
    background above and below it are what the navbar and the headline need as
@@ -651,6 +652,15 @@ html{color-scheme:light}
 }
 .cuts__tag.is-on{opacity:1}
 .cuts__detail{display:flex;flex-direction:column;gap:var(--spacing-s)}
+.cuts__products{min-height:6.75rem;display:flex;flex-direction:column;gap:var(--spacing-xxs);padding-top:var(--spacing-s);border-top:1px solid var(--color-light-gray)}
+.cuts__products-k{letter-spacing:.08em}
+.cuts__go{align-self:flex-start;margin-top:var(--spacing-xxs);color:var(--color-black);text-decoration:underline;text-underline-offset:.2em;min-height:44px;display:inline-flex;align-items:center}
+.cuts__svg path[data-cut]{cursor:pointer}
+.cut-bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--spacing-xs) var(--spacing-m);padding:var(--spacing-s) 0;margin-bottom:var(--spacing-s);border-bottom:1px solid var(--color-black)}
+.cut-bar a{color:var(--color-black);text-decoration:underline;text-underline-offset:.2em}
+.prices__list.has-cut .prices__row{transition:opacity .3s cubic-bezier(.23,1,.32,1)}
+.prices__list.has-cut .prices__row:not(.is-cut){opacity:.38}
+.prices__list.has-cut .prices__row.is-cut .row-name-text{font-weight:600}
 .cuts__list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--spacing-xxs) var(--spacing-m);margin-top:var(--spacing-m);border-top:1px solid var(--color-light-gray);padding-top:var(--spacing-m)}
 .cuts__list-btn{display:block;width:100%;text-align:left;padding-block:var(--spacing-xxs);color:var(--color-mid-gray);transition:color .2s ease}
 .cuts__list-btn.is-on{color:var(--color-black)}
