@@ -491,10 +491,14 @@
         host.addEventListener('pointerleave', function (e) { if (isMouse(e)) show(null); });
         /* A mouse click on a cut goes to its meat (hover already showed what it is). A finger has no
            hover, so a tap latches the cut and the panel's "Sjá vörurnar" link takes it from there. */
+        /* iOS Safari reports a tap's click with no pointerType (so isMouse() says mouse): read the type
+           from the pointerdown that started it instead (iPhone check 17 Nov: a tap jumped straight away). */
+        var downType = '';
+        host.addEventListener('pointerdown', function (e) { downType = e.pointerType || ''; });
         host.addEventListener('click', function (e) {
           var p = e.target.closest && e.target.closest('path');
           if (!p || !p.dataset.cut) return;
-          if (isMouse(e) && e.detail > 0) { window.location.href = cutHref(p.dataset.cut); return; }
+          if (downType === 'mouse' && e.detail > 0) { window.location.href = cutHref(p.dataset.cut); return; }
           show(p.dataset.cut === active ? null : p.dataset.cut);
         });
       })
