@@ -809,6 +809,7 @@ html{color-scheme:light}
 .mega__input::-webkit-search-cancel-button{display:none}
 .mega__clear{display:grid;place-items:center;width:2.5rem;height:2.5rem;color:var(--color-light-gray);flex:none}
 .mega__clear .i{width:1.125rem;height:1.125rem}
+.mega__clear[hidden],.mega__results[hidden]{display:none}
 .mega__results{display:flex;flex-direction:column;border:1px solid var(--color-dark-gray);border-top:0}
 .mega__hit{display:flex;flex-direction:column;gap:.15rem;padding:.7rem var(--spacing-s);border-top:1px solid var(--color-light-black);color:var(--color-white);outline-offset:-2px}
 .mega__hit:first-child{border-top:0}
