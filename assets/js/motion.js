@@ -510,10 +510,12 @@
     var media = document.querySelector('.hero .hero__media');
     if (!media || !window.gsap) return;
     var slides = Array.prototype.slice.call(media.querySelectorAll('.hero__image'));
-    if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (slides.length < 2) return;
+    /* Reduced motion keeps the slideshow but as a plain fade: no zoom. */
+    var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var ready = slides.map(function (img, i) { return i === 0; });
     var cur = 0, busy = false, visible = true, timer = null;
-    var HOLD = 6500, FADE = 1.6;
+    var HOLD = 5000, FADE = 1.6;
     gsap.set(slides, { opacity: function (i) { return i === 0 ? 1 : 0; } });
     function arm() { clearTimeout(timer); timer = setTimeout(next, HOLD); }
     function next() {
@@ -524,13 +526,15 @@
       busy = true;
       var inc = slides[n], out = slides[cur];
       inc.style.zIndex = 2; out.style.zIndex = 1;
-      gsap.fromTo(inc, { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: FADE, ease: 'power2.inOut', overwrite: true,
+      gsap.fromTo(inc, { opacity: 0, scale: calm ? 1 : 1.06 }, { opacity: 1, scale: 1, duration: FADE, ease: 'power2.inOut', overwrite: true,
         onComplete: function () {
           gsap.set(out, { opacity: 0, scale: 1 }); out.classList.remove('is-on'); inc.classList.add('is-on');
           inc.style.zIndex = ''; out.style.zIndex = ''; cur = n; busy = false; arm();
         } });
     }
+    var started = false;
     function loadRest() {
+      if (started) return; started = true;
       slides.forEach(function (img, i) {
         if (i === 0 || !img.dataset.srcset) return;
         img.srcset = img.dataset.srcset; img.removeAttribute('data-srcset');
@@ -539,7 +543,10 @@
         else img.addEventListener('load', done, { once: true });
       });
     }
-    if (document.readyState === 'complete') setTimeout(loadRest, 800); else window.addEventListener('load', function () { setTimeout(loadRest, 800); }, { once: true });
+    /* Start fetching the rest as soon as the FIRST photo is in, not after the whole page (booklets, fonts,
+       snow) has loaded: that delay left the first change 10+ seconds away (Sindri 17 Nov: "just a singular one"). */
+    var first = slides[0];
+    if (first.complete && first.naturalWidth) loadRest(); else { first.addEventListener('load', loadRest, { once: true }); setTimeout(loadRest, 2500); }
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(media);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) arm(); });
     arm();
