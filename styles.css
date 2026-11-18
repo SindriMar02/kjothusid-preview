@@ -404,7 +404,7 @@ body.is-modal-open{overflow:hidden}
 .mega__line{display:none}
 @media (min-width:64rem){
   .mega{height:auto;display:block}
-  .mega__grid{grid-template-columns:minmax(0,2fr) minmax(14rem,1fr) minmax(16rem,1.2fr);flex:none;overflow:visible;padding-block:0}
+  .mega__grid{grid-template-columns:minmax(0,2fr) minmax(20rem,1fr);flex:none;overflow:visible;padding-block:0}
   .mega__media{display:block}
   .mega__line{display:block;position:absolute;top:0;bottom:0;left:0;width:1px;background:var(--color-dark-gray);transform:scaleY(0);transform-origin:top}
   .mega__col{position:relative;padding-top:var(--spacing-xl);padding-bottom:var(--spacing-xxl);padding-left:var(--spacing-l)}
@@ -844,8 +844,7 @@ html{color-scheme:light}
   .mega__results{position:absolute;left:0;right:0;top:100%;z-index:2;background:var(--color-black);max-height:24rem;overflow-y:auto;box-shadow:0 1.5rem 3rem #0009}
   .mega__nav{grid-column:1;grid-row:2}
   .mega__nav .mega__col{padding-top:var(--spacing-l)}
-  .mega__media{grid-column:2;grid-row:1/3}
-  .mega__side{grid-column:3;grid-row:1/3;display:flex;flex-direction:column;gap:var(--spacing-s);padding-block:var(--spacing-xl) var(--spacing-xl)}
+  .mega__side{grid-column:2;grid-row:1/3;position:relative;display:flex;flex-direction:column;gap:var(--spacing-s);padding:var(--spacing-xl) 0 var(--spacing-xl) var(--spacing-xl)}
   .mega__side .mega__promo{flex:1}
 }
 @media (max-width:63.99rem){.mega__grid{gap:var(--spacing-l)}}
