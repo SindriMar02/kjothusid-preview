@@ -193,3 +193,12 @@
     }
   }
 })();
+
+/* K24 holiday hours: a page is static, so days that have passed since it was built are hidden here
+   (a past line on the contact page, the FAQ sentence and the footer link once the last day is over). */
+(function () {
+  var n = new Date(), today = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate())).toISOString().slice(0, 10);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hol-to]'), function (li) { if (li.getAttribute('data-hol-to') < today) li.hidden = true; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hol-until]'), function (el) { if (el.getAttribute('data-hol-until') < today) el.hidden = true; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hol-block]'), function (b) { if (!b.querySelector('[data-hol-to]:not([hidden])')) b.hidden = true; });
+})();

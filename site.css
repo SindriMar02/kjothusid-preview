@@ -291,7 +291,9 @@ main{position:relative;z-index:1;background:var(--color-white)}
 .contact__facts{display:grid;border-top:var(--ink-hair)}
 .contact__facts>div{display:grid;gap:var(--spacing-xxs);padding-block:var(--spacing-m);border-bottom:var(--hair)}
 .contact__facts dd{margin:0}
-.contact__holiday{list-style:none;margin:0;padding:0;display:grid;gap:var(--spacing-xxs);max-width:28rem;font-variant-numeric:tabular-nums}.contact__holiday li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--spacing-s)}.contact__holiday li>span:last-child{white-space:nowrap}.contact__holiday .is-closed>span:last-child{font-weight:600}
+.holiday-hours{list-style:none;margin:0;padding:0;display:grid;gap:var(--spacing-xxs);max-width:28rem;font-variant-numeric:tabular-nums}.holiday-hours li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--spacing-s)}.holiday-hours li>span:last-child{white-space:nowrap}.holiday-hours .is-closed>span:last-child{font-weight:600}
+.faq__holiday{display:grid;gap:var(--spacing-xxs)}
+#hatidir[hidden],.holiday-hours li[hidden],[data-hol-block][hidden],[data-hol-until][hidden]{display:none}
 #hatidir{scroll-margin-top:calc(var(--top-chrome) + var(--spacing-m))}
 .map{margin:0}
 .map__frame{position:relative;aspect-ratio:4/3;overflow:hidden;background:#e6e6e3;border:var(--hair)}
