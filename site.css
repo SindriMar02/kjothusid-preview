@@ -291,7 +291,8 @@ main{position:relative;z-index:1;background:var(--color-white)}
 .contact__facts{display:grid;border-top:var(--ink-hair)}
 .contact__facts>div{display:grid;gap:var(--spacing-xxs);padding-block:var(--spacing-m);border-bottom:var(--hair)}
 .contact__facts dd{margin:0}
-.holiday-hours{list-style:none;margin:0;padding:0;display:grid;gap:var(--spacing-xxs);max-width:28rem;font-variant-numeric:tabular-nums}.holiday-hours li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--spacing-s)}.holiday-hours li>span:last-child{white-space:nowrap}.holiday-hours .is-closed>span:last-child{font-weight:600}
+.holiday-hours{list-style:none;margin:0;padding:0;display:grid;gap:var(--spacing-xs);max-width:28rem;font-variant-numeric:tabular-nums}.holiday-hours li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--spacing-s)}.holiday-hours li>span:last-child{white-space:nowrap}.holiday-hours .is-closed>span:last-child{font-weight:600;color:var(--color-brand)}
+.footer__hol{display:inline-block;padding-block:.625rem;margin-block:-.625rem}
 .faq__holiday{display:grid;gap:var(--spacing-xxs)}
 #hatidir[hidden],.holiday-hours li[hidden],[data-hol-block][hidden],[data-hol-until][hidden]{display:none}
 #hatidir{scroll-margin-top:calc(var(--top-chrome) + var(--spacing-m))}
