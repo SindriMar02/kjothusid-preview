@@ -291,6 +291,8 @@ main{position:relative;z-index:1;background:var(--color-white)}
 .contact__facts{display:grid;border-top:var(--ink-hair)}
 .contact__facts>div{display:grid;gap:var(--spacing-xxs);padding-block:var(--spacing-m);border-bottom:var(--hair)}
 .contact__facts dd{margin:0}
+.contact__holiday{list-style:none;margin:0;padding:0;display:grid;gap:var(--spacing-xxs);max-width:28rem;font-variant-numeric:tabular-nums}.contact__holiday li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--spacing-s)}.contact__holiday li>span:last-child{white-space:nowrap}.contact__holiday .is-closed>span:last-child{font-weight:600}
+#hatidir{scroll-margin-top:calc(var(--top-chrome) + var(--spacing-m))}
 .map{margin:0}
 .map__frame{position:relative;aspect-ratio:4/3;overflow:hidden;background:#e6e6e3;border:var(--hair)}
 .map__frame svg{display:block;width:100%;height:100%}

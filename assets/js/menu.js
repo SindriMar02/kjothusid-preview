@@ -37,8 +37,11 @@
   }
   var hm = function (s) { return Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5)); };
   var clock = function (s) { return String(Number(s.slice(0, 2))) + (s.slice(3, 5) === '00' ? '' : ':' + s.slice(3, 5)); };
+  function iso(d) { return d.toISOString().slice(0, 10); }
   function hoursOn(d) { // {opens, closes} | 'closed' | 'unknown'
     var hol = holidays(d.getUTCFullYear());
+    var sp = (data.special || {})[iso(d)]; // Karen's holiday hours (K24) win over the week
+    if (sp) return sp;
     if ((data.closed || []).indexOf(md(d)) > -1) return 'closed';
     if (hol[md(d)]) return 'unknown';
     var day = DAYS[d.getUTCDay()];
@@ -58,7 +61,7 @@
       }
       if (mins < hm(h.opens)) return { open: false, text: 'Lokað · opnar kl. ' + clock(h.opens), short: 'Opnar kl. ' + clock(h.opens) };
     }
-    if ((data.closed || []).indexOf(md(today)) > -1) return { open: false, text: 'Lokað í dag', short: 'Lokað í dag' };
+    if ((data.closed || []).indexOf(md(today)) > -1 || (data.special || {})[iso(today)] === 'closed') return { open: false, text: 'Lokað í dag', short: 'Lokað í dag' };
     for (var n = 1; n <= 10; n++) {
       var d = addDays(today, n), x = hoursOn(d);
       if (x === 'unknown') return { open: false, text: 'Lokað núna', short: 'Lokað' };
