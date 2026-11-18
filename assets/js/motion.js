@@ -744,6 +744,9 @@
         close();
       }
     });
+    // a tap that landed before this script ran (inline listener in the head) opens now
+    window.kjModalReady = true;
+    if (window.kjEarly) { var early = window.kjEarly; window.kjEarly = null; open(early.id, early.kb); }
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') { close(); return; }
       if (e.key !== 'Tab' || !openId) return;

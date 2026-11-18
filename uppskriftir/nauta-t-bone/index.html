@@ -24,7 +24,7 @@
     var on = always || occasion === 'jol' || occasion === 'aramot' || inWindow(from, to, null, search);
     root.document.documentElement.classList.toggle('is-jol', on);
   };applyTheme(window,"12-01","12-31",false);})();</script>
-<script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-done')},1800)</script>
+<script>document.documentElement.classList.add('js');/* a tap on the menu or basket before the deferred scripts run is kept and replayed (iPhone 18 Nov: an early tap was lost) */document.addEventListener('click',function(e){if(window.kjModalReady)return;var o=e.target.closest&&e.target.closest('[data-modal-open]');if(o){e.preventDefault();window.kjEarly={id:o.getAttribute('data-modal-open'),kb:e.detail===0}}},true);setTimeout(function(){document.documentElement.classList.add('motion-done')},1800)</script>
 <title>Nauta T-Bone á grillið: uppskrift | Kjöthúsið</title>
 <meta name="description" content="Nauta T-Bone á grillið: uppskrift Kjöthússins með hráefnum og aðferð.">
 <link rel="canonical" href="https://kjothusid.is/uppskriftir/nauta-t-bone/">
@@ -50,12 +50,12 @@
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/Marcellus-Regular.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/kjothusid-preview/assets/fonts/NimbusSans-Regular.woff2" crossorigin>
 
-<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=4c749d1e">
-<link rel="stylesheet" href="/kjothusid-preview/site.css?v=4c749d1e">
-<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=4c749d1e">
-<link rel="stylesheet" href="/kjothusid-preview/ordering.css?v=4c749d1e">
-<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=4c749d1e">
-<link rel="stylesheet" href="/kjothusid-preview/booklet.css?v=4c749d1e">
+<link rel="stylesheet" href="/kjothusid-preview/styles.css?v=3cbd3951">
+<link rel="stylesheet" href="/kjothusid-preview/site.css?v=3cbd3951">
+<link rel="stylesheet" href="/kjothusid-preview/doneness.css?v=3cbd3951">
+<link rel="stylesheet" href="/kjothusid-preview/ordering.css?v=3cbd3951">
+<link rel="stylesheet" href="/kjothusid-preview/marks.css?v=3cbd3951">
+<link rel="stylesheet" href="/kjothusid-preview/booklet.css?v=3cbd3951">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Recipe","name":"Nauta T-Bone á grillið","author":{"@type":"Organization","name":"Kjöthúsið","@id":"https://kjothusid.is/#kjothusid"},"recipeCategory":"Á grillið","recipeCuisine":"Íslensk","description":"Nauta T-Bone á grillið: uppskrift Kjöthússins.","inLanguage":"is","recipeIngredient":["600 g nauta T-Bone steik"],"recipeInstructions":[{"@type":"HowToSection","name":"Nauta T-Bone","itemListElement":[{"@type":"HowToStep","text":"Steikin er grilluð í 3 til 4 mínútur á hvorri hlið á mesta hita."},{"@type":"HowToStep","text":"Svo er hitinn lækkaður í minnsta hita og grillað í 5 til 7 mínútur á hvorri hlið, eftir því hvernig steikin á að vera elduð. Fimm mínútur á hvorri hlið ætti að gefa meðalsteikt kjöt."}]}]}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Forsíða","item":"https://kjothusid.is/"},{"@type":"ListItem","position":2,"name":"Uppskriftir","item":"https://kjothusid.is/uppskriftir/"},{"@type":"ListItem","position":3,"name":"Nauta T-Bone á grillið","item":"https://kjothusid.is/uppskriftir/nauta-t-bone/"}]}</script>
 </head>
 <body class="is-subpage is-preview" data-page="recipe-nauta-t-bone">
@@ -442,19 +442,19 @@
 <script src="/kjothusid-preview/assets/vendor/lenis.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/gsap.min.js" defer></script>
 <script src="/kjothusid-preview/assets/vendor/ScrollTrigger.min.js" defer></script>
-<script src="/kjothusid-preview/assets/js/christmas.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/motion.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/ordering-core.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/navdrop.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/decor.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/site.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/basket.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/menu.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/line-options.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/calendar.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/extras.js?v=4c749d1e" defer></script>
-<script src="/kjothusid-preview/assets/js/doneness.js?v=4c749d1e" defer></script>
+<script src="/kjothusid-preview/assets/js/christmas.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/motion.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/ordering-core.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/navdrop.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/decor.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/site.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/basket.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/menu.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/line-options.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/calendar.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/extras.js?v=3cbd3951" defer></script>
+<script src="/kjothusid-preview/assets/js/doneness.js?v=3cbd3951" defer></script>
 
-<script src="/kjothusid-preview/assets/js/remember.js?v=4c749d1e" defer></script>
+<script src="/kjothusid-preview/assets/js/remember.js?v=3cbd3951" defer></script>
 </body>
 </html>
