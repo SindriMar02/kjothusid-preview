@@ -806,6 +806,8 @@ html{color-scheme:light}
 .mega__field>.i{width:1.125rem;height:1.125rem;color:var(--color-light-gray);flex:none}
 .mega__input{flex:1;min-width:0;background:none;border:0;color:var(--color-white);font:inherit;font-family:var(--font-sans);font-size:1rem;letter-spacing:.01em;padding:.75rem 0;outline:none;-webkit-appearance:none;appearance:none}
 .mega__input::placeholder{color:var(--color-dark-gray)}
+/* the field's own border shows focus; without this the global .mega :focus-visible ring draws a second box inside it (iPhone 18 Nov) */
+.mega .mega__input:focus,.mega .mega__input:focus-visible{outline:none;box-shadow:none}
 .mega__input::-webkit-search-cancel-button{display:none}
 .mega__clear{display:grid;place-items:center;width:2.5rem;height:2.5rem;color:var(--color-light-gray);flex:none}
 .mega__clear .i{width:1.125rem;height:1.125rem}
