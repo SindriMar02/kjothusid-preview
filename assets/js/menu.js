@@ -195,10 +195,22 @@
 })();
 
 /* K24 holiday hours: a page is static, so days that have passed since it was built are hidden here
-   (a past line on the contact page, the FAQ sentence and the footer link once the last day is over). */
+   (a past line on the contact page, the FAQ list and the footer link once the last day is over). Runs on load,
+   when the tab is shown again and at the next UTC midnight, so a tab left open overnight follows too. */
 (function () {
-  var n = new Date(), today = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate())).toISOString().slice(0, 10);
-  Array.prototype.forEach.call(document.querySelectorAll('[data-hol-to]'), function (li) { if (li.getAttribute('data-hol-to') < today) li.hidden = true; });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-hol-until]'), function (el) { if (el.getAttribute('data-hol-until') < today) el.hidden = true; });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-hol-block]'), function (b) { if (!b.querySelector('[data-hol-to]:not([hidden])')) b.hidden = true; });
+  if (!document.querySelector('[data-hol-to],[data-hol-until]')) return;
+  function today() { var n = new Date(); return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate())).toISOString().slice(0, 10); }
+  function hide() {
+    var t = today();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-hol-to]'), function (li) { li.hidden = li.getAttribute('data-hol-to') < t; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-hol-until]'), function (el) { el.hidden = el.getAttribute('data-hol-until') < t; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-hol-block]'), function (b) { b.hidden = !b.querySelector('[data-hol-to]:not([hidden])'); });
+  }
+  function atMidnight() {
+    var n = new Date(), next = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate() + 1);
+    setTimeout(function () { hide(); atMidnight(); }, Math.max(1000, next - n.getTime() + 1000));
+  }
+  hide();
+  atMidnight();
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) hide(); });
 })();
