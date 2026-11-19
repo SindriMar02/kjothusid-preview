@@ -667,10 +667,12 @@ html.is-jol .time-chip input:checked + span {
 .form--order > .form__status {
   grid-column: 2;
 }
-.form--order > .form__foot {
-  margin-top: -2rem;
-}
 @media (min-width: 64rem) {
+  /* Pull the foot up only where its submit button is hidden (computers). On a phone the -2rem put
+     "Senda pöntun" flush against the Athugasemdir box (19 Nov, real-UI run). */
+  .form--order > .form__foot {
+    margin-top: -2rem;
+  }
   .form--order > .form__foot > .form__submit {
     display: none;
   }
@@ -1491,12 +1493,17 @@ html.motion-draw .order-progress__step::before {
   min-height: 0;
   overflow: hidden;
 }
+/* The toggle and its fields are one row of the step (19 Nov, real-UI run: as two rows the closed fields kept a
+   32px gap on each side, so "Panta fyrir fyrirtæki" floated in 49px + 64px of empty space on a phone). */
+.company-block > .company-reveal > div > .fields {
+  padding-top: 1rem;
+}
 .company-toggle {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   min-height: 44px;
-  margin-top: 1rem;
+  margin-top: 0;
   cursor: pointer;
 }
 .company-toggle input {
